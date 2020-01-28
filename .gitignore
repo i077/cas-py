@@ -8,3 +8,4 @@ venv/
 *.log
 *.out
 *.synctex.gz
+*.run.xml

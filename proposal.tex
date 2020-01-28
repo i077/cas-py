@@ -1,0 +1,67 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{graphicx}
+% \usepackage[backend=bibtex,style=ieee]{biblatex}
+% \bibliography{citations}
+\usepackage{wrapfig}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+  language=python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4
+}
+\graphicspath{{images/}}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.25em}
+\title{EECS 395 Project Proposal: Computer Algebra System}
+\author{David Blincoe \and
+Imran Hossain \and
+Sam Jenkins \and
+Kennan LeJeune \and
+Chris Toomey \and Ben Young}
+\date{\today}
+
+\begin{document}
+    \maketitle
+    \section{Background and Project Goals}
+      A computer algebra system (CAS) is a program that symbolically manipulates potentially complex mathematical formulae and outputs a solution. This helps automate equations that may be too difficult for humans to solve in a reasonable amount of time. This differs from a typical calculator in two main ways:
+      \begin{enumerate}
+        \item It has the ability to solve equations involving symbols in addition to numerics
+        \item The user can store self-created equations and functions.
+      \end{enumerate}
+      Our goal for this project is to develop a computer algebra system and an interface for interacting with it. We hope to implement as many of the following features as possible from scratch, without using external math libraries.
+    \section{Features}
+      \begin{enumerate}
+        \item Intuitive user interface for input of equations and output of solutions
+        \item Simplify expressions
+        \item Factor polynomials
+        \item Factor integers into primes
+        \item Symbolic manipulation of input equations
+
+      \end{enumerate}
+
+\end{document}

@@ -1,0 +1,32 @@
+.App {
+  text-align: center;
+}
+
+.App-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.App-header-row {
+  height: 15vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #282c34;
+  font-size: 75px;
+}
+
+.App-main-row {
+  height: 85vh;
+  width: 100%;
+}
+
+.App-col {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

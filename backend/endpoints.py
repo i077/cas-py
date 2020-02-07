@@ -16,7 +16,7 @@ def run():
 
         # TODO: Impliement CAS
         cas_output = cas_input
-        error = ""
+        error = False
 
         response = jsonify({"output": cas_output, "error": error})
         response.headers.add("Access-Control-Allow-Origin", "*")

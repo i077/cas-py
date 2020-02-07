@@ -17,8 +17,16 @@ class App extends React.Component {
   }
 
   handleSubmit(input) {
-    // TODO: Post to flask
-    this.setState({ output: "" });
+    this.setState({ loading: true });
+
+    fetch('http://localhost:5000/run', {
+      method: 'POST',
+      body: JSON.stringify({ input: input })
+    })
+      .then(response => response.json())
+      .then(response => {
+        this.setState({ output: response.output, error: response.error, loading: false });
+      });
   }
 
 

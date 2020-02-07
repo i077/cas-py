@@ -8,9 +8,9 @@ export class Transition extends React.Component {
     render() {
         let transitionImg;
         if (this.props.loading) {
-            transitionImg = <img className="spinner" src={spinner}></img>;
+            transitionImg = <img className="spinner" src={spinner} alt="spinner"></img>;
         } else {
-            transitionImg = <img className="arrow" src={arrow}></img>;
+            transitionImg = <img className="arrow" src={arrow} alt="arrow"></img>;
         }
 
         return (

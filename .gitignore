@@ -10,3 +10,4 @@ venv/
 *.synctex.gz
 *.run.xml
 .idea/
+*.pyc

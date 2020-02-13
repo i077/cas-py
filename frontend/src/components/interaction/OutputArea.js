@@ -1,20 +1,24 @@
 import React from 'react';
-import Latex from "react-latex";
+import TeX from '@matejmazur/react-katex';
 import './OutputArea.css';
 
 export class OutputArea extends React.Component {
     render() {
         let output;
         if (this.props.output !== "") {
-            output = <Latex>{this.props.output}</Latex>;
+            output = <TeX
+                math={this.props.output}
+                errorColor={'#cc0000'}
+                settings={{ macros: { '\\dd': '\\mathrm{d}' } }}
+            />;
         } else if (this.props.error) {
-            output = <Latex>Error with no output</Latex>;
+            output = <p>Error with no output</p>;
         } else {
-            output = <Latex>No Output</Latex>;
+            output = <p>No Output</p>;
         }
 
         return (
-            <div className="output-div">
+            <div className="output-area-div">
                 {output}
             </div>
         );

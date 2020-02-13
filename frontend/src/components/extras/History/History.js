@@ -1,5 +1,5 @@
 import React from 'react';
-import Latex from "react-latex";
+import TeX from '@matejmazur/react-katex';
 import './History.css';
 
 export class History extends React.Component {

@@ -2,10 +2,10 @@ import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import { InputArea } from './interaction/InputArea';
-import { OutputArea } from './interaction/OutputArea';
-import { Transition } from './extras/Transition/Transition';
-import { History } from './extras/History/History';
+import { InputArea } from './input/InputArea';
+import { OutputArea } from './output/OutputArea';
+import { Transition } from './extras/Transition';
+import { History } from './input/History';
 import './App.css';
 
 class App extends React.Component {
@@ -35,7 +35,6 @@ class App extends React.Component {
         });
       });
   }
-
 
   render() {
     return (

@@ -1,0 +1,7 @@
+.live-input-div {
+    display: flex;
+    justify-content: center;
+    background-color: white;
+    color: black;
+    padding: 10px;
+}

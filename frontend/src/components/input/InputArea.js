@@ -1,6 +1,7 @@
 import React from 'react';
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import { LiveInput } from "./LiveInput";
 import './InputArea.css';
 
 export class InputArea extends React.Component {
@@ -28,10 +29,10 @@ export class InputArea extends React.Component {
                 <Form>
                     <Form.Group controlId="exampleForm.ControlTextarea1">
                         <Form.Label>Enter Latex:</Form.Label>
-                        <Form.Control as="textarea" rows="25" onChange={this.textAreaChange} />
+                        <Form.Control as="textarea" rows="10" onChange={this.textAreaChange} />
+                        <LiveInput input={this.state.input} />
                     </Form.Group>
                     <Button onClick={this.handleSubmit}>Submit Latex</Button>
-
                 </Form>
             </div>
         );

@@ -5,16 +5,17 @@ import Row from "react-bootstrap/Row";
 import { InputArea } from './input/InputArea';
 import { OutputArea } from './output/OutputArea';
 import { Transition } from './extras/Transition';
-import { History } from './input/History';
+import { History } from './history/History';
 import './App.css';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { input: "", output: "", history: [], error: false, loading: false };
+    this.state = { input: "", selectedText: "", output: "", history: [], error: false, loading: false };
 
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleHistory = this.handleHistory.bind(this);
   }
 
   handleSubmit(input) {
@@ -36,6 +37,13 @@ class App extends React.Component {
       });
   }
 
+  handleHistory(command) {
+    this.setState({
+      selectedText: command,
+    });
+    this.forceUpdate();
+  }
+
   render() {
     return (
       <Container fluid={true} className="App-container">
@@ -44,8 +52,8 @@ class App extends React.Component {
         </Row>
         <Row className="App-main-row">
           <Col sm={5} className="App-col">
-            <History history_list={this.state.history} />
-            <InputArea submitHandler={this.handleSubmit} />
+            <History history={this.state.history} handleHistory={this.handleHistory} />
+            <InputArea submitHandler={this.handleSubmit} selectedText={this.state.selectedText} />
           </Col>
           <Col className="App-col">
             <Transition loading={this.state.loading}></Transition>

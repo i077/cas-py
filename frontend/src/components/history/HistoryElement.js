@@ -1,6 +1,6 @@
 import React from 'react';
 import TeX from '@matejmazur/react-katex';
-import './History.css';
+import './HistoryElement.css';
 
 export class HistoryElement extends React.Component {
     constructor(props) {

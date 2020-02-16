@@ -1,5 +1,6 @@
 import React from 'react';
 import { HistoryElement } from "./HistoryElement";
+import { HistoryScroll } from "./HistoryScroll";
 import './History.css';
 
 export class History extends React.Component {
@@ -21,7 +22,10 @@ export class History extends React.Component {
         return (
             <div className="history-div">
                 <p>History:</p>
-                {historyList}
+                <div className="history-list-div">
+                    {historyList}
+                    <HistoryScroll />
+                </div>
             </div>
         );
     }

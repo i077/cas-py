@@ -67,40 +67,44 @@ class Expression(Function):
         self.right = right
 
     def evaluate(self, x):
-        pass
+        if not isinstance(self.left, Number):
+            self.left = self.left.evaluate(x)
+        if not isinstance(self.right, Number):
+            self.right = self.right.evaluate(x)
+        return self.map_operator(self.left, self.right, self.op)
 
     def __add__(self, other):
-        pass
+        return Expression("PLUS", self.map_operator(self.left, self.right, self.op), other)
 
     def __sub__(self, other):
-        pass
+        return Expression("MINUS", self.map_operator(self.left, self.right, self.op), other)
 
     def __mul__(self, other):
-        pass
+        return Expression("MULT", self.map_operator(self.left, self.right, self.op), other)
 
     def __truediv__(self, other):
-        pass
+        return Expression("DIV", self.map_operator(self.left, self.right, self.op), other)
 
     def __pow__(self, power, modulo=None):
-        pass
+        return Expression("POW", self.map_operator(self.left, self.right, self.op), other)
 
     def __lt__(self, other):
-        pass
+        return Expression("LT", self.map_operator(self.left, self.right, self.op), other)
 
     def __gt__(self, other):
-        pass
+        return Expression("GT", self.map_operator(self.left, self.right, self.op), other)
 
     def __ge__(self, other):
-        pass
+        return Expression("GE", self.map_operator(self.left, self.right, self.op), other)
 
     def __le__(self, other):
-        pass
+        return Expression("LE", self.map_operator(self.left, self.right, self.op), other)
 
     def __eq__(self, other):
-        pass
+        return Expression("EQ", self.map_operator(self.left, self.right, self.op), other)
 
     def __ne__(self, other):
-        pass
+        return Expression("NE", self.map_operator(self.left, self.right, self.op), other)
 
     def derivative(self):
         pass
@@ -108,6 +112,31 @@ class Expression(Function):
     def integral(self):
         pass
 
+    def map_operator(self, left, right, op):
+        if op == "PLUS":
+            return left + right
+        elif op == "MINUS":
+            return left - right
+        elif op == "MULT":
+            return left * right
+        elif op == "DIV":
+            return left / right
+        elif op == "LT":
+            return left < right
+        elif op == "GT":
+            return left > right
+        elif op == "GE":
+            return left >= right
+        elif op == "LE":
+            return left <= right
+        elif op == "POW":
+            return left ** right
+        elif op == "EQ":
+            return left == right
+        elif op == "NE":
+            return left != right
+        else:
+            return "Error: invalid operator"
 
 class Variable(Function):
     def __init__(self, name):

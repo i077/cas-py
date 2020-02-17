@@ -12,6 +12,8 @@ WS
 
 BS      : '\\';
 
+BACKTICK: '`';
+
 LPAREN  : '(';
 RPAREN  : ')';
 LCURLY  : '{';
@@ -41,9 +43,10 @@ B_MATRIX: 'bmatrix';
 V_MATRIX: 'vmatrix';
 
 UNDERSCORE : '_';
+COMMA      : ',';
 
-fragment LETTER  : [a-zA-Z];
-fragment DIGIT   : [0-9];
+LETTER  : [a-zA-Z];
+DIGIT   : [0-9];
 
 CMD_CDOT        : '\\cdot';
 CMD_TIMES       : '\\times';
@@ -62,43 +65,78 @@ FUNC_SIN        : '\\sin';
 FUNC_COS        : '\\cos';
 FUNC_TAN        : '\\tan';
 FUNC_SEC        : '\\sec';
+FUNC_CSC        : '\\csc';
+FUNC_COT        : '\\cot';
 
 // Compound literals
 
-NUMBER  : MINUS? DIGIT+ (POINT DIGIT*)?;
+number  : MINUS? DIGIT+ (POINT DIGIT*)?;
 
-SYMBOL  : BS [a-zA-Z]+;
+multichar_var : (LETTER | DIGIT)+;
+
+// Variable names
+var_name
+    : LETTER
+    | BACKTICK name=multichar_var BACKTICK
+    ;
+
+var
+    : var_name (UNDERSCORE tex_symb)?;
+tex_symb
+    : (LETTER | DIGIT)
+    | LCURLY expr RCURLY
+    ;
+
+// Function names can either be builtin LaTeX commands or var names
+func_name
+    : func_builtin
+    | var
+    ;
+
+func_builtin
+    : FUNC_SIN | FUNC_COS | FUNC_TAN
+    | FUNC_SEC | FUNC_CSC | FUNC_COT
+    | FUNC_EXP | FUNC_LN | FUNC_LOG
+    ;
+
+func: func_name LPAREN (expr ((COMMA expr)+)*) RPAREN;
 
 // Rules
 
-start: relation;
+start
+    : relation EOF
+    ;
 
 relation
-    : relation (EQ | LT | LTE | GT | GTE) relation
+    : relation relop=(EQ | LT | LTE | GT | GTE) relation
     | expr
     ;
 
 expr: add_expr;
 
 add_expr
-    : add_expr (PLUS | MINUS) add_expr
+    : add_expr op=(PLUS | MINUS) add_expr
     | mult_expr
     ;
 
 mult_expr
-    : mult_expr (MULT | CMD_TIMES | CMD_CDOT | DIV | CMD_DIV) mult_expr
+    : mult_expr op=(MULT | CMD_TIMES | CMD_CDOT | DIV | CMD_DIV) mult_expr
+    | pow_expr
+    ;
+
+pow_expr
+    : pow_expr CARET (number | LCURLY expr RCURLY)
     | unit
     ;
 
 unit
-    : (PLUS | MINUS) unit
-    | pow_expr
+    : sign=(PLUS | MINUS) unit
+    | MINUS? LPAREN expr RPAREN
+    | func
+    | var
+    | number
     | fraction
-    ;
-
-pow_expr
-    : pow_expr CARET (NUMBER | LCURLY expr RCURLY)
-    | NUMBER
+    | matrix_env
     ;
 
 fraction

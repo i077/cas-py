@@ -62,6 +62,8 @@ CMD_DD          : '\\dd';
 FUNC_LIM        : '\\lim';
 FUNC_INT        : '\\int';
 FUNC_SUM        : '\\sum';
+FUNC_DV         : '\\dv';
+FUNC_PDV        : '\\pdv';
 
 FUNC_LOG        : '\\log';
 FUNC_LN         : '\\ln';
@@ -76,10 +78,12 @@ FUNC_COT        : '\\cot';
 CMD_LFLOOR      : '\\lfloor';
 CMD_RFLOOR      : '\\rfloor';
 CMD_LCEIL       : '\\lceil';
+CMD_RCEIL       : '\\rceil';
 
 // Compound literals
 
 number  : MINUS? DIGIT+ (POINT DIGIT*)?;
+nnint   : DIGIT+;
 
 multichar_var : (LETTER | DIGIT)+;
 
@@ -117,15 +121,19 @@ func_call
     // Integrals
     | FUNC_INT (UNDERSCORE tex_symb CARET tex_symb)? LCURLY expr CMD_DD var RCURLY                             #func_int
     // Floor/ceilings
+    | lop=(CMD_LFLOOR | CMD_LCEIL) expr rop=(CMD_RFLOOR | CMD_RCEIL)                                           #func_floorceil
+    // (Partial) derivatives
+    | op=(FUNC_DV | FUNC_PDV) (LBRACK nnint RBRACK)? LCURLY expr RCURLY LCURLY var RCURLY                      #func_deriv
     ;
 
 // Rules
 input
-    :start EOF
+    : start EOF
     ;
 
 start
-    : relation   #start_relation
+    : expr       #start_expr
+    | relation   #start_relation
     | assignment #start_assignment
     ;
 
@@ -158,7 +166,7 @@ unit
     | number                    #unit_number       // Number literals
     | fraction                  #unit_fraction     // Fraction expressions
     | matrix_env                #unit_matrix       // Matrices
-    | cases_env                 #unit_cases
+    | cases_env                 #unit_cases        // Branching (cases)
     ;
 
 arg_list
@@ -202,4 +210,3 @@ matrix_env
       matrix_exp
       CMD_END LCURLY close_mat_type=(MATRIX | V_MATRIX | B_MATRIX | P_MATRIX) RCURLY
     ;
-

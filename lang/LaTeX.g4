@@ -99,6 +99,7 @@ var
 tex_symb
     : (LETTER | DIGIT)   #tex_symb_single
     | LCURLY expr RCURLY #tex_symb_multi
+    | LCURLY var RCURLY  #tex_symb_recurse
     ;
 
 // Function names can either be builtin LaTeX commands or var names
@@ -187,9 +188,21 @@ fraction
     : CMD_FRAC LCURLY expr RCURLY LCURLY expr RCURLY
     ;
 
+cases_last_row
+    : expr AMPERSAND relation (BS BS)?
+    ;
+
+cases_row
+    : expr AMPERSAND relation BS BS
+    ;
+
+cases_exp
+    : cases_row* cases_last_row
+    ;
+
 cases_env
     : CMD_BEGIN LCURLY CASES RCURLY
-      (expr AMPERSAND relation BS BS)* expr AMPERSAND relation
+      cases_exp
       CMD_END LCURLY CASES RCURLY
     ;
 

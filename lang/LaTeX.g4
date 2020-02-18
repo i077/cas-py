@@ -54,9 +54,13 @@ CMD_DIV         : '\\div';
 CMD_FRAC        : '\\frac';
 CMD_BEGIN       : '\\begin';
 CMD_END         : '\\end';
+CMD_TO          : '\\to';
+CMD_RIGHTARROW  : '\\rightarrow';
+CMD_DD          : '\\dd';
 
 FUNC_LIM        : '\\lim';
 FUNC_INT        : '\\int';
+FUNC_SUM        : '\\sum';
 
 FUNC_LOG        : '\\log';
 FUNC_LN         : '\\ln';
@@ -67,6 +71,10 @@ FUNC_TAN        : '\\tan';
 FUNC_SEC        : '\\sec';
 FUNC_CSC        : '\\csc';
 FUNC_COT        : '\\cot';
+
+CMD_LFLOOR      : '\\lfloor';
+CMD_RFLOOR      : '\\rfloor';
+CMD_LCEIL       : '\\lceil';
 
 // Compound literals
 
@@ -99,7 +107,15 @@ func_builtin
     | FUNC_EXP | FUNC_LN | FUNC_LOG
     ;
 
-func: func_name LPAREN (expr ((COMMA expr)+)*) RPAREN;
+func
+    // Function calls with normal syntax
+    : func_name LPAREN (expr ((COMMA expr)+)*) RPAREN
+    // Limits
+    | FUNC_LIM UNDERSCORE LCURLY limitvar=var (CMD_TO | CMD_RIGHTARROW) limitto=expr RCURLY LCURLY expr RCURLY
+    // Integrals
+    | FUNC_INT (UNDERSCORE tex_symb CARET tex_symb)? LCURLY expr CMD_DD var RCURLY
+    // Floor/ceilings
+    ;
 
 // Rules
 
@@ -125,18 +141,18 @@ mult_expr
     ;
 
 pow_expr
-    : pow_expr CARET (number | LCURLY expr RCURLY)
+    : pow_expr CARET tex_symb
     | unit
     ;
 
 unit
-    : sign=(PLUS | MINUS) unit
-    | MINUS? LPAREN expr RPAREN
-    | func
-    | var
-    | number
-    | fraction
-    | matrix_env
+    : sign=(PLUS | MINUS) unit      // Signed unit expressions
+    | MINUS? LPAREN expr RPAREN     // Parentheticals, optionally signed
+    | func                          // Function calls
+    | var                           // Variable identifiers
+    | number                        // Number literals
+    | fraction                      // Fraction expressions
+    | matrix_env                    // Matrices
     ;
 
 fraction

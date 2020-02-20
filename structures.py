@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from operator import add, sub, mul, truediv, lt, gt, le, ge, eq, ne, pow
+import operator as op
 
 
 class Function(ABC):
@@ -7,41 +7,32 @@ class Function(ABC):
     def evaluate(self, x):
         pass
 
-    @abstractmethod
     def __add__(self, other):
-        pass
+        return Expression(op.add, self, other)
 
-    @abstractmethod
     def __sub__(self, other):
-        pass
+        return Expression(op.sub, self, other)
 
-    @abstractmethod
     def __mul__(self, other):
-        pass
+        return Expression(op.mul, self, other)
 
-    @abstractmethod
     def __truediv__(self, other):
-        pass
+        return Expression(op.truediv, self, other)
 
-    @abstractmethod
     def __pow__(self, power, modulo=None):
         pass
 
-    @abstractmethod
     def __lt__(self, other):
-        pass
+        return Expression(op.lt, self, other)
 
-    @abstractmethod
     def __gt__(self, other):
-        pass
+        return Expression(op.gt, self, other)
 
-    @abstractmethod
     def __ge__(self, other):
-        pass
+        return Expression(op.ge, self, other)
 
-    @abstractmethod
     def __le__(self, other):
-        pass
+        return Expression(op.le, self, other)
 
     @abstractmethod
     def __eq__(self, other):
@@ -61,50 +52,24 @@ class Function(ABC):
 
 
 class Expression(Function):
-    def __init__(self, op, left: Function, right: Function):
+    def __init__(self, op, left: Function, right: Function, power=1):
         self.op = op
         self.left = left
         self.right = right
+        self.pow = power
 
     def evaluate(self, x):
-        if not isinstance(self.left, Number):
-            self.left = self.left.evaluate(x)
-        if not isinstance(self.right, Number):
-            self.right = self.right.evaluate(x)
-        return self.map_operator(self.left, self.right, self.op)
-
-    def __add__(self, other):
-        return Expression("PLUS", self.map_operator(self.left, self.right, self.op), other)
-
-    def __sub__(self, other):
-        return Expression("MINUS", self.map_operator(self.left, self.right, self.op), other)
-
-    def __mul__(self, other):
-        return Expression("MULT", self.map_operator(self.left, self.right, self.op), other)
-
-    def __truediv__(self, other):
-        return Expression("DIV", self.map_operator(self.left, self.right, self.op), other)
-
-    def __pow__(self, power, modulo=None):
-        return Expression("POW", self.map_operator(self.left, self.right, self.op), other)
-
-    def __lt__(self, other):
-        return Expression("LT", self.map_operator(self.left, self.right, self.op), other)
-
-    def __gt__(self, other):
-        return Expression("GT", self.map_operator(self.left, self.right, self.op), other)
-
-    def __ge__(self, other):
-        return Expression("GE", self.map_operator(self.left, self.right, self.op), other)
-
-    def __le__(self, other):
-        return Expression("LE", self.map_operator(self.left, self.right, self.op), other)
+        return self.op(self.left.evaluate(x), self.right.evaluate(x))
 
     def __eq__(self, other):
-        return Expression("EQ", self.map_operator(self.left, self.right, self.op), other)
+        return isinstance(other, Expression) and other.left == self.left \
+                                             and other.right == self.right\
+                                             and other.op == self.op
 
     def __ne__(self, other):
-        return Expression("NE", self.map_operator(self.left, self.right, self.op), other)
+        return not isinstance(other, Expression) and other.left == self.left \
+                                             and other.right == self.right\
+                                             and other.op == self.op
 
     def derivative(self):
         pass
@@ -112,31 +77,6 @@ class Expression(Function):
     def integral(self):
         pass
 
-    def map_operator(self, left, right, op):
-        if op == "PLUS":
-            return left + right
-        elif op == "MINUS":
-            return left - right
-        elif op == "MULT":
-            return left * right
-        elif op == "DIV":
-            return left / right
-        elif op == "LT":
-            return left < right
-        elif op == "GT":
-            return left > right
-        elif op == "GE":
-            return left >= right
-        elif op == "LE":
-            return left <= right
-        elif op == "POW":
-            return left ** right
-        elif op == "EQ":
-            return left == right
-        elif op == "NE":
-            return left != right
-        else:
-            return "Error: invalid operator"
 
 class Variable(Function):
     def __init__(self, name):
@@ -145,38 +85,11 @@ class Variable(Function):
     def evaluate(self, x):
         return x
 
-    def __add__(self, other):
-        pass
-
-    def __sub__(self, other):
-        pass
-
-    def __mul__(self, other):
-        pass
-
-    def __truediv__(self, other):
-        pass
-
-    def __pow__(self, power, modulo=None):
-        pass
-
-    def __lt__(self, other):
-        pass
-
-    def __gt__(self, other):
-        pass
-
-    def __ge__(self, other):
-        pass
-
-    def __le__(self, other):
-        pass
-
     def __eq__(self, f) -> bool:
         return isinstance(f, Variable) and f.name == self.name
 
     def __ne__(self, other):
-        pass
+        return not isinstance(other, Variable) and other.name == self.name
 
     def derivative(self):
         return 1
@@ -197,33 +110,6 @@ class Polynomial(Function):
     def evaluate(self, x):
         val = x.value if isinstance(x, Number) else x
         return self.coeff * (val ** self.power)
-
-    def __add__(self, other):
-        pass
-
-    def __sub__(self, other):
-        pass
-
-    def __mul__(self, other):
-        pass
-
-    def __truediv__(self, other):
-        pass
-
-    def __pow__(self, power, modulo=None):
-        pass
-
-    def __lt__(self, other):
-        pass
-
-    def __gt__(self, other):
-        pass
-
-    def __ge__(self, other):
-        pass
-
-    def __le__(self, other):
-        pass
 
     def __eq__(self, other):
         pass
@@ -247,18 +133,6 @@ class Number(Function):
     def evaluate(self, x=None):
         return self.value
 
-    def __add__(self, other):
-        pass
-
-    def __sub__(self, other):
-        pass
-
-    def __mul__(self, other):
-        pass
-
-    def __truediv__(self, other):
-        pass
-
     def derivative(self):
         return 0
 
@@ -275,33 +149,6 @@ class Fraction(Function):
         self.denominator = denominator
 
     def evaluate(self, x):
-        pass
-
-    def __add__(self, other):
-        pass
-
-    def __sub__(self, other):
-        pass
-
-    def __mul__(self, other):
-        pass
-
-    def __truediv__(self, other):
-        pass
-
-    def __pow__(self, power, modulo=None):
-        pass
-
-    def __lt__(self, other):
-        pass
-
-    def __gt__(self, other):
-        pass
-
-    def __ge__(self, other):
-        pass
-
-    def __le__(self, other):
         pass
 
     def __eq__(self, other):

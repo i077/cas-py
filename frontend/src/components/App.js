@@ -6,6 +6,7 @@ import { InputArea } from './input/InputArea';
 import { OutputArea } from './output/OutputArea';
 import { Transition } from './extras/Transition';
 import { History } from './history/History';
+import { Session } from "./session/session";
 import './App.css';
 
 class App extends React.Component {

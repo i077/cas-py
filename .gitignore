@@ -11,3 +11,4 @@ venv/
 *.run.xml
 .idea/
 *.pyc
+lang/.antlr/*

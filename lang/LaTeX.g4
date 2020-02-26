@@ -31,7 +31,7 @@ AMPERSAND   : '&';
 POINT   : '.';
 
 EQ      : '=';
-LT      : '<';
+LT      : '<' | '\\lt';
 LTE     : '\\leq';
 GT      : '>';
 GTE     : '\\geq';
@@ -79,6 +79,13 @@ CMD_LFLOOR      : '\\lfloor';
 CMD_RFLOOR      : '\\rfloor';
 CMD_LCEIL       : '\\lceil';
 CMD_RCEIL       : '\\rceil';
+
+// History tokens
+DOLLAR          : '$';
+hist_entry
+    : DOLLAR nnint  #hist_index
+    | DOLLAR 'ans'  #hist_ans
+    ;
 
 // Compound literals
 
@@ -128,9 +135,7 @@ func_call
     ;
 
 // Rules
-input
-    : start EOF
-    ;
+entry: start EOF;
 
 start
     : expr       #start_expr
@@ -168,6 +173,7 @@ unit
     | fraction                  #unit_fraction     // Fraction expressions
     | matrix_env                #unit_matrix       // Matrices
     | cases_env                 #unit_cases        // Branching (cases)
+    | hist_entry                #unit_hist         // History reference
     ;
 
 arg_list

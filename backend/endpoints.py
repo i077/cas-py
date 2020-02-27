@@ -3,17 +3,17 @@ import json
 from flask import Flask, request, jsonify, abort
 from flask.logging import create_logger
 
-from session_handler import create_new_session, load_state, save_state
+from session_handler import create_session, delete_session, load_state, save_state
 
 APP = Flask(__name__)
 LOG = create_logger(APP)
 
 
-@APP.route("/new-session", methods=["POST"])
-def new_session():
+@APP.route("/create-session", methods=["POST"])
+def create():
     if request.method == "POST":
 
-        session_id = create_new_session()
+        session_id = create_session()
 
         response = jsonify({"id": session_id})
         response.headers.add("Access-Control-Allow-Origin", "*")
@@ -28,9 +28,11 @@ def run():
     if request.method == "POST":
         # Extract Data
         data = json.loads(request.data)
+        id = data["id"]
         cas_input = data["input"]
 
         # TODO: Impliement CAS
+        state = load_state(id)
         cas_output = cas_input
         error = False
 

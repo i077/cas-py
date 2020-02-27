@@ -7,17 +7,18 @@ root_path = "/".join(os.path.abspath(__file__).split("/")[:-2])
 sessions_path = os.path.join(root_path, "sessions")
 
 
-def create_new_session():
+def create_session():
     """Creates a new experiment or session
-
-    Args:
-        user_id: User ID
 
     Returns:
         Whether this session was succefully created
     """
 
+    if not os.path.exists(sessions_path):
+        os.mkdir(sessions_path)
+
     session_id = __get_next_session_id__()
+    print(session_id)
     session_path = os.path.join(sessions_path, session_id)
 
     if os.path.exists(session_path):
@@ -34,6 +35,27 @@ def create_new_session():
         save_state(session_id, state)
 
         return session_id
+
+
+def delete_session(session_id):
+    """Deletes session
+
+    Args:
+        session_id: ID of given session
+
+    Returns:
+        Whether this session was succefully created
+    """
+
+    session_path = os.path.join(sessions_path, session_id)
+
+    if not os.path.exists(session_path):
+        return False
+    else:
+        # Remove directory
+        os.remove(session_path)
+
+        return True
 
 
 def load_state(session_id):
@@ -87,7 +109,7 @@ def __get_next_session_id__():
 
     # If there are no sessions, start the ids at 0
     if len(session_paths) == 0:
-        return 0
+        return str(0)
 
     session_numbers = [int(path.split("/")[-1]) for path in session_paths]
-    return sorted(session_numbers)[-1] + 1
+    return str(sorted(session_numbers)[-1] + 1)

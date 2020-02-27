@@ -1,9 +1,9 @@
 var Session = (function () {
     var getSession = function () {
         var value = "; " + document.cookie;
-        var parts = value.split("; cas-session=");
+        var parts = value.split("; cas-session:");
 
-        if (parts.length == 2)
+        if (parts.length === 2)
             return parts.pop().split(";").shift();
     };
 

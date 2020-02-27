@@ -6,7 +6,7 @@ import { InputArea } from './input/InputArea';
 import { OutputArea } from './output/OutputArea';
 import { Transition } from './extras/Transition';
 import { History } from './history/History';
-import { Session } from "./session/session";
+import Session from "./session/session";
 import './App.css';
 
 class App extends React.Component {
@@ -17,6 +17,18 @@ class App extends React.Component {
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleHistory = this.handleHistory.bind(this);
+  }
+
+  componentDidMount() {
+    if (Session.getSession() === undefined) {
+      fetch('http://localhost:5000/create-session', {
+        method: 'POST'
+      })
+        .then(response => response.json())
+        .then(response => {
+          Session.setSession(response.id);
+        });
+    }
   }
 
   handleSubmit(input) {

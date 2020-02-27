@@ -1,4 +1,16 @@
 .history-item-div {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
     align-self: center;
     margin: 10px;
+}
+
+.history-item-id-div {
+    width: 10%;
+}
+
+.history-item-text-div {
+    width: 90%;
+    text-align: center;
 }

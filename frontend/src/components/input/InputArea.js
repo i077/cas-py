@@ -12,6 +12,7 @@ export class InputArea extends React.Component {
 
         this.textAreaChange = this.textAreaChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleKeyPress = this.handleKeyPress.bind(this);
     }
 
     static getDerivedStateFromProps(props, state) {
@@ -19,6 +20,12 @@ export class InputArea extends React.Component {
             return { input: props.selectedText, previousSelect: props.selectedText };
         } else {
             return { input: state.input };
+        }
+    }
+
+    handleKeyPress(e) {
+        if (e.key === 'Enter' && e.ctrlKey) {
+            this.handleSubmit();
         }
     }
 
@@ -34,10 +41,10 @@ export class InputArea extends React.Component {
     render() {
         return (
             <div className="input-div">
-                <Form>
-                    <Form.Group controlId="exampleForm.ControlTextarea1">
+                <Form id="input-form" >
+                    <Form.Group>
                         <Form.Label>Enter Latex:</Form.Label>
-                        <Form.Control as="textarea" rows="6" value={this.state.input} onChange={this.textAreaChange} />
+                        <Form.Control as="textarea" rows="6" value={this.state.input} onChange={this.textAreaChange} onKeyUp={this.handleKeyPress} />
 
                         <LiveInput input={this.state.input} />
                     </Form.Group>

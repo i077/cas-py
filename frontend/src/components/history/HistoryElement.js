@@ -25,7 +25,10 @@ export class HistoryElement extends React.Component {
     render() {
         return (
             <div className="history-item-div" onClick={this.elementClick}>
-                <div>
+                <div className="history-item-id-div">
+                    [{this.props.historyItem.id}]
+                </div>
+                <div className="history-item-text-div">
                     <TeX
                         math={this.getHistoryItemOutput()}
                         errorColor={'#cc0000'}

@@ -11,10 +11,6 @@ var Session = (function () {
         document.cookie = "cas-session:" + id;
     };
 
-    var deleteSession = function () {
-        document.cookie = "cas-session:";
-    }
-
     return {
         getSession: getSession,
         setSession: setSession,

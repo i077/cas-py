@@ -24,6 +24,8 @@ class App extends React.Component {
   componentDidMount() {
     if (Session.getSession() === undefined) {
       this.createNewSession();
+    } else {
+      this.getHistory();
     }
   }
 
@@ -36,7 +38,6 @@ class App extends React.Component {
       .then(response => {
         Session.setSession(response.id);
       });
-
   }
 
   handleReset() {
@@ -73,7 +74,32 @@ class App extends React.Component {
           history: new_history,
           loading: false
         });
+
+        this.updateHistory();
       });
+  }
+
+  getHistory() {
+    fetch('http://localhost:5000/get-history', {
+      method: 'POST',
+      body: JSON.stringify({ id: Session.getSession() })
+    })
+      .then(response => response.json())
+      .then(response => {
+        this.setState({
+          history: response.history,
+        });
+      });
+  }
+
+  updateHistory() {
+    fetch('http://localhost:5000/update-history', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: Session.getSession(),
+        calculation: this.getLastCalculation()
+      })
+    });
   }
 
   getLastCalculation() {

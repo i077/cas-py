@@ -79,6 +79,16 @@ class App extends React.Component {
       });
   }
 
+  updateHistory() {
+    fetch('http://localhost:5000/update-history', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: Session.getSession(),
+        calculation: this.getLastCalculation()
+      })
+    });
+  }
+
   getHistory() {
     fetch('http://localhost:5000/get-history', {
       method: 'POST',
@@ -90,16 +100,6 @@ class App extends React.Component {
           history: response.history,
         });
       });
-  }
-
-  updateHistory() {
-    fetch('http://localhost:5000/update-history', {
-      method: 'POST',
-      body: JSON.stringify({
-        id: Session.getSession(),
-        calculation: this.getLastCalculation()
-      })
-    });
   }
 
   getLastCalculation() {

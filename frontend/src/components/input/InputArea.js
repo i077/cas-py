@@ -62,7 +62,7 @@ export class InputArea extends React.Component {
     }
 
     handleSubmit() {
-        this.props.submitHandler(this.state.input);
+        this.props.submitHandler(this.state.replacedInput);
     }
 
 

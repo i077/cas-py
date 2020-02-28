@@ -14,12 +14,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #282c34;
+  font-size: 75px;
+}
+
+.App-footer-row {
+  height: 5vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: right;
   font-size: 75px;
 }
 
 .App-main-row {
-  height: 85vh;
+  height: 80vh;
   width: 100%;
 }
 

@@ -13,14 +13,28 @@ export class HistoryElement extends React.Component {
         this.props.handleClick(this.props.historyItem);
     }
 
+    getHistoryItemOutput() {
+        const item = this.props.historyItem;
+        if (item.output !== "") {
+            return item.input + ' = ' + item.output;
+        } else {
+            return item.input;
+        }
+    }
+
     render() {
         return (
             <div className="history-item-div" onClick={this.elementClick}>
-                <TeX
-                    math={this.props.historyItem}
-                    errorColor={'#cc0000'}
-                    settings={{ macros: { '\\dd': '\\mathrm{d}' } }}
-                />
+                <div className="history-item-id-div">
+                    [{this.props.historyItem.id}]
+                </div>
+                <div className="history-item-text-div">
+                    <TeX
+                        math={this.getHistoryItemOutput()}
+                        errorColor={'#cc0000'}
+                        settings={{ macros: { '\\dd': '\\mathrm{d}' } }}
+                    />
+                </div>
             </div>
         );
     }

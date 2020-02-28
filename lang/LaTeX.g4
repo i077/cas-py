@@ -33,7 +33,7 @@ POINT   : '.';
 EQ      : '=';
 LT      : '<' | '\\lt';
 LTE     : '\\leq';
-GT      : '>';
+GT      : '>' | '\\gt';
 GTE     : '\\geq';
 ASSIGN  : ':=';
 
@@ -135,12 +135,12 @@ func_call
     ;
 
 // Rules
-entry: start EOF;
+entry: castle_input EOF;
 
-start
-    : expr       #start_expr
-    | relation   #start_relation
-    | assignment #start_assignment
+castle_input
+    : expr       #castle_input_expr
+    | relation   #castle_input_relation
+    | assignment #castle_input_assignment
     ;
 
 relation

@@ -1,14 +1,17 @@
 import React from 'react';
+
 import Container from 'react-bootstrap/Container';
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
+import Button from 'react-bootstrap/Button';
+
 import { InputArea } from './input/InputArea';
 import { OutputArea } from './output/OutputArea';
 import { Transition } from './extras/Transition';
 import { History } from './history/History';
+
 import Session from "./session/session";
 import './App.css';
-import Button from 'react-bootstrap/Button';
 
 class App extends React.Component {
   constructor(props) {

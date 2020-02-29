@@ -249,6 +249,11 @@ class LaTeXVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by LaTeXParser#var_def.
+    def visitVar_def(self, ctx:LaTeXParser.Var_defContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by LaTeXParser#arg_list_single.
     def visitArg_list_single(self, ctx:LaTeXParser.Arg_list_singleContext):
         return self.visitChildren(ctx)

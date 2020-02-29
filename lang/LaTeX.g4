@@ -176,9 +176,12 @@ unit
     | hist_entry                #unit_hist         // History reference
     ;
 
+var_def
+    : var_name (UNDERSCORE tex_symb)?;
+
 arg_list
-    : LPAREN var? RPAREN             #arg_list_single
-    | LPAREN (var COMMA)* var RPAREN #arg_list_multi
+    : LPAREN var_def? RPAREN                    #arg_list_single
+    | LPAREN (var_def COMMA)* var_def RPAREN    #arg_list_multi
     ;
 
 func_def
@@ -186,8 +189,8 @@ func_def
     ;
 
 assignment
-    : var ASSIGN expr     #var_assign
-    | var ASSIGN func_def #func_assign
+    : var_def ASSIGN expr     #var_assign
+    | var_def ASSIGN func_def #func_assign
     ;
 
 fraction

@@ -440,6 +440,15 @@ class LaTeXListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by LaTeXParser#var_def.
+    def enterVar_def(self, ctx:LaTeXParser.Var_defContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#var_def.
+    def exitVar_def(self, ctx:LaTeXParser.Var_defContext):
+        pass
+
+
     # Enter a parse tree produced by LaTeXParser#arg_list_single.
     def enterArg_list_single(self, ctx:LaTeXParser.Arg_list_singleContext):
         pass

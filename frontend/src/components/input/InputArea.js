@@ -76,7 +76,7 @@ export class InputArea extends React.Component {
 
                         <LiveInput input={this.state.replacedInput} />
                     </Form.Group>
-                    <Button onClick={this.handleSubmit}>Submit Latex</Button>
+                    <Button onClick={this.handleSubmit}>Submit LaTeX</Button>
                 </Form>
             </div >
         );

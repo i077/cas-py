@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 
 class Function(ABC):
     @abstractmethod
-    def evaluate(self, x):
+    def evaluate(self, state):
         pass
 
     def __add__(self, other):
@@ -21,15 +21,7 @@ class Function(ABC):
         return Expression(op.truediv, self, other)
 
     def __pow__(self, power, modulo=None):
-        if power > 0:
-            if power == 1:
-                return self
-            else:
-                return self * Expression(op.mul, self, power - 1)
-        elif power < 0:
-            return Number(1) / self.__pow__(power=math.abs(power))
-        else:
-            return Number(1)
+        return Expression(op.pow, self, power)
 
     # we can't do this unless we specify function domains -- probably too much complexity?
     #     def __lt__(self, other):
@@ -69,8 +61,23 @@ class Expression(Function):
         self.right = right
         self.pow = power
 
-    def evaluate(self, x):
-        return self.op(self.left.evaluate(x), self.right.evaluate(x))
+    def evaluate(self, state: dict):
+        if self.op == op.pow:
+            power = self.right.evaluate(state)
+            if isinstance(power, Number):
+                if power == 1:
+                    return self
+                    # why this?
+                    # else:
+                    #     return self * Expression(op.mul, self, r - 1)
+                if power == 0:
+                    return Number(1)
+                if power < 0:
+                    return Number(1) / Expression(op.pow, self.left.evaluate(state), abs(power))
+
+            return self.op(self.left.evaluate(state), power)
+
+        return self.op(self.left.evaluate(state), self.right.evaluate(state))
 
     def __eq__(self, other):
         return (
@@ -111,8 +118,8 @@ class Variable(Function):
     def __init__(self, name):
         self.name = name
 
-    def evaluate(self, x):
-        return x
+    def evaluate(self, state: dict):
+        return state[self.name]
 
     def __eq__(self, f) -> bool:
         return isinstance(f, Variable) and f.name == self.name
@@ -172,9 +179,8 @@ class Polynomial(Function):
         else:
             return super().__truediv__(other)
 
-    def evaluate(self, x):
-        val = x.value if isinstance(x, Number) else x
-        return self.coeff * (val ** self.power)
+    def evaluate(self, state: dict):
+        return self.coeff * (state[self.var.name] ** self.power)
 
     def __eq__(self, other):
         return (
@@ -214,8 +220,17 @@ class Number(Function):
         if isinstance(other, Number):
             return Number(self.value - other.value)
 
-    def evaluate(self, x=None):
+    def evaluate(self, state=None):
         return self.value
+
+    def __eq__(self, other):
+        if isinstance(other, Number):
+            return self.value == other.value
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def derivative(self):
         return 0
@@ -224,4 +239,4 @@ class Number(Function):
         pass
 
     def __repr__(self):
-        return self.value
+        return str(self.value)

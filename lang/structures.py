@@ -1,7 +1,7 @@
 import math
 import operator as op
 from abc import ABC, abstractmethod
-
+from State import State
 
 class Function(ABC):
     @abstractmethod
@@ -61,7 +61,7 @@ class Expression(Function):
         self.right = right
         self.pow = power
 
-    def evaluate(self, state: dict):
+    def evaluate(self, state: State):
         l_val = self.left.evaluate(state)
         r_val = self.right.evaluate(state)
 
@@ -136,7 +136,7 @@ class Variable(Function):
         if subscript is not None:
             self.name += '_{' + str(subscript.evaluate(state)) + '}'
 
-    def evaluate(self, state: dict):
+    def evaluate(self, state: State):
         #reevaluate subscript with current state
         if self.subscript is not None:
             new_name = self.base_var + '_{' + str(self.subscript.evaluate(state)) + '}'
@@ -146,8 +146,7 @@ class Variable(Function):
         if self.name in state or new_name in state:
             #replace this variable's key in state with new variable name
             if new_name != self.name and self.name in state:
-                state[new_name] = state[self.name]
-                del state[self.name]
+                state.replace(self.name, new_name)
                 self.name = new_name
             return state[new_name].evaluate(state)
 
@@ -212,7 +211,7 @@ class Polynomial(Function):
         else:
             return super().__truediv__(other)
 
-    def evaluate(self, state: dict):
+    def evaluate(self, state: State):
         return self.coeff * (state[self.var.name] ** self.power)
 
     def __eq__(self, other):
@@ -274,4 +273,57 @@ class Number(Function):
         pass
 
     def __repr__(self):
+        #if it's an integer, print as an integer
+        if int(self.value) == self.value:
+            return str(int(self.value))
         return str(self.value)
+
+class Cases(Function):
+    def __init__(self, cases_list):
+        self.cases_list = cases_list
+
+    def evaluate(self, state: State):
+        for row in self.cases_list:
+            if not isinstance(row[1], Relation):
+                raise Exception(f"Improper Cases: {row[1]} is not a relation")
+            if row[1].evaluate(state):
+                return row[0].evaluate(state)
+            
+        #no conditions were satisfied
+        raise Exception("Improper Cases: No case satisfied!")
+
+    def __eq__(self, other):
+        pass
+
+    def __ne__(self, other):
+        pass
+
+    def derivative(self):
+        pass
+
+    def integral(self):
+        pass
+
+    def __repr__(self):
+        rep = '\\begin{cases}\n'
+        for row in self.cases_list:
+            rep += str(row[0]) + '&' + str(row[1]) + '\\\\'
+        rep += '\n\\end{cases}'
+        return rep
+
+    
+class Relation():
+    def __init__(self, rel_chain):
+        self.rel_chain = rel_chain
+
+    def evaluate(self, state):
+        for i in range(1,len(self.rel_chain)-1,2):
+            rel = self.rel_chain[i]
+            left = self.rel_chain[i-1].evaluate(state)
+            right = self.rel_chain[i+1].evaluate(state)
+            if isinstance(right, (float, int)) and isinstance(left, (float, int)):
+                if not rel(left, right):
+                    return False
+            else:
+                raise ValueError(f'Cannot compute relation {rel} on {left} and {right}')
+        return True

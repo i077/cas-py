@@ -11,180 +11,176 @@ else:
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3>")
+        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3?")
         buf.write("\u017e\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7")
         buf.write("\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4\f\t\f\4\r\t\r\4\16")
         buf.write("\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22\4\23\t\23")
         buf.write("\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31")
         buf.write("\t\31\4\32\t\32\4\33\t\33\4\34\t\34\4\35\t\35\4\36\t\36")
-        buf.write("\4\37\t\37\4 \t \3\2\3\2\3\2\3\2\5\2E\n\2\3\3\5\3H\n\3")
-        buf.write("\3\3\6\3K\n\3\r\3\16\3L\3\3\3\3\7\3Q\n\3\f\3\16\3T\13")
-        buf.write("\3\5\3V\n\3\3\4\6\4Y\n\4\r\4\16\4Z\3\5\6\5^\n\5\r\5\16")
-        buf.write("\5_\3\6\3\6\3\6\3\6\3\6\5\6g\n\6\3\7\3\7\3\7\5\7l\n\7")
-        buf.write("\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\5\bw\n\b\3\t\3\t")
-        buf.write("\5\t{\n\t\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\5\n\u0086")
-        buf.write("\n\n\3\13\3\13\3\13\3\13\3\13\6\13\u008d\n\13\r\13\16")
-        buf.write("\13\u008e\7\13\u0091\n\13\f\13\16\13\u0094\13\13\3\13")
-        buf.write("\3\13\3\13\3\13\3\13\3\13\3\13\3\13\3\13\3\13\3\13\3\13")
-        buf.write("\3\13\3\13\3\13\3\13\3\13\3\13\3\13\5\13\u00a9\n\13\3")
+        buf.write("\4\37\t\37\4 \t \4!\t!\3\2\3\2\3\2\3\2\5\2G\n\2\3\3\5")
+        buf.write("\3J\n\3\3\3\6\3M\n\3\r\3\16\3N\3\3\3\3\7\3S\n\3\f\3\16")
+        buf.write("\3V\13\3\5\3X\n\3\3\4\6\4[\n\4\r\4\16\4\\\3\5\6\5`\n\5")
+        buf.write("\r\5\16\5a\3\6\3\6\3\6\3\6\3\6\5\6i\n\6\3\7\3\7\3\7\5")
+        buf.write("\7n\n\7\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\5\by\n\b\3")
+        buf.write("\t\3\t\5\t}\n\t\3\n\3\n\3\13\3\13\3\13\3\13\3\13\6\13")
+        buf.write("\u0086\n\13\r\13\16\13\u0087\7\13\u008a\n\13\f\13\16\13")
+        buf.write("\u008d\13\13\3\13\3\13\3\13\3\13\3\13\3\13\3\13\3\13\3")
         buf.write("\13\3\13\3\13\3\13\3\13\3\13\3\13\3\13\3\13\3\13\3\13")
-        buf.write("\3\13\3\13\3\13\3\13\5\13\u00ba\n\13\3\13\3\13\3\13\3")
-        buf.write("\13\3\13\3\13\3\13\5\13\u00c3\n\13\3\f\3\f\3\f\3\r\3\r")
-        buf.write("\3\r\5\r\u00cb\n\r\3\16\3\16\3\16\3\16\3\17\3\17\3\20")
-        buf.write("\3\20\3\20\3\20\3\20\3\20\7\20\u00d9\n\20\f\20\16\20\u00dc")
-        buf.write("\13\20\3\21\3\21\3\21\3\21\3\21\3\21\7\21\u00e4\n\21\f")
-        buf.write("\21\16\21\u00e7\13\21\3\22\3\22\3\22\3\22\3\22\3\22\7")
-        buf.write("\22\u00ef\n\22\f\22\16\22\u00f2\13\22\3\23\3\23\3\23\5")
-        buf.write("\23\u00f7\n\23\3\23\3\23\3\23\3\23\3\23\3\23\3\23\3\23")
-        buf.write("\3\23\3\23\3\23\5\23\u0104\n\23\3\24\3\24\3\24\5\24\u0109")
-        buf.write("\n\24\3\25\3\25\5\25\u010d\n\25\3\25\3\25\3\25\3\25\3")
-        buf.write("\25\7\25\u0114\n\25\f\25\16\25\u0117\13\25\3\25\3\25\3")
-        buf.write("\25\5\25\u011c\n\25\3\26\3\26\3\26\3\26\3\27\3\27\3\27")
-        buf.write("\3\27\3\27\3\27\3\27\3\27\5\27\u012a\n\27\3\30\3\30\3")
-        buf.write("\30\3\30\3\30\3\30\3\30\3\30\3\31\3\31\3\31\3\31\3\31")
-        buf.write("\5\31\u0139\n\31\3\32\3\32\3\32\3\32\3\32\3\32\3\33\7")
-        buf.write("\33\u0142\n\33\f\33\16\33\u0145\13\33\3\33\3\33\3\34\3")
-        buf.write("\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\35\3\35")
-        buf.write("\3\35\7\35\u0156\n\35\f\35\16\35\u0159\13\35\3\35\3\35")
-        buf.write("\3\35\5\35\u015e\n\35\3\36\3\36\3\36\7\36\u0163\n\36\f")
-        buf.write("\36\16\36\u0166\13\36\3\36\3\36\3\36\3\36\3\37\7\37\u016d")
-        buf.write("\n\37\f\37\16\37\u0170\13\37\3\37\3\37\3 \3 \3 \3 \3 ")
-        buf.write("\3 \3 \3 \3 \3 \3 \2\5\36 \"!\2\4\6\b\n\f\16\20\22\24")
-        buf.write("\26\30\32\34\36 \"$&(*,.\60\62\64\668:<>\2\13\3\2!\"\3")
-        buf.write("\2)*\4\2::<<\4\2;;==\3\2/\60\3\2\24\30\3\2\r\16\4\2\17")
-        buf.write("\20#%\3\2\33\36\2\u0193\2D\3\2\2\2\4G\3\2\2\2\6X\3\2\2")
-        buf.write("\2\b]\3\2\2\2\nf\3\2\2\2\fh\3\2\2\2\16v\3\2\2\2\20z\3")
-        buf.write("\2\2\2\22\u0085\3\2\2\2\24\u00c2\3\2\2\2\26\u00c4\3\2")
-        buf.write("\2\2\30\u00ca\3\2\2\2\32\u00cc\3\2\2\2\34\u00d0\3\2\2")
-        buf.write("\2\36\u00d2\3\2\2\2 \u00dd\3\2\2\2\"\u00e8\3\2\2\2$\u0103")
-        buf.write("\3\2\2\2&\u0105\3\2\2\2(\u011b\3\2\2\2*\u011d\3\2\2\2")
-        buf.write(",\u0129\3\2\2\2.\u012b\3\2\2\2\60\u0133\3\2\2\2\62\u013a")
-        buf.write("\3\2\2\2\64\u0143\3\2\2\2\66\u0148\3\2\2\28\u0157\3\2")
-        buf.write("\2\2:\u0164\3\2\2\2<\u016e\3\2\2\2>\u0173\3\2\2\2@A\7")
-        buf.write(">\2\2AE\5\6\4\2BC\7>\2\2CE\7\3\2\2D@\3\2\2\2DB\3\2\2\2")
-        buf.write("E\3\3\2\2\2FH\7\16\2\2GF\3\2\2\2GH\3\2\2\2HJ\3\2\2\2I")
-        buf.write("K\7\"\2\2JI\3\2\2\2KL\3\2\2\2LJ\3\2\2\2LM\3\2\2\2MU\3")
-        buf.write("\2\2\2NR\7\23\2\2OQ\7\"\2\2PO\3\2\2\2QT\3\2\2\2RP\3\2")
-        buf.write("\2\2RS\3\2\2\2SV\3\2\2\2TR\3\2\2\2UN\3\2\2\2UV\3\2\2\2")
-        buf.write("V\5\3\2\2\2WY\7\"\2\2XW\3\2\2\2YZ\3\2\2\2ZX\3\2\2\2Z[")
-        buf.write("\3\2\2\2[\7\3\2\2\2\\^\t\2\2\2]\\\3\2\2\2^_\3\2\2\2_]")
-        buf.write("\3\2\2\2_`\3\2\2\2`\t\3\2\2\2ag\7!\2\2bc\7\6\2\2cd\5\b")
-        buf.write("\5\2de\7\6\2\2eg\3\2\2\2fa\3\2\2\2fb\3\2\2\2g\13\3\2\2")
-        buf.write("\2hk\5\n\6\2ij\7\37\2\2jl\5\16\b\2ki\3\2\2\2kl\3\2\2\2")
-        buf.write("l\r\3\2\2\2mw\t\2\2\2no\7\t\2\2op\5\34\17\2pq\7\n\2\2")
-        buf.write("qw\3\2\2\2rs\7\t\2\2st\5\f\7\2tu\7\n\2\2uw\3\2\2\2vm\3")
-        buf.write("\2\2\2vn\3\2\2\2vr\3\2\2\2w\17\3\2\2\2x{\5\22\n\2y{\5")
-        buf.write("\f\7\2zx\3\2\2\2zy\3\2\2\2{\21\3\2\2\2|\u0086\7\64\2\2")
-        buf.write("}\u0086\7\65\2\2~\u0086\7\66\2\2\177\u0086\7\67\2\2\u0080")
-        buf.write("\u0086\78\2\2\u0081\u0086\79\2\2\u0082\u0086\7\63\2\2")
-        buf.write("\u0083\u0086\7\62\2\2\u0084\u0086\7\61\2\2\u0085|\3\2")
-        buf.write("\2\2\u0085}\3\2\2\2\u0085~\3\2\2\2\u0085\177\3\2\2\2\u0085")
-        buf.write("\u0080\3\2\2\2\u0085\u0081\3\2\2\2\u0085\u0082\3\2\2\2")
-        buf.write("\u0085\u0083\3\2\2\2\u0085\u0084\3\2\2\2\u0086\23\3\2")
-        buf.write("\2\2\u0087\u0088\5\20\t\2\u0088\u0089\7\7\2\2\u0089\u0092")
-        buf.write("\5\34\17\2\u008a\u008b\7 \2\2\u008b\u008d\5\34\17\2\u008c")
-        buf.write("\u008a\3\2\2\2\u008d\u008e\3\2\2\2\u008e\u008c\3\2\2\2")
-        buf.write("\u008e\u008f\3\2\2\2\u008f\u0091\3\2\2\2\u0090\u008c\3")
-        buf.write("\2\2\2\u0091\u0094\3\2\2\2\u0092\u0090\3\2\2\2\u0092\u0093")
-        buf.write("\3\2\2\2\u0093\u0095\3\2\2\2\u0094\u0092\3\2\2\2\u0095")
-        buf.write("\u0096\7\b\2\2\u0096\u00c3\3\2\2\2\u0097\u0098\7,\2\2")
-        buf.write("\u0098\u0099\7\37\2\2\u0099\u009a\7\t\2\2\u009a\u009b")
-        buf.write("\5\f\7\2\u009b\u009c\t\3\2\2\u009c\u009d\5\34\17\2\u009d")
-        buf.write("\u009e\7\n\2\2\u009e\u009f\7\t\2\2\u009f\u00a0\5\34\17")
-        buf.write("\2\u00a0\u00a1\7\n\2\2\u00a1\u00c3\3\2\2\2\u00a2\u00a8")
-        buf.write("\7-\2\2\u00a3\u00a4\7\37\2\2\u00a4\u00a5\5\16\b\2\u00a5")
-        buf.write("\u00a6\7\21\2\2\u00a6\u00a7\5\16\b\2\u00a7\u00a9\3\2\2")
-        buf.write("\2\u00a8\u00a3\3\2\2\2\u00a8\u00a9\3\2\2\2\u00a9\u00aa")
-        buf.write("\3\2\2\2\u00aa\u00ab\7\t\2\2\u00ab\u00ac\5\34\17\2\u00ac")
-        buf.write("\u00ad\7+\2\2\u00ad\u00ae\5\f\7\2\u00ae\u00af\7\n\2\2")
-        buf.write("\u00af\u00c3\3\2\2\2\u00b0\u00b1\t\4\2\2\u00b1\u00b2\5")
-        buf.write("\34\17\2\u00b2\u00b3\t\5\2\2\u00b3\u00c3\3\2\2\2\u00b4")
-        buf.write("\u00b9\t\6\2\2\u00b5\u00b6\7\13\2\2\u00b6\u00b7\5\6\4")
-        buf.write("\2\u00b7\u00b8\7\f\2\2\u00b8\u00ba\3\2\2\2\u00b9\u00b5")
-        buf.write("\3\2\2\2\u00b9\u00ba\3\2\2\2\u00ba\u00bb\3\2\2\2\u00bb")
-        buf.write("\u00bc\7\t\2\2\u00bc\u00bd\5\34\17\2\u00bd\u00be\7\n\2")
-        buf.write("\2\u00be\u00bf\7\t\2\2\u00bf\u00c0\5\f\7\2\u00c0\u00c1")
-        buf.write("\7\n\2\2\u00c1\u00c3\3\2\2\2\u00c2\u0087\3\2\2\2\u00c2")
-        buf.write("\u0097\3\2\2\2\u00c2\u00a2\3\2\2\2\u00c2\u00b0\3\2\2\2")
-        buf.write("\u00c2\u00b4\3\2\2\2\u00c3\25\3\2\2\2\u00c4\u00c5\5\30")
-        buf.write("\r\2\u00c5\u00c6\7\2\2\3\u00c6\27\3\2\2\2\u00c7\u00cb")
-        buf.write("\5\34\17\2\u00c8\u00cb\5\32\16\2\u00c9\u00cb\5,\27\2\u00ca")
-        buf.write("\u00c7\3\2\2\2\u00ca\u00c8\3\2\2\2\u00ca\u00c9\3\2\2\2")
-        buf.write("\u00cb\31\3\2\2\2\u00cc\u00cd\5\34\17\2\u00cd\u00ce\t")
-        buf.write("\7\2\2\u00ce\u00cf\5\34\17\2\u00cf\33\3\2\2\2\u00d0\u00d1")
-        buf.write("\5\36\20\2\u00d1\35\3\2\2\2\u00d2\u00d3\b\20\1\2\u00d3")
-        buf.write("\u00d4\5 \21\2\u00d4\u00da\3\2\2\2\u00d5\u00d6\f\4\2\2")
-        buf.write("\u00d6\u00d7\t\b\2\2\u00d7\u00d9\5\36\20\5\u00d8\u00d5")
-        buf.write("\3\2\2\2\u00d9\u00dc\3\2\2\2\u00da\u00d8\3\2\2\2\u00da")
-        buf.write("\u00db\3\2\2\2\u00db\37\3\2\2\2\u00dc\u00da\3\2\2\2\u00dd")
-        buf.write("\u00de\b\21\1\2\u00de\u00df\5\"\22\2\u00df\u00e5\3\2\2")
-        buf.write("\2\u00e0\u00e1\f\4\2\2\u00e1\u00e2\t\t\2\2\u00e2\u00e4")
-        buf.write("\5 \21\5\u00e3\u00e0\3\2\2\2\u00e4\u00e7\3\2\2\2\u00e5")
-        buf.write("\u00e3\3\2\2\2\u00e5\u00e6\3\2\2\2\u00e6!\3\2\2\2\u00e7")
-        buf.write("\u00e5\3\2\2\2\u00e8\u00e9\b\22\1\2\u00e9\u00ea\5$\23")
-        buf.write("\2\u00ea\u00f0\3\2\2\2\u00eb\u00ec\f\4\2\2\u00ec\u00ed")
-        buf.write("\7\21\2\2\u00ed\u00ef\5\16\b\2\u00ee\u00eb\3\2\2\2\u00ef")
-        buf.write("\u00f2\3\2\2\2\u00f0\u00ee\3\2\2\2\u00f0\u00f1\3\2\2\2")
-        buf.write("\u00f1#\3\2\2\2\u00f2\u00f0\3\2\2\2\u00f3\u00f4\t\b\2")
-        buf.write("\2\u00f4\u0104\5$\23\2\u00f5\u00f7\7\16\2\2\u00f6\u00f5")
-        buf.write("\3\2\2\2\u00f6\u00f7\3\2\2\2\u00f7\u00f8\3\2\2\2\u00f8")
-        buf.write("\u00f9\7\7\2\2\u00f9\u00fa\5\34\17\2\u00fa\u00fb\7\b\2")
-        buf.write("\2\u00fb\u0104\3\2\2\2\u00fc\u0104\5\24\13\2\u00fd\u0104")
-        buf.write("\5\f\7\2\u00fe\u0104\5\4\3\2\u00ff\u0104\5.\30\2\u0100")
-        buf.write("\u0104\5> \2\u0101\u0104\5\66\34\2\u0102\u0104\5\2\2\2")
-        buf.write("\u0103\u00f3\3\2\2\2\u0103\u00f6\3\2\2\2\u0103\u00fc\3")
-        buf.write("\2\2\2\u0103\u00fd\3\2\2\2\u0103\u00fe\3\2\2\2\u0103\u00ff")
-        buf.write("\3\2\2\2\u0103\u0100\3\2\2\2\u0103\u0101\3\2\2\2\u0103")
-        buf.write("\u0102\3\2\2\2\u0104%\3\2\2\2\u0105\u0108\5\n\6\2\u0106")
-        buf.write("\u0107\7\37\2\2\u0107\u0109\5\16\b\2\u0108\u0106\3\2\2")
-        buf.write("\2\u0108\u0109\3\2\2\2\u0109\'\3\2\2\2\u010a\u010c\7\7")
-        buf.write("\2\2\u010b\u010d\5&\24\2\u010c\u010b\3\2\2\2\u010c\u010d")
-        buf.write("\3\2\2\2\u010d\u010e\3\2\2\2\u010e\u011c\7\b\2\2\u010f")
-        buf.write("\u0115\7\7\2\2\u0110\u0111\5&\24\2\u0111\u0112\7 \2\2")
-        buf.write("\u0112\u0114\3\2\2\2\u0113\u0110\3\2\2\2\u0114\u0117\3")
-        buf.write("\2\2\2\u0115\u0113\3\2\2\2\u0115\u0116\3\2\2\2\u0116\u0118")
-        buf.write("\3\2\2\2\u0117\u0115\3\2\2\2\u0118\u0119\5&\24\2\u0119")
-        buf.write("\u011a\7\b\2\2\u011a\u011c\3\2\2\2\u011b\u010a\3\2\2\2")
-        buf.write("\u011b\u010f\3\2\2\2\u011c)\3\2\2\2\u011d\u011e\5(\25")
-        buf.write("\2\u011e\u011f\t\3\2\2\u011f\u0120\5\34\17\2\u0120+\3")
-        buf.write("\2\2\2\u0121\u0122\5&\24\2\u0122\u0123\7\31\2\2\u0123")
-        buf.write("\u0124\5\34\17\2\u0124\u012a\3\2\2\2\u0125\u0126\5&\24")
-        buf.write("\2\u0126\u0127\7\31\2\2\u0127\u0128\5*\26\2\u0128\u012a")
-        buf.write("\3\2\2\2\u0129\u0121\3\2\2\2\u0129\u0125\3\2\2\2\u012a")
-        buf.write("-\3\2\2\2\u012b\u012c\7&\2\2\u012c\u012d\7\t\2\2\u012d")
-        buf.write("\u012e\5\34\17\2\u012e\u012f\7\n\2\2\u012f\u0130\7\t\2")
-        buf.write("\2\u0130\u0131\5\34\17\2\u0131\u0132\7\n\2\2\u0132/\3")
-        buf.write("\2\2\2\u0133\u0134\5\34\17\2\u0134\u0135\7\22\2\2\u0135")
-        buf.write("\u0138\5\32\16\2\u0136\u0137\7\5\2\2\u0137\u0139\7\5\2")
-        buf.write("\2\u0138\u0136\3\2\2\2\u0138\u0139\3\2\2\2\u0139\61\3")
-        buf.write("\2\2\2\u013a\u013b\5\34\17\2\u013b\u013c\7\22\2\2\u013c")
-        buf.write("\u013d\5\32\16\2\u013d\u013e\7\5\2\2\u013e\u013f\7\5\2")
-        buf.write("\2\u013f\63\3\2\2\2\u0140\u0142\5\62\32\2\u0141\u0140")
-        buf.write("\3\2\2\2\u0142\u0145\3\2\2\2\u0143\u0141\3\2\2\2\u0143")
-        buf.write("\u0144\3\2\2\2\u0144\u0146\3\2\2\2\u0145\u0143\3\2\2\2")
-        buf.write("\u0146\u0147\5\60\31\2\u0147\65\3\2\2\2\u0148\u0149\7")
-        buf.write("\'\2\2\u0149\u014a\7\t\2\2\u014a\u014b\7\32\2\2\u014b")
-        buf.write("\u014c\7\n\2\2\u014c\u014d\5\64\33\2\u014d\u014e\7(\2")
-        buf.write("\2\u014e\u014f\7\t\2\2\u014f\u0150\7\32\2\2\u0150\u0151")
-        buf.write("\7\n\2\2\u0151\67\3\2\2\2\u0152\u0153\5\34\17\2\u0153")
-        buf.write("\u0154\7\22\2\2\u0154\u0156\3\2\2\2\u0155\u0152\3\2\2")
-        buf.write("\2\u0156\u0159\3\2\2\2\u0157\u0155\3\2\2\2\u0157\u0158")
-        buf.write("\3\2\2\2\u0158\u015a\3\2\2\2\u0159\u0157\3\2\2\2\u015a")
-        buf.write("\u015d\5\34\17\2\u015b\u015c\7\5\2\2\u015c\u015e\7\5\2")
-        buf.write("\2\u015d\u015b\3\2\2\2\u015d\u015e\3\2\2\2\u015e9\3\2")
-        buf.write("\2\2\u015f\u0160\5\34\17\2\u0160\u0161\7\22\2\2\u0161")
-        buf.write("\u0163\3\2\2\2\u0162\u015f\3\2\2\2\u0163\u0166\3\2\2\2")
-        buf.write("\u0164\u0162\3\2\2\2\u0164\u0165\3\2\2\2\u0165\u0167\3")
-        buf.write("\2\2\2\u0166\u0164\3\2\2\2\u0167\u0168\5\34\17\2\u0168")
-        buf.write("\u0169\7\5\2\2\u0169\u016a\7\5\2\2\u016a;\3\2\2\2\u016b")
-        buf.write("\u016d\5:\36\2\u016c\u016b\3\2\2\2\u016d\u0170\3\2\2\2")
-        buf.write("\u016e\u016c\3\2\2\2\u016e\u016f\3\2\2\2\u016f\u0171\3")
-        buf.write("\2\2\2\u0170\u016e\3\2\2\2\u0171\u0172\58\35\2\u0172=")
-        buf.write("\3\2\2\2\u0173\u0174\7\'\2\2\u0174\u0175\7\t\2\2\u0175")
-        buf.write("\u0176\t\n\2\2\u0176\u0177\7\n\2\2\u0177\u0178\5<\37\2")
-        buf.write("\u0178\u0179\7(\2\2\u0179\u017a\7\t\2\2\u017a\u017b\t")
-        buf.write("\n\2\2\u017b\u017c\7\n\2\2\u017c?\3\2\2\2$DGLRUZ_fkvz")
-        buf.write("\u0085\u008e\u0092\u00a8\u00b9\u00c2\u00ca\u00da\u00e5")
+        buf.write("\5\13\u00a2\n\13\3\13\3\13\3\13\3\13\3\13\3\13\3\13\3")
+        buf.write("\13\3\13\3\13\3\13\3\13\3\13\3\13\3\13\5\13\u00b3\n\13")
+        buf.write("\3\13\3\13\3\13\3\13\3\13\3\13\3\13\5\13\u00bc\n\13\3")
+        buf.write("\f\3\f\3\f\3\r\3\r\3\r\5\r\u00c4\n\r\3\16\3\16\3\16\6")
+        buf.write("\16\u00c9\n\16\r\16\16\16\u00ca\3\16\3\16\3\17\3\17\3")
+        buf.write("\20\3\20\3\21\3\21\3\21\3\21\3\21\3\21\7\21\u00d9\n\21")
+        buf.write("\f\21\16\21\u00dc\13\21\3\22\3\22\3\22\3\22\3\22\3\22")
+        buf.write("\7\22\u00e4\n\22\f\22\16\22\u00e7\13\22\3\23\3\23\3\23")
+        buf.write("\3\23\3\23\3\23\7\23\u00ef\n\23\f\23\16\23\u00f2\13\23")
+        buf.write("\3\24\3\24\3\24\5\24\u00f7\n\24\3\24\3\24\3\24\3\24\3")
+        buf.write("\24\3\24\3\24\3\24\3\24\3\24\3\24\5\24\u0104\n\24\3\25")
+        buf.write("\3\25\3\25\5\25\u0109\n\25\3\26\3\26\5\26\u010d\n\26\3")
+        buf.write("\26\3\26\3\26\3\26\3\26\7\26\u0114\n\26\f\26\16\26\u0117")
+        buf.write("\13\26\3\26\3\26\3\26\5\26\u011c\n\26\3\27\3\27\3\27\3")
+        buf.write("\27\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\30\5\30\u012a")
+        buf.write("\n\30\3\31\3\31\3\31\3\31\3\31\3\31\3\31\3\31\3\32\3\32")
+        buf.write("\3\32\3\32\3\32\5\32\u0139\n\32\3\33\3\33\3\33\3\33\3")
+        buf.write("\33\3\33\3\34\7\34\u0142\n\34\f\34\16\34\u0145\13\34\3")
+        buf.write("\34\3\34\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35")
+        buf.write("\3\35\3\36\3\36\3\36\7\36\u0156\n\36\f\36\16\36\u0159")
+        buf.write("\13\36\3\36\3\36\3\36\5\36\u015e\n\36\3\37\3\37\3\37\7")
+        buf.write("\37\u0163\n\37\f\37\16\37\u0166\13\37\3\37\3\37\3\37\3")
+        buf.write("\37\3 \7 \u016d\n \f \16 \u0170\13 \3 \3 \3!\3!\3!\3!")
+        buf.write("\3!\3!\3!\3!\3!\3!\3!\2\5 \"$\"\2\4\6\b\n\f\16\20\22\24")
+        buf.write("\26\30\32\34\36 \"$&(*,.\60\62\64\668:<>@\2\f\3\2\"#\3")
+        buf.write("\2\62:\3\2*+\4\2;;==\4\2<<>>\3\2\60\61\3\2\24\31\3\2\r")
+        buf.write("\16\4\2\17\20$&\3\2\34\37\2\u018b\2F\3\2\2\2\4I\3\2\2")
+        buf.write("\2\6Z\3\2\2\2\b_\3\2\2\2\nh\3\2\2\2\fj\3\2\2\2\16x\3\2")
+        buf.write("\2\2\20|\3\2\2\2\22~\3\2\2\2\24\u00bb\3\2\2\2\26\u00bd")
+        buf.write("\3\2\2\2\30\u00c3\3\2\2\2\32\u00c8\3\2\2\2\34\u00ce\3")
+        buf.write("\2\2\2\36\u00d0\3\2\2\2 \u00d2\3\2\2\2\"\u00dd\3\2\2\2")
+        buf.write("$\u00e8\3\2\2\2&\u0103\3\2\2\2(\u0105\3\2\2\2*\u011b\3")
+        buf.write("\2\2\2,\u011d\3\2\2\2.\u0129\3\2\2\2\60\u012b\3\2\2\2")
+        buf.write("\62\u0133\3\2\2\2\64\u013a\3\2\2\2\66\u0143\3\2\2\28\u0148")
+        buf.write("\3\2\2\2:\u0157\3\2\2\2<\u0164\3\2\2\2>\u016e\3\2\2\2")
+        buf.write("@\u0173\3\2\2\2BC\7?\2\2CG\5\6\4\2DE\7?\2\2EG\7\3\2\2")
+        buf.write("FB\3\2\2\2FD\3\2\2\2G\3\3\2\2\2HJ\7\16\2\2IH\3\2\2\2I")
+        buf.write("J\3\2\2\2JL\3\2\2\2KM\7#\2\2LK\3\2\2\2MN\3\2\2\2NL\3\2")
+        buf.write("\2\2NO\3\2\2\2OW\3\2\2\2PT\7\23\2\2QS\7#\2\2RQ\3\2\2\2")
+        buf.write("SV\3\2\2\2TR\3\2\2\2TU\3\2\2\2UX\3\2\2\2VT\3\2\2\2WP\3")
+        buf.write("\2\2\2WX\3\2\2\2X\5\3\2\2\2Y[\7#\2\2ZY\3\2\2\2[\\\3\2")
+        buf.write("\2\2\\Z\3\2\2\2\\]\3\2\2\2]\7\3\2\2\2^`\t\2\2\2_^\3\2")
+        buf.write("\2\2`a\3\2\2\2a_\3\2\2\2ab\3\2\2\2b\t\3\2\2\2ci\7\"\2")
+        buf.write("\2de\7\6\2\2ef\5\b\5\2fg\7\6\2\2gi\3\2\2\2hc\3\2\2\2h")
+        buf.write("d\3\2\2\2i\13\3\2\2\2jm\5\n\6\2kl\7 \2\2ln\5\16\b\2mk")
+        buf.write("\3\2\2\2mn\3\2\2\2n\r\3\2\2\2oy\t\2\2\2pq\7\t\2\2qr\5")
+        buf.write("\36\20\2rs\7\n\2\2sy\3\2\2\2tu\7\t\2\2uv\5\f\7\2vw\7\n")
+        buf.write("\2\2wy\3\2\2\2xo\3\2\2\2xp\3\2\2\2xt\3\2\2\2y\17\3\2\2")
+        buf.write("\2z}\5\22\n\2{}\5\f\7\2|z\3\2\2\2|{\3\2\2\2}\21\3\2\2")
+        buf.write("\2~\177\t\3\2\2\177\23\3\2\2\2\u0080\u0081\5\20\t\2\u0081")
+        buf.write("\u0082\7\7\2\2\u0082\u008b\5\36\20\2\u0083\u0084\7!\2")
+        buf.write("\2\u0084\u0086\5\36\20\2\u0085\u0083\3\2\2\2\u0086\u0087")
+        buf.write("\3\2\2\2\u0087\u0085\3\2\2\2\u0087\u0088\3\2\2\2\u0088")
+        buf.write("\u008a\3\2\2\2\u0089\u0085\3\2\2\2\u008a\u008d\3\2\2\2")
+        buf.write("\u008b\u0089\3\2\2\2\u008b\u008c\3\2\2\2\u008c\u008e\3")
+        buf.write("\2\2\2\u008d\u008b\3\2\2\2\u008e\u008f\7\b\2\2\u008f\u00bc")
+        buf.write("\3\2\2\2\u0090\u0091\7-\2\2\u0091\u0092\7 \2\2\u0092\u0093")
+        buf.write("\7\t\2\2\u0093\u0094\5\f\7\2\u0094\u0095\t\4\2\2\u0095")
+        buf.write("\u0096\5\36\20\2\u0096\u0097\7\n\2\2\u0097\u0098\7\t\2")
+        buf.write("\2\u0098\u0099\5\36\20\2\u0099\u009a\7\n\2\2\u009a\u00bc")
+        buf.write("\3\2\2\2\u009b\u00a1\7.\2\2\u009c\u009d\7 \2\2\u009d\u009e")
+        buf.write("\5\16\b\2\u009e\u009f\7\21\2\2\u009f\u00a0\5\16\b\2\u00a0")
+        buf.write("\u00a2\3\2\2\2\u00a1\u009c\3\2\2\2\u00a1\u00a2\3\2\2\2")
+        buf.write("\u00a2\u00a3\3\2\2\2\u00a3\u00a4\7\t\2\2\u00a4\u00a5\5")
+        buf.write("\36\20\2\u00a5\u00a6\7,\2\2\u00a6\u00a7\5\f\7\2\u00a7")
+        buf.write("\u00a8\7\n\2\2\u00a8\u00bc\3\2\2\2\u00a9\u00aa\t\5\2\2")
+        buf.write("\u00aa\u00ab\5\36\20\2\u00ab\u00ac\t\6\2\2\u00ac\u00bc")
+        buf.write("\3\2\2\2\u00ad\u00b2\t\7\2\2\u00ae\u00af\7\13\2\2\u00af")
+        buf.write("\u00b0\5\6\4\2\u00b0\u00b1\7\f\2\2\u00b1\u00b3\3\2\2\2")
+        buf.write("\u00b2\u00ae\3\2\2\2\u00b2\u00b3\3\2\2\2\u00b3\u00b4\3")
+        buf.write("\2\2\2\u00b4\u00b5\7\t\2\2\u00b5\u00b6\5\36\20\2\u00b6")
+        buf.write("\u00b7\7\n\2\2\u00b7\u00b8\7\t\2\2\u00b8\u00b9\5\f\7\2")
+        buf.write("\u00b9\u00ba\7\n\2\2\u00ba\u00bc\3\2\2\2\u00bb\u0080\3")
+        buf.write("\2\2\2\u00bb\u0090\3\2\2\2\u00bb\u009b\3\2\2\2\u00bb\u00a9")
+        buf.write("\3\2\2\2\u00bb\u00ad\3\2\2\2\u00bc\25\3\2\2\2\u00bd\u00be")
+        buf.write("\5\30\r\2\u00be\u00bf\7\2\2\3\u00bf\27\3\2\2\2\u00c0\u00c4")
+        buf.write("\5\36\20\2\u00c1\u00c4\5\32\16\2\u00c2\u00c4\5.\30\2\u00c3")
+        buf.write("\u00c0\3\2\2\2\u00c3\u00c1\3\2\2\2\u00c3\u00c2\3\2\2\2")
+        buf.write("\u00c4\31\3\2\2\2\u00c5\u00c6\5\36\20\2\u00c6\u00c7\5")
+        buf.write("\34\17\2\u00c7\u00c9\3\2\2\2\u00c8\u00c5\3\2\2\2\u00c9")
+        buf.write("\u00ca\3\2\2\2\u00ca\u00c8\3\2\2\2\u00ca\u00cb\3\2\2\2")
+        buf.write("\u00cb\u00cc\3\2\2\2\u00cc\u00cd\5\36\20\2\u00cd\33\3")
+        buf.write("\2\2\2\u00ce\u00cf\t\b\2\2\u00cf\35\3\2\2\2\u00d0\u00d1")
+        buf.write("\5 \21\2\u00d1\37\3\2\2\2\u00d2\u00d3\b\21\1\2\u00d3\u00d4")
+        buf.write("\5\"\22\2\u00d4\u00da\3\2\2\2\u00d5\u00d6\f\4\2\2\u00d6")
+        buf.write("\u00d7\t\t\2\2\u00d7\u00d9\5 \21\5\u00d8\u00d5\3\2\2\2")
+        buf.write("\u00d9\u00dc\3\2\2\2\u00da\u00d8\3\2\2\2\u00da\u00db\3")
+        buf.write("\2\2\2\u00db!\3\2\2\2\u00dc\u00da\3\2\2\2\u00dd\u00de")
+        buf.write("\b\22\1\2\u00de\u00df\5$\23\2\u00df\u00e5\3\2\2\2\u00e0")
+        buf.write("\u00e1\f\4\2\2\u00e1\u00e2\t\n\2\2\u00e2\u00e4\5\"\22")
+        buf.write("\5\u00e3\u00e0\3\2\2\2\u00e4\u00e7\3\2\2\2\u00e5\u00e3")
+        buf.write("\3\2\2\2\u00e5\u00e6\3\2\2\2\u00e6#\3\2\2\2\u00e7\u00e5")
+        buf.write("\3\2\2\2\u00e8\u00e9\b\23\1\2\u00e9\u00ea\5&\24\2\u00ea")
+        buf.write("\u00f0\3\2\2\2\u00eb\u00ec\f\4\2\2\u00ec\u00ed\7\21\2")
+        buf.write("\2\u00ed\u00ef\5\16\b\2\u00ee\u00eb\3\2\2\2\u00ef\u00f2")
+        buf.write("\3\2\2\2\u00f0\u00ee\3\2\2\2\u00f0\u00f1\3\2\2\2\u00f1")
+        buf.write("%\3\2\2\2\u00f2\u00f0\3\2\2\2\u00f3\u00f4\t\t\2\2\u00f4")
+        buf.write("\u0104\5&\24\2\u00f5\u00f7\7\16\2\2\u00f6\u00f5\3\2\2")
+        buf.write("\2\u00f6\u00f7\3\2\2\2\u00f7\u00f8\3\2\2\2\u00f8\u00f9")
+        buf.write("\7\7\2\2\u00f9\u00fa\5\36\20\2\u00fa\u00fb\7\b\2\2\u00fb")
+        buf.write("\u0104\3\2\2\2\u00fc\u0104\5\24\13\2\u00fd\u0104\5\f\7")
+        buf.write("\2\u00fe\u0104\5\4\3\2\u00ff\u0104\5\60\31\2\u0100\u0104")
+        buf.write("\5@!\2\u0101\u0104\58\35\2\u0102\u0104\5\2\2\2\u0103\u00f3")
+        buf.write("\3\2\2\2\u0103\u00f6\3\2\2\2\u0103\u00fc\3\2\2\2\u0103")
+        buf.write("\u00fd\3\2\2\2\u0103\u00fe\3\2\2\2\u0103\u00ff\3\2\2\2")
+        buf.write("\u0103\u0100\3\2\2\2\u0103\u0101\3\2\2\2\u0103\u0102\3")
+        buf.write("\2\2\2\u0104\'\3\2\2\2\u0105\u0108\5\n\6\2\u0106\u0107")
+        buf.write("\7 \2\2\u0107\u0109\5\16\b\2\u0108\u0106\3\2\2\2\u0108")
+        buf.write("\u0109\3\2\2\2\u0109)\3\2\2\2\u010a\u010c\7\7\2\2\u010b")
+        buf.write("\u010d\5(\25\2\u010c\u010b\3\2\2\2\u010c\u010d\3\2\2\2")
+        buf.write("\u010d\u010e\3\2\2\2\u010e\u011c\7\b\2\2\u010f\u0115\7")
+        buf.write("\7\2\2\u0110\u0111\5(\25\2\u0111\u0112\7!\2\2\u0112\u0114")
+        buf.write("\3\2\2\2\u0113\u0110\3\2\2\2\u0114\u0117\3\2\2\2\u0115")
+        buf.write("\u0113\3\2\2\2\u0115\u0116\3\2\2\2\u0116\u0118\3\2\2\2")
+        buf.write("\u0117\u0115\3\2\2\2\u0118\u0119\5(\25\2\u0119\u011a\7")
+        buf.write("\b\2\2\u011a\u011c\3\2\2\2\u011b\u010a\3\2\2\2\u011b\u010f")
+        buf.write("\3\2\2\2\u011c+\3\2\2\2\u011d\u011e\5*\26\2\u011e\u011f")
+        buf.write("\t\4\2\2\u011f\u0120\5\36\20\2\u0120-\3\2\2\2\u0121\u0122")
+        buf.write("\5(\25\2\u0122\u0123\7\32\2\2\u0123\u0124\5\36\20\2\u0124")
+        buf.write("\u012a\3\2\2\2\u0125\u0126\5(\25\2\u0126\u0127\7\32\2")
+        buf.write("\2\u0127\u0128\5,\27\2\u0128\u012a\3\2\2\2\u0129\u0121")
+        buf.write("\3\2\2\2\u0129\u0125\3\2\2\2\u012a/\3\2\2\2\u012b\u012c")
+        buf.write("\7\'\2\2\u012c\u012d\7\t\2\2\u012d\u012e\5\36\20\2\u012e")
+        buf.write("\u012f\7\n\2\2\u012f\u0130\7\t\2\2\u0130\u0131\5\36\20")
+        buf.write("\2\u0131\u0132\7\n\2\2\u0132\61\3\2\2\2\u0133\u0134\5")
+        buf.write("\36\20\2\u0134\u0135\7\22\2\2\u0135\u0138\5\32\16\2\u0136")
+        buf.write("\u0137\7\5\2\2\u0137\u0139\7\5\2\2\u0138\u0136\3\2\2\2")
+        buf.write("\u0138\u0139\3\2\2\2\u0139\63\3\2\2\2\u013a\u013b\5\36")
+        buf.write("\20\2\u013b\u013c\7\22\2\2\u013c\u013d\5\32\16\2\u013d")
+        buf.write("\u013e\7\5\2\2\u013e\u013f\7\5\2\2\u013f\65\3\2\2\2\u0140")
+        buf.write("\u0142\5\64\33\2\u0141\u0140\3\2\2\2\u0142\u0145\3\2\2")
+        buf.write("\2\u0143\u0141\3\2\2\2\u0143\u0144\3\2\2\2\u0144\u0146")
+        buf.write("\3\2\2\2\u0145\u0143\3\2\2\2\u0146\u0147\5\62\32\2\u0147")
+        buf.write("\67\3\2\2\2\u0148\u0149\7(\2\2\u0149\u014a\7\t\2\2\u014a")
+        buf.write("\u014b\7\33\2\2\u014b\u014c\7\n\2\2\u014c\u014d\5\66\34")
+        buf.write("\2\u014d\u014e\7)\2\2\u014e\u014f\7\t\2\2\u014f\u0150")
+        buf.write("\7\33\2\2\u0150\u0151\7\n\2\2\u01519\3\2\2\2\u0152\u0153")
+        buf.write("\5\36\20\2\u0153\u0154\7\22\2\2\u0154\u0156\3\2\2\2\u0155")
+        buf.write("\u0152\3\2\2\2\u0156\u0159\3\2\2\2\u0157\u0155\3\2\2\2")
+        buf.write("\u0157\u0158\3\2\2\2\u0158\u015a\3\2\2\2\u0159\u0157\3")
+        buf.write("\2\2\2\u015a\u015d\5\36\20\2\u015b\u015c\7\5\2\2\u015c")
+        buf.write("\u015e\7\5\2\2\u015d\u015b\3\2\2\2\u015d\u015e\3\2\2\2")
+        buf.write("\u015e;\3\2\2\2\u015f\u0160\5\36\20\2\u0160\u0161\7\22")
+        buf.write("\2\2\u0161\u0163\3\2\2\2\u0162\u015f\3\2\2\2\u0163\u0166")
+        buf.write("\3\2\2\2\u0164\u0162\3\2\2\2\u0164\u0165\3\2\2\2\u0165")
+        buf.write("\u0167\3\2\2\2\u0166\u0164\3\2\2\2\u0167\u0168\5\36\20")
+        buf.write("\2\u0168\u0169\7\5\2\2\u0169\u016a\7\5\2\2\u016a=\3\2")
+        buf.write("\2\2\u016b\u016d\5<\37\2\u016c\u016b\3\2\2\2\u016d\u0170")
+        buf.write("\3\2\2\2\u016e\u016c\3\2\2\2\u016e\u016f\3\2\2\2\u016f")
+        buf.write("\u0171\3\2\2\2\u0170\u016e\3\2\2\2\u0171\u0172\5:\36\2")
+        buf.write("\u0172?\3\2\2\2\u0173\u0174\7(\2\2\u0174\u0175\7\t\2\2")
+        buf.write("\u0175\u0176\t\13\2\2\u0176\u0177\7\n\2\2\u0177\u0178")
+        buf.write("\5> \2\u0178\u0179\7)\2\2\u0179\u017a\7\t\2\2\u017a\u017b")
+        buf.write("\t\13\2\2\u017b\u017c\7\n\2\2\u017cA\3\2\2\2$FINTW\\a")
+        buf.write("hmx|\u0087\u008b\u00a1\u00b2\u00bb\u00c3\u00ca\u00da\u00e5")
         buf.write("\u00f0\u00f6\u0103\u0108\u010c\u0115\u011b\u0129\u0138")
         buf.write("\u0143\u0157\u015d\u0164\u016e")
         return buf.getvalue()
@@ -202,22 +198,22 @@ class LaTeXParser ( Parser ):
 
     literalNames = [ "<INVALID>", "'ans'", "<INVALID>", "'\\'", "'`'", "'('", 
                      "')'", "'{'", "'}'", "'['", "']'", "'+'", "'-'", "'*'", 
-                     "'/'", "'^'", "'&'", "'.'", "'='", "<INVALID>", "'\\leq'", 
-                     "<INVALID>", "'\\geq'", "':='", "'cases'", "'matrix'", 
-                     "'pmatrix'", "'bmatrix'", "'vmatrix'", "'_'", "','", 
-                     "<INVALID>", "<INVALID>", "'\\cdot'", "'\\times'", 
-                     "'\\div'", "'\\frac'", "'\\begin'", "'\\end'", "'\\to'", 
-                     "'\\rightarrow'", "'\\dd'", "'\\lim'", "'\\int'", "'\\sum'", 
-                     "'\\dv'", "'\\pdv'", "'\\log'", "'\\ln'", "'\\exp'", 
-                     "'\\sin'", "'\\cos'", "'\\tan'", "'\\sec'", "'\\csc'", 
-                     "'\\cot'", "'\\lfloor'", "'\\rfloor'", "'\\lceil'", 
+                     "'/'", "'^'", "'&'", "'.'", "'='", "'\\neq'", "<INVALID>", 
+                     "'\\leq'", "<INVALID>", "'\\geq'", "':='", "'cases'", 
+                     "'matrix'", "'pmatrix'", "'bmatrix'", "'vmatrix'", 
+                     "'_'", "','", "<INVALID>", "<INVALID>", "'\\cdot'", 
+                     "'\\times'", "'\\div'", "'\\frac'", "'\\begin'", "'\\end'", 
+                     "'\\to'", "'\\rightarrow'", "'\\dd'", "'\\lim'", "'\\int'", 
+                     "'\\sum'", "'\\dv'", "'\\pdv'", "'\\log'", "'\\ln'", 
+                     "'\\exp'", "'\\sin'", "'\\cos'", "'\\tan'", "'\\sec'", 
+                     "'\\csc'", "'\\cot'", "'\\lfloor'", "'\\rfloor'", "'\\lceil'", 
                      "'\\rceil'", "'$'" ]
 
     symbolicNames = [ "<INVALID>", "<INVALID>", "WS", "BS", "BACKTICK", 
                       "LPAREN", "RPAREN", "LCURLY", "RCURLY", "LBRACK", 
                       "RBRACK", "PLUS", "MINUS", "MULT", "DIV", "CARET", 
-                      "AMPERSAND", "POINT", "EQ", "LT", "LTE", "GT", "GTE", 
-                      "ASSIGN", "CASES", "MATRIX", "P_MATRIX", "B_MATRIX", 
+                      "AMPERSAND", "POINT", "EQ", "NEQ", "LT", "LTE", "GT", 
+                      "GTE", "ASSIGN", "CASES", "MATRIX", "P_MATRIX", "B_MATRIX", 
                       "V_MATRIX", "UNDERSCORE", "COMMA", "LETTER", "DIGIT", 
                       "CMD_CDOT", "CMD_TIMES", "CMD_DIV", "CMD_FRAC", "CMD_BEGIN", 
                       "CMD_END", "CMD_TO", "CMD_RIGHTARROW", "CMD_DD", "FUNC_LIM", 
@@ -239,30 +235,31 @@ class LaTeXParser ( Parser ):
     RULE_entry = 10
     RULE_castle_input = 11
     RULE_relation = 12
-    RULE_expr = 13
-    RULE_add_expr = 14
-    RULE_mult_expr = 15
-    RULE_pow_expr = 16
-    RULE_unit = 17
-    RULE_var_def = 18
-    RULE_arg_list = 19
-    RULE_func_def = 20
-    RULE_assignment = 21
-    RULE_fraction = 22
-    RULE_cases_last_row = 23
-    RULE_cases_row = 24
-    RULE_cases_exp = 25
-    RULE_cases_env = 26
-    RULE_matrix_last_row = 27
-    RULE_matrix_row = 28
-    RULE_matrix_exp = 29
-    RULE_matrix_env = 30
+    RULE_relop = 13
+    RULE_expr = 14
+    RULE_add_expr = 15
+    RULE_mult_expr = 16
+    RULE_pow_expr = 17
+    RULE_unit = 18
+    RULE_var_def = 19
+    RULE_arg_list = 20
+    RULE_func_def = 21
+    RULE_assignment = 22
+    RULE_fraction = 23
+    RULE_cases_last_row = 24
+    RULE_cases_row = 25
+    RULE_cases_exp = 26
+    RULE_cases_env = 27
+    RULE_matrix_last_row = 28
+    RULE_matrix_row = 29
+    RULE_matrix_exp = 30
+    RULE_matrix_env = 31
 
     ruleNames =  [ "hist_entry", "number", "nnint", "multichar_var", "var_name", 
                    "var", "tex_symb", "func_name", "func_builtin", "func_call", 
-                   "entry", "castle_input", "relation", "expr", "add_expr", 
-                   "mult_expr", "pow_expr", "unit", "var_def", "arg_list", 
-                   "func_def", "assignment", "fraction", "cases_last_row", 
+                   "entry", "castle_input", "relation", "relop", "expr", 
+                   "add_expr", "mult_expr", "pow_expr", "unit", "var_def", 
+                   "arg_list", "func_def", "assignment", "fraction", "cases_last_row", 
                    "cases_row", "cases_exp", "cases_env", "matrix_last_row", 
                    "matrix_row", "matrix_exp", "matrix_env" ]
 
@@ -285,48 +282,49 @@ class LaTeXParser ( Parser ):
     AMPERSAND=16
     POINT=17
     EQ=18
-    LT=19
-    LTE=20
-    GT=21
-    GTE=22
-    ASSIGN=23
-    CASES=24
-    MATRIX=25
-    P_MATRIX=26
-    B_MATRIX=27
-    V_MATRIX=28
-    UNDERSCORE=29
-    COMMA=30
-    LETTER=31
-    DIGIT=32
-    CMD_CDOT=33
-    CMD_TIMES=34
-    CMD_DIV=35
-    CMD_FRAC=36
-    CMD_BEGIN=37
-    CMD_END=38
-    CMD_TO=39
-    CMD_RIGHTARROW=40
-    CMD_DD=41
-    FUNC_LIM=42
-    FUNC_INT=43
-    FUNC_SUM=44
-    FUNC_DV=45
-    FUNC_PDV=46
-    FUNC_LOG=47
-    FUNC_LN=48
-    FUNC_EXP=49
-    FUNC_SIN=50
-    FUNC_COS=51
-    FUNC_TAN=52
-    FUNC_SEC=53
-    FUNC_CSC=54
-    FUNC_COT=55
-    CMD_LFLOOR=56
-    CMD_RFLOOR=57
-    CMD_LCEIL=58
-    CMD_RCEIL=59
-    DOLLAR=60
+    NEQ=19
+    LT=20
+    LTE=21
+    GT=22
+    GTE=23
+    ASSIGN=24
+    CASES=25
+    MATRIX=26
+    P_MATRIX=27
+    B_MATRIX=28
+    V_MATRIX=29
+    UNDERSCORE=30
+    COMMA=31
+    LETTER=32
+    DIGIT=33
+    CMD_CDOT=34
+    CMD_TIMES=35
+    CMD_DIV=36
+    CMD_FRAC=37
+    CMD_BEGIN=38
+    CMD_END=39
+    CMD_TO=40
+    CMD_RIGHTARROW=41
+    CMD_DD=42
+    FUNC_LIM=43
+    FUNC_INT=44
+    FUNC_SUM=45
+    FUNC_DV=46
+    FUNC_PDV=47
+    FUNC_LOG=48
+    FUNC_LN=49
+    FUNC_EXP=50
+    FUNC_SIN=51
+    FUNC_COS=52
+    FUNC_TAN=53
+    FUNC_SEC=54
+    FUNC_CSC=55
+    FUNC_COT=56
+    CMD_LFLOOR=57
+    CMD_RFLOOR=58
+    CMD_LCEIL=59
+    CMD_RCEIL=60
+    DOLLAR=61
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -410,24 +408,24 @@ class LaTeXParser ( Parser ):
         localctx = LaTeXParser.Hist_entryContext(self, self._ctx, self.state)
         self.enterRule(localctx, 0, self.RULE_hist_entry)
         try:
-            self.state = 66
+            self.state = 68
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,0,self._ctx)
             if la_ == 1:
                 localctx = LaTeXParser.Hist_indexContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
-                self.state = 62
+                self.state = 64
                 self.match(LaTeXParser.DOLLAR)
-                self.state = 63
+                self.state = 65
                 self.nnint()
                 pass
 
             elif la_ == 2:
                 localctx = LaTeXParser.Hist_ansContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
-                self.state = 64
+                self.state = 66
                 self.match(LaTeXParser.DOLLAR)
-                self.state = 65
+                self.state = 67
                 self.match(LaTeXParser.T__0)
                 pass
 
@@ -486,42 +484,42 @@ class LaTeXParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 69
+            self.state = 71
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==LaTeXParser.MINUS:
-                self.state = 68
+                self.state = 70
                 self.match(LaTeXParser.MINUS)
 
 
-            self.state = 72 
+            self.state = 74 
             self._errHandler.sync(self)
             _alt = 1
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                 if _alt == 1:
-                    self.state = 71
+                    self.state = 73
                     self.match(LaTeXParser.DIGIT)
 
                 else:
                     raise NoViableAltException(self)
-                self.state = 74 
+                self.state = 76 
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,2,self._ctx)
 
-            self.state = 83
+            self.state = 85
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,4,self._ctx)
             if la_ == 1:
-                self.state = 76
+                self.state = 78
                 self.match(LaTeXParser.POINT)
-                self.state = 80
+                self.state = 82
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,3,self._ctx)
                 while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                     if _alt==1:
-                        self.state = 77
+                        self.state = 79
                         self.match(LaTeXParser.DIGIT) 
-                    self.state = 82
+                    self.state = 84
                     self._errHandler.sync(self)
                     _alt = self._interp.adaptivePredict(self._input,3,self._ctx)
 
@@ -574,17 +572,17 @@ class LaTeXParser ( Parser ):
         self.enterRule(localctx, 4, self.RULE_nnint)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 86 
+            self.state = 88 
             self._errHandler.sync(self)
             _alt = 1
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                 if _alt == 1:
-                    self.state = 85
+                    self.state = 87
                     self.match(LaTeXParser.DIGIT)
 
                 else:
                     raise NoViableAltException(self)
-                self.state = 88 
+                self.state = 90 
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,5,self._ctx)
 
@@ -642,18 +640,18 @@ class LaTeXParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 91 
+            self.state = 93 
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while True:
-                self.state = 90
+                self.state = 92
                 _la = self._input.LA(1)
                 if not(_la==LaTeXParser.LETTER or _la==LaTeXParser.DIGIT):
                     self._errHandler.recoverInline(self)
                 else:
                     self._errHandler.reportMatch(self)
                     self.consume()
-                self.state = 93 
+                self.state = 95 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if not (_la==LaTeXParser.LETTER or _la==LaTeXParser.DIGIT):
@@ -745,23 +743,23 @@ class LaTeXParser ( Parser ):
         localctx = LaTeXParser.Var_nameContext(self, self._ctx, self.state)
         self.enterRule(localctx, 8, self.RULE_var_name)
         try:
-            self.state = 100
+            self.state = 102
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [LaTeXParser.LETTER]:
                 localctx = LaTeXParser.Var_name_letterContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
-                self.state = 95
+                self.state = 97
                 self.match(LaTeXParser.LETTER)
                 pass
             elif token in [LaTeXParser.BACKTICK]:
                 localctx = LaTeXParser.Var_name_multicharContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
-                self.state = 96
-                self.match(LaTeXParser.BACKTICK)
-                self.state = 97
-                localctx.name = self.multichar_var()
                 self.state = 98
+                self.match(LaTeXParser.BACKTICK)
+                self.state = 99
+                localctx.name = self.multichar_var()
+                self.state = 100
                 self.match(LaTeXParser.BACKTICK)
                 pass
             else:
@@ -819,15 +817,15 @@ class LaTeXParser ( Parser ):
         self.enterRule(localctx, 10, self.RULE_var)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 102
+            self.state = 104
             self.var_name()
-            self.state = 105
+            self.state = 107
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,8,self._ctx)
             if la_ == 1:
-                self.state = 103
+                self.state = 105
                 self.match(LaTeXParser.UNDERSCORE)
-                self.state = 104
+                self.state = 106
                 self.tex_symb()
 
 
@@ -947,13 +945,13 @@ class LaTeXParser ( Parser ):
         self.enterRule(localctx, 12, self.RULE_tex_symb)
         self._la = 0 # Token type
         try:
-            self.state = 116
+            self.state = 118
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,9,self._ctx)
             if la_ == 1:
                 localctx = LaTeXParser.Tex_symb_singleContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
-                self.state = 107
+                self.state = 109
                 _la = self._input.LA(1)
                 if not(_la==LaTeXParser.LETTER or _la==LaTeXParser.DIGIT):
                     self._errHandler.recoverInline(self)
@@ -965,22 +963,22 @@ class LaTeXParser ( Parser ):
             elif la_ == 2:
                 localctx = LaTeXParser.Tex_symb_multiContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
-                self.state = 108
-                self.match(LaTeXParser.LCURLY)
-                self.state = 109
-                self.expr()
                 self.state = 110
+                self.match(LaTeXParser.LCURLY)
+                self.state = 111
+                self.expr()
+                self.state = 112
                 self.match(LaTeXParser.RCURLY)
                 pass
 
             elif la_ == 3:
                 localctx = LaTeXParser.Tex_symb_recurseContext(self, localctx)
                 self.enterOuterAlt(localctx, 3)
-                self.state = 112
-                self.match(LaTeXParser.LCURLY)
-                self.state = 113
-                self.var()
                 self.state = 114
+                self.match(LaTeXParser.LCURLY)
+                self.state = 115
+                self.var()
+                self.state = 116
                 self.match(LaTeXParser.RCURLY)
                 pass
 
@@ -1066,19 +1064,19 @@ class LaTeXParser ( Parser ):
         localctx = LaTeXParser.Func_nameContext(self, self._ctx, self.state)
         self.enterRule(localctx, 14, self.RULE_func_name)
         try:
-            self.state = 120
+            self.state = 122
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [LaTeXParser.FUNC_LOG, LaTeXParser.FUNC_LN, LaTeXParser.FUNC_EXP, LaTeXParser.FUNC_SIN, LaTeXParser.FUNC_COS, LaTeXParser.FUNC_TAN, LaTeXParser.FUNC_SEC, LaTeXParser.FUNC_CSC, LaTeXParser.FUNC_COT]:
                 localctx = LaTeXParser.Func_name_builtinContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
-                self.state = 118
+                self.state = 120
                 self.func_builtin()
                 pass
             elif token in [LaTeXParser.BACKTICK, LaTeXParser.LETTER]:
                 localctx = LaTeXParser.Func_name_varContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
-                self.state = 119
+                self.state = 121
                 self.var()
                 pass
             else:
@@ -1098,231 +1096,52 @@ class LaTeXParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-
-
-        def getRuleIndex(self):
-            return LaTeXParser.RULE_func_builtin
-
-     
-        def copyFrom(self, ctx:ParserRuleContext):
-            super().copyFrom(ctx)
-
-
-
-    class TanContext(Func_builtinContext):
-
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a LaTeXParser.Func_builtinContext
-            super().__init__(parser)
-            self.copyFrom(ctx)
-
-        def FUNC_TAN(self):
-            return self.getToken(LaTeXParser.FUNC_TAN, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterTan" ):
-                listener.enterTan(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitTan" ):
-                listener.exitTan(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitTan" ):
-                return visitor.visitTan(self)
-            else:
-                return visitor.visitChildren(self)
-
-
-    class SecContext(Func_builtinContext):
-
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a LaTeXParser.Func_builtinContext
-            super().__init__(parser)
-            self.copyFrom(ctx)
-
-        def FUNC_SEC(self):
-            return self.getToken(LaTeXParser.FUNC_SEC, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterSec" ):
-                listener.enterSec(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitSec" ):
-                listener.exitSec(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitSec" ):
-                return visitor.visitSec(self)
-            else:
-                return visitor.visitChildren(self)
-
-
-    class CscContext(Func_builtinContext):
-
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a LaTeXParser.Func_builtinContext
-            super().__init__(parser)
-            self.copyFrom(ctx)
-
-        def FUNC_CSC(self):
-            return self.getToken(LaTeXParser.FUNC_CSC, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCsc" ):
-                listener.enterCsc(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCsc" ):
-                listener.exitCsc(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitCsc" ):
-                return visitor.visitCsc(self)
-            else:
-                return visitor.visitChildren(self)
-
-
-    class LnContext(Func_builtinContext):
-
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a LaTeXParser.Func_builtinContext
-            super().__init__(parser)
-            self.copyFrom(ctx)
-
-        def FUNC_LN(self):
-            return self.getToken(LaTeXParser.FUNC_LN, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLn" ):
-                listener.enterLn(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLn" ):
-                listener.exitLn(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitLn" ):
-                return visitor.visitLn(self)
-            else:
-                return visitor.visitChildren(self)
-
-
-    class LogContext(Func_builtinContext):
-
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a LaTeXParser.Func_builtinContext
-            super().__init__(parser)
-            self.copyFrom(ctx)
-
-        def FUNC_LOG(self):
-            return self.getToken(LaTeXParser.FUNC_LOG, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLog" ):
-                listener.enterLog(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLog" ):
-                listener.exitLog(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitLog" ):
-                return visitor.visitLog(self)
-            else:
-                return visitor.visitChildren(self)
-
-
-    class CosContext(Func_builtinContext):
-
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a LaTeXParser.Func_builtinContext
-            super().__init__(parser)
-            self.copyFrom(ctx)
-
-        def FUNC_COS(self):
-            return self.getToken(LaTeXParser.FUNC_COS, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCos" ):
-                listener.enterCos(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCos" ):
-                listener.exitCos(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitCos" ):
-                return visitor.visitCos(self)
-            else:
-                return visitor.visitChildren(self)
-
-
-    class SinContext(Func_builtinContext):
-
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a LaTeXParser.Func_builtinContext
-            super().__init__(parser)
-            self.copyFrom(ctx)
+            self.name = None # Token
 
         def FUNC_SIN(self):
             return self.getToken(LaTeXParser.FUNC_SIN, 0)
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterSin" ):
-                listener.enterSin(self)
+        def FUNC_COS(self):
+            return self.getToken(LaTeXParser.FUNC_COS, 0)
 
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitSin" ):
-                listener.exitSin(self)
+        def FUNC_TAN(self):
+            return self.getToken(LaTeXParser.FUNC_TAN, 0)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitSin" ):
-                return visitor.visitSin(self)
-            else:
-                return visitor.visitChildren(self)
+        def FUNC_SEC(self):
+            return self.getToken(LaTeXParser.FUNC_SEC, 0)
 
-
-    class CotContext(Func_builtinContext):
-
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a LaTeXParser.Func_builtinContext
-            super().__init__(parser)
-            self.copyFrom(ctx)
+        def FUNC_CSC(self):
+            return self.getToken(LaTeXParser.FUNC_CSC, 0)
 
         def FUNC_COT(self):
             return self.getToken(LaTeXParser.FUNC_COT, 0)
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCot" ):
-                listener.enterCot(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCot" ):
-                listener.exitCot(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitCot" ):
-                return visitor.visitCot(self)
-            else:
-                return visitor.visitChildren(self)
-
-
-    class ExpContext(Func_builtinContext):
-
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a LaTeXParser.Func_builtinContext
-            super().__init__(parser)
-            self.copyFrom(ctx)
-
         def FUNC_EXP(self):
             return self.getToken(LaTeXParser.FUNC_EXP, 0)
 
+        def FUNC_LN(self):
+            return self.getToken(LaTeXParser.FUNC_LN, 0)
+
+        def FUNC_LOG(self):
+            return self.getToken(LaTeXParser.FUNC_LOG, 0)
+
+        def getRuleIndex(self):
+            return LaTeXParser.RULE_func_builtin
+
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterExp" ):
-                listener.enterExp(self)
+            if hasattr( listener, "enterFunc_builtin" ):
+                listener.enterFunc_builtin(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitExp" ):
-                listener.exitExp(self)
+            if hasattr( listener, "exitFunc_builtin" ):
+                listener.exitFunc_builtin(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitExp" ):
-                return visitor.visitExp(self)
+            if hasattr( visitor, "visitFunc_builtin" ):
+                return visitor.visitFunc_builtin(self)
             else:
                 return visitor.visitChildren(self)
+
 
 
 
@@ -1330,67 +1149,17 @@ class LaTeXParser ( Parser ):
 
         localctx = LaTeXParser.Func_builtinContext(self, self._ctx, self.state)
         self.enterRule(localctx, 16, self.RULE_func_builtin)
+        self._la = 0 # Token type
         try:
-            self.state = 131
-            self._errHandler.sync(self)
-            token = self._input.LA(1)
-            if token in [LaTeXParser.FUNC_SIN]:
-                localctx = LaTeXParser.SinContext(self, localctx)
-                self.enterOuterAlt(localctx, 1)
-                self.state = 122
-                self.match(LaTeXParser.FUNC_SIN)
-                pass
-            elif token in [LaTeXParser.FUNC_COS]:
-                localctx = LaTeXParser.CosContext(self, localctx)
-                self.enterOuterAlt(localctx, 2)
-                self.state = 123
-                self.match(LaTeXParser.FUNC_COS)
-                pass
-            elif token in [LaTeXParser.FUNC_TAN]:
-                localctx = LaTeXParser.TanContext(self, localctx)
-                self.enterOuterAlt(localctx, 3)
-                self.state = 124
-                self.match(LaTeXParser.FUNC_TAN)
-                pass
-            elif token in [LaTeXParser.FUNC_SEC]:
-                localctx = LaTeXParser.SecContext(self, localctx)
-                self.enterOuterAlt(localctx, 4)
-                self.state = 125
-                self.match(LaTeXParser.FUNC_SEC)
-                pass
-            elif token in [LaTeXParser.FUNC_CSC]:
-                localctx = LaTeXParser.CscContext(self, localctx)
-                self.enterOuterAlt(localctx, 5)
-                self.state = 126
-                self.match(LaTeXParser.FUNC_CSC)
-                pass
-            elif token in [LaTeXParser.FUNC_COT]:
-                localctx = LaTeXParser.CotContext(self, localctx)
-                self.enterOuterAlt(localctx, 6)
-                self.state = 127
-                self.match(LaTeXParser.FUNC_COT)
-                pass
-            elif token in [LaTeXParser.FUNC_EXP]:
-                localctx = LaTeXParser.ExpContext(self, localctx)
-                self.enterOuterAlt(localctx, 7)
-                self.state = 128
-                self.match(LaTeXParser.FUNC_EXP)
-                pass
-            elif token in [LaTeXParser.FUNC_LN]:
-                localctx = LaTeXParser.LnContext(self, localctx)
-                self.enterOuterAlt(localctx, 8)
-                self.state = 129
-                self.match(LaTeXParser.FUNC_LN)
-                pass
-            elif token in [LaTeXParser.FUNC_LOG]:
-                localctx = LaTeXParser.LogContext(self, localctx)
-                self.enterOuterAlt(localctx, 9)
-                self.state = 130
-                self.match(LaTeXParser.FUNC_LOG)
-                pass
+            self.enterOuterAlt(localctx, 1)
+            self.state = 124
+            localctx.name = self._input.LT(1)
+            _la = self._input.LA(1)
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << LaTeXParser.FUNC_LOG) | (1 << LaTeXParser.FUNC_LN) | (1 << LaTeXParser.FUNC_EXP) | (1 << LaTeXParser.FUNC_SIN) | (1 << LaTeXParser.FUNC_COS) | (1 << LaTeXParser.FUNC_TAN) | (1 << LaTeXParser.FUNC_SEC) | (1 << LaTeXParser.FUNC_CSC) | (1 << LaTeXParser.FUNC_COT))) != 0)):
+                localctx.name = self._errHandler.recoverInline(self)
             else:
-                raise NoViableAltException(self)
-
+                self._errHandler.reportMatch(self)
+                self.consume()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1645,109 +1414,109 @@ class LaTeXParser ( Parser ):
         self.enterRule(localctx, 18, self.RULE_func_call)
         self._la = 0 # Token type
         try:
-            self.state = 192
+            self.state = 185
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [LaTeXParser.BACKTICK, LaTeXParser.LETTER, LaTeXParser.FUNC_LOG, LaTeXParser.FUNC_LN, LaTeXParser.FUNC_EXP, LaTeXParser.FUNC_SIN, LaTeXParser.FUNC_COS, LaTeXParser.FUNC_TAN, LaTeXParser.FUNC_SEC, LaTeXParser.FUNC_CSC, LaTeXParser.FUNC_COT]:
                 localctx = LaTeXParser.Func_call_varContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
-                self.state = 133
+                self.state = 126
                 self.func_name()
-                self.state = 134
+                self.state = 127
                 self.match(LaTeXParser.LPAREN)
 
-                self.state = 135
+                self.state = 128
                 self.expr()
-                self.state = 144
+                self.state = 137
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 while _la==LaTeXParser.COMMA:
-                    self.state = 138 
+                    self.state = 131 
                     self._errHandler.sync(self)
                     _alt = 1
                     while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                         if _alt == 1:
-                            self.state = 136
+                            self.state = 129
                             self.match(LaTeXParser.COMMA)
-                            self.state = 137
+                            self.state = 130
                             self.expr()
 
                         else:
                             raise NoViableAltException(self)
-                        self.state = 140 
+                        self.state = 133 
                         self._errHandler.sync(self)
-                        _alt = self._interp.adaptivePredict(self._input,12,self._ctx)
+                        _alt = self._interp.adaptivePredict(self._input,11,self._ctx)
 
-                    self.state = 146
+                    self.state = 139
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
 
-                self.state = 147
+                self.state = 140
                 self.match(LaTeXParser.RPAREN)
                 pass
             elif token in [LaTeXParser.FUNC_LIM]:
                 localctx = LaTeXParser.Func_limContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
-                self.state = 149
+                self.state = 142
                 self.match(LaTeXParser.FUNC_LIM)
-                self.state = 150
+                self.state = 143
                 self.match(LaTeXParser.UNDERSCORE)
-                self.state = 151
+                self.state = 144
                 self.match(LaTeXParser.LCURLY)
-                self.state = 152
+                self.state = 145
                 localctx.limitvar = self.var()
-                self.state = 153
+                self.state = 146
                 _la = self._input.LA(1)
                 if not(_la==LaTeXParser.CMD_TO or _la==LaTeXParser.CMD_RIGHTARROW):
                     self._errHandler.recoverInline(self)
                 else:
                     self._errHandler.reportMatch(self)
                     self.consume()
-                self.state = 154
+                self.state = 147
                 localctx.limitto = self.expr()
-                self.state = 155
+                self.state = 148
                 self.match(LaTeXParser.RCURLY)
-                self.state = 156
+                self.state = 149
                 self.match(LaTeXParser.LCURLY)
-                self.state = 157
+                self.state = 150
                 self.expr()
-                self.state = 158
+                self.state = 151
                 self.match(LaTeXParser.RCURLY)
                 pass
             elif token in [LaTeXParser.FUNC_INT]:
                 localctx = LaTeXParser.Func_intContext(self, localctx)
                 self.enterOuterAlt(localctx, 3)
-                self.state = 160
+                self.state = 153
                 self.match(LaTeXParser.FUNC_INT)
-                self.state = 166
+                self.state = 159
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==LaTeXParser.UNDERSCORE:
-                    self.state = 161
+                    self.state = 154
                     self.match(LaTeXParser.UNDERSCORE)
-                    self.state = 162
+                    self.state = 155
                     self.tex_symb()
-                    self.state = 163
+                    self.state = 156
                     self.match(LaTeXParser.CARET)
-                    self.state = 164
+                    self.state = 157
                     self.tex_symb()
 
 
-                self.state = 168
+                self.state = 161
                 self.match(LaTeXParser.LCURLY)
-                self.state = 169
+                self.state = 162
                 self.expr()
-                self.state = 170
+                self.state = 163
                 self.match(LaTeXParser.CMD_DD)
-                self.state = 171
+                self.state = 164
                 self.var()
-                self.state = 172
+                self.state = 165
                 self.match(LaTeXParser.RCURLY)
                 pass
             elif token in [LaTeXParser.CMD_LFLOOR, LaTeXParser.CMD_LCEIL]:
                 localctx = LaTeXParser.Func_floorceilContext(self, localctx)
                 self.enterOuterAlt(localctx, 4)
-                self.state = 174
+                self.state = 167
                 localctx.lop = self._input.LT(1)
                 _la = self._input.LA(1)
                 if not(_la==LaTeXParser.CMD_LFLOOR or _la==LaTeXParser.CMD_LCEIL):
@@ -1755,9 +1524,9 @@ class LaTeXParser ( Parser ):
                 else:
                     self._errHandler.reportMatch(self)
                     self.consume()
-                self.state = 175
+                self.state = 168
                 self.expr()
-                self.state = 176
+                self.state = 169
                 localctx.rop = self._input.LT(1)
                 _la = self._input.LA(1)
                 if not(_la==LaTeXParser.CMD_RFLOOR or _la==LaTeXParser.CMD_RCEIL):
@@ -1769,7 +1538,7 @@ class LaTeXParser ( Parser ):
             elif token in [LaTeXParser.FUNC_DV, LaTeXParser.FUNC_PDV]:
                 localctx = LaTeXParser.Func_derivContext(self, localctx)
                 self.enterOuterAlt(localctx, 5)
-                self.state = 178
+                self.state = 171
                 localctx.op = self._input.LT(1)
                 _la = self._input.LA(1)
                 if not(_la==LaTeXParser.FUNC_DV or _la==LaTeXParser.FUNC_PDV):
@@ -1777,29 +1546,29 @@ class LaTeXParser ( Parser ):
                 else:
                     self._errHandler.reportMatch(self)
                     self.consume()
-                self.state = 183
+                self.state = 176
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==LaTeXParser.LBRACK:
-                    self.state = 179
+                    self.state = 172
                     self.match(LaTeXParser.LBRACK)
-                    self.state = 180
+                    self.state = 173
                     self.nnint()
-                    self.state = 181
+                    self.state = 174
                     self.match(LaTeXParser.RBRACK)
 
 
-                self.state = 185
+                self.state = 178
                 self.match(LaTeXParser.LCURLY)
-                self.state = 186
+                self.state = 179
                 self.expr()
-                self.state = 187
+                self.state = 180
                 self.match(LaTeXParser.RCURLY)
-                self.state = 188
+                self.state = 181
                 self.match(LaTeXParser.LCURLY)
-                self.state = 189
+                self.state = 182
                 self.var()
-                self.state = 190
+                self.state = 183
                 self.match(LaTeXParser.RCURLY)
                 pass
             else:
@@ -1853,9 +1622,9 @@ class LaTeXParser ( Parser ):
         self.enterRule(localctx, 20, self.RULE_entry)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 194
+            self.state = 187
             self.castle_input()
-            self.state = 195
+            self.state = 188
             self.match(LaTeXParser.EOF)
         except RecognitionException as re:
             localctx.exception = re
@@ -1963,27 +1732,27 @@ class LaTeXParser ( Parser ):
         localctx = LaTeXParser.Castle_inputContext(self, self._ctx, self.state)
         self.enterRule(localctx, 22, self.RULE_castle_input)
         try:
-            self.state = 200
+            self.state = 193
             self._errHandler.sync(self)
-            la_ = self._interp.adaptivePredict(self._input,17,self._ctx)
+            la_ = self._interp.adaptivePredict(self._input,16,self._ctx)
             if la_ == 1:
                 localctx = LaTeXParser.Castle_input_exprContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
-                self.state = 197
+                self.state = 190
                 self.expr()
                 pass
 
             elif la_ == 2:
                 localctx = LaTeXParser.Castle_input_relationContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
-                self.state = 198
+                self.state = 191
                 self.relation()
                 pass
 
             elif la_ == 3:
                 localctx = LaTeXParser.Castle_input_assignmentContext(self, localctx)
                 self.enterOuterAlt(localctx, 3)
-                self.state = 199
+                self.state = 192
                 self.assignment()
                 pass
 
@@ -2002,7 +1771,6 @@ class LaTeXParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.relop = None # Token
 
         def expr(self, i:int=None):
             if i is None:
@@ -2011,20 +1779,12 @@ class LaTeXParser ( Parser ):
                 return self.getTypedRuleContext(LaTeXParser.ExprContext,i)
 
 
-        def EQ(self):
-            return self.getToken(LaTeXParser.EQ, 0)
+        def relop(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(LaTeXParser.RelopContext)
+            else:
+                return self.getTypedRuleContext(LaTeXParser.RelopContext,i)
 
-        def LT(self):
-            return self.getToken(LaTeXParser.LT, 0)
-
-        def LTE(self):
-            return self.getToken(LaTeXParser.LTE, 0)
-
-        def GT(self):
-            return self.getToken(LaTeXParser.GT, 0)
-
-        def GTE(self):
-            return self.getToken(LaTeXParser.GTE, 0)
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_relation
@@ -2050,21 +1810,95 @@ class LaTeXParser ( Parser ):
 
         localctx = LaTeXParser.RelationContext(self, self._ctx, self.state)
         self.enterRule(localctx, 24, self.RULE_relation)
+        try:
+            self.enterOuterAlt(localctx, 1)
+            self.state = 198 
+            self._errHandler.sync(self)
+            _alt = 1
+            while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
+                if _alt == 1:
+                    self.state = 195
+                    self.expr()
+                    self.state = 196
+                    self.relop()
+
+                else:
+                    raise NoViableAltException(self)
+                self.state = 200 
+                self._errHandler.sync(self)
+                _alt = self._interp.adaptivePredict(self._input,17,self._ctx)
+
+            self.state = 202
+            self.expr()
+        except RecognitionException as re:
+            localctx.exception = re
+            self._errHandler.reportError(self, re)
+            self._errHandler.recover(self, re)
+        finally:
+            self.exitRule()
+        return localctx
+
+
+    class RelopContext(ParserRuleContext):
+
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
+            super().__init__(parent, invokingState)
+            self.parser = parser
+            self.op = None # Token
+
+        def EQ(self):
+            return self.getToken(LaTeXParser.EQ, 0)
+
+        def NEQ(self):
+            return self.getToken(LaTeXParser.NEQ, 0)
+
+        def LT(self):
+            return self.getToken(LaTeXParser.LT, 0)
+
+        def LTE(self):
+            return self.getToken(LaTeXParser.LTE, 0)
+
+        def GT(self):
+            return self.getToken(LaTeXParser.GT, 0)
+
+        def GTE(self):
+            return self.getToken(LaTeXParser.GTE, 0)
+
+        def getRuleIndex(self):
+            return LaTeXParser.RULE_relop
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterRelop" ):
+                listener.enterRelop(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitRelop" ):
+                listener.exitRelop(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRelop" ):
+                return visitor.visitRelop(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+
+
+    def relop(self):
+
+        localctx = LaTeXParser.RelopContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 26, self.RULE_relop)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 202
-            self.expr()
-            self.state = 203
-            localctx.relop = self._input.LT(1)
+            self.state = 204
+            localctx.op = self._input.LT(1)
             _la = self._input.LA(1)
-            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << LaTeXParser.EQ) | (1 << LaTeXParser.LT) | (1 << LaTeXParser.LTE) | (1 << LaTeXParser.GT) | (1 << LaTeXParser.GTE))) != 0)):
-                localctx.relop = self._errHandler.recoverInline(self)
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << LaTeXParser.EQ) | (1 << LaTeXParser.NEQ) | (1 << LaTeXParser.LT) | (1 << LaTeXParser.LTE) | (1 << LaTeXParser.GT) | (1 << LaTeXParser.GTE))) != 0)):
+                localctx.op = self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
                 self.consume()
-            self.state = 204
-            self.expr()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -2107,7 +1941,7 @@ class LaTeXParser ( Parser ):
     def expr(self):
 
         localctx = LaTeXParser.ExprContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 26, self.RULE_expr)
+        self.enterRule(localctx, 28, self.RULE_expr)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 206
@@ -2200,8 +2034,8 @@ class LaTeXParser ( Parser ):
         _parentState = self.state
         localctx = LaTeXParser.Add_exprContext(self, self._ctx, _parentState)
         _prevctx = localctx
-        _startState = 28
-        self.enterRecursionRule(localctx, 28, self.RULE_add_expr, _p)
+        _startState = 30
+        self.enterRecursionRule(localctx, 30, self.RULE_add_expr, _p)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
@@ -2334,8 +2168,8 @@ class LaTeXParser ( Parser ):
         _parentState = self.state
         localctx = LaTeXParser.Mult_exprContext(self, self._ctx, _parentState)
         _prevctx = localctx
-        _startState = 30
-        self.enterRecursionRule(localctx, 30, self.RULE_mult_expr, _p)
+        _startState = 32
+        self.enterRecursionRule(localctx, 32, self.RULE_mult_expr, _p)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
@@ -2459,8 +2293,8 @@ class LaTeXParser ( Parser ):
         _parentState = self.state
         localctx = LaTeXParser.Pow_exprContext(self, self._ctx, _parentState)
         _prevctx = localctx
-        _startState = 32
-        self.enterRecursionRule(localctx, 32, self.RULE_pow_expr, _p)
+        _startState = 34
+        self.enterRecursionRule(localctx, 34, self.RULE_pow_expr, _p)
         try:
             self.enterOuterAlt(localctx, 1)
             localctx = LaTeXParser.Pow_expr_unitContext(self, localctx)
@@ -2757,7 +2591,7 @@ class LaTeXParser ( Parser ):
     def unit(self):
 
         localctx = LaTeXParser.UnitContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 34, self.RULE_unit)
+        self.enterRule(localctx, 36, self.RULE_unit)
         self._la = 0 # Token type
         try:
             self.state = 257
@@ -2896,7 +2730,7 @@ class LaTeXParser ( Parser ):
     def var_def(self):
 
         localctx = LaTeXParser.Var_defContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 36, self.RULE_var_def)
+        self.enterRule(localctx, 38, self.RULE_var_def)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
@@ -3007,7 +2841,7 @@ class LaTeXParser ( Parser ):
     def arg_list(self):
 
         localctx = LaTeXParser.Arg_listContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 38, self.RULE_arg_list)
+        self.enterRule(localctx, 40, self.RULE_arg_list)
         self._la = 0 # Token type
         try:
             self.state = 281
@@ -3107,7 +2941,7 @@ class LaTeXParser ( Parser ):
     def func_def(self):
 
         localctx = LaTeXParser.Func_defContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 40, self.RULE_func_def)
+        self.enterRule(localctx, 42, self.RULE_func_def)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
@@ -3211,7 +3045,7 @@ class LaTeXParser ( Parser ):
     def assignment(self):
 
         localctx = LaTeXParser.AssignmentContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 42, self.RULE_assignment)
+        self.enterRule(localctx, 44, self.RULE_assignment)
         try:
             self.state = 295
             self._errHandler.sync(self)
@@ -3299,7 +3133,7 @@ class LaTeXParser ( Parser ):
     def fraction(self):
 
         localctx = LaTeXParser.FractionContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 44, self.RULE_fraction)
+        self.enterRule(localctx, 46, self.RULE_fraction)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 297
@@ -3371,7 +3205,7 @@ class LaTeXParser ( Parser ):
     def cases_last_row(self):
 
         localctx = LaTeXParser.Cases_last_rowContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 46, self.RULE_cases_last_row)
+        self.enterRule(localctx, 48, self.RULE_cases_last_row)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
@@ -3446,7 +3280,7 @@ class LaTeXParser ( Parser ):
     def cases_row(self):
 
         localctx = LaTeXParser.Cases_rowContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 48, self.RULE_cases_row)
+        self.enterRule(localctx, 50, self.RULE_cases_row)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 312
@@ -3508,7 +3342,7 @@ class LaTeXParser ( Parser ):
     def cases_exp(self):
 
         localctx = LaTeXParser.Cases_expContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 50, self.RULE_cases_exp)
+        self.enterRule(localctx, 52, self.RULE_cases_exp)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 321
@@ -3590,7 +3424,7 @@ class LaTeXParser ( Parser ):
     def cases_env(self):
 
         localctx = LaTeXParser.Cases_envContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 52, self.RULE_cases_env)
+        self.enterRule(localctx, 54, self.RULE_cases_env)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 326
@@ -3668,7 +3502,7 @@ class LaTeXParser ( Parser ):
     def matrix_last_row(self):
 
         localctx = LaTeXParser.Matrix_last_rowContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 54, self.RULE_matrix_last_row)
+        self.enterRule(localctx, 56, self.RULE_matrix_last_row)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
@@ -3754,7 +3588,7 @@ class LaTeXParser ( Parser ):
     def matrix_row(self):
 
         localctx = LaTeXParser.Matrix_rowContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 56, self.RULE_matrix_row)
+        self.enterRule(localctx, 58, self.RULE_matrix_row)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 354
@@ -3825,7 +3659,7 @@ class LaTeXParser ( Parser ):
     def matrix_exp(self):
 
         localctx = LaTeXParser.Matrix_expContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 58, self.RULE_matrix_exp)
+        self.enterRule(localctx, 60, self.RULE_matrix_exp)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 364
@@ -3927,7 +3761,7 @@ class LaTeXParser ( Parser ):
     def matrix_env(self):
 
         localctx = LaTeXParser.Matrix_envContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 60, self.RULE_matrix_env)
+        self.enterRule(localctx, 62, self.RULE_matrix_env)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
@@ -3974,9 +3808,9 @@ class LaTeXParser ( Parser ):
     def sempred(self, localctx:RuleContext, ruleIndex:int, predIndex:int):
         if self._predicates == None:
             self._predicates = dict()
-        self._predicates[14] = self.add_expr_sempred
-        self._predicates[15] = self.mult_expr_sempred
-        self._predicates[16] = self.pow_expr_sempred
+        self._predicates[15] = self.add_expr_sempred
+        self._predicates[16] = self.mult_expr_sempred
+        self._predicates[17] = self.pow_expr_sempred
         pred = self._predicates.get(ruleIndex, None)
         if pred is None:
             raise Exception("No predicate with index:" + str(ruleIndex))

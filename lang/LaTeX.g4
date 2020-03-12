@@ -31,6 +31,7 @@ AMPERSAND   : '&';
 POINT   : '.';
 
 EQ      : '=';
+NEQ     : '\\neq';
 LT      : '<' | '\\lt';
 LTE     : '\\leq';
 GT      : '>' | '\\gt';
@@ -116,9 +117,9 @@ func_name
     ;
 
 func_builtin
-    : FUNC_SIN #sin | FUNC_COS #cos | FUNC_TAN #tan
-    | FUNC_SEC #sec | FUNC_CSC #csc | FUNC_COT #cot
-    | FUNC_EXP #exp | FUNC_LN #ln | FUNC_LOG #log
+    : name=(FUNC_SIN | FUNC_COS | FUNC_TAN
+    | FUNC_SEC | FUNC_CSC | FUNC_COT
+    | FUNC_EXP | FUNC_LN | FUNC_LOG)
     ;
 
 func_call
@@ -144,8 +145,10 @@ castle_input
     ;
 
 relation
-    : expr relop=(EQ | LT | LTE | GT | GTE) expr
+    : (expr relop)+ expr
     ;
+
+relop: op=(EQ | NEQ | LT | LTE | GT | GTE);
 
 expr: add_expr;
 

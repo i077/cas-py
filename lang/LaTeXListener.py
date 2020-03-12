@@ -125,84 +125,12 @@ class LaTeXListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by LaTeXParser#sin.
-    def enterSin(self, ctx:LaTeXParser.SinContext):
+    # Enter a parse tree produced by LaTeXParser#func_builtin.
+    def enterFunc_builtin(self, ctx:LaTeXParser.Func_builtinContext):
         pass
 
-    # Exit a parse tree produced by LaTeXParser#sin.
-    def exitSin(self, ctx:LaTeXParser.SinContext):
-        pass
-
-
-    # Enter a parse tree produced by LaTeXParser#cos.
-    def enterCos(self, ctx:LaTeXParser.CosContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#cos.
-    def exitCos(self, ctx:LaTeXParser.CosContext):
-        pass
-
-
-    # Enter a parse tree produced by LaTeXParser#tan.
-    def enterTan(self, ctx:LaTeXParser.TanContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#tan.
-    def exitTan(self, ctx:LaTeXParser.TanContext):
-        pass
-
-
-    # Enter a parse tree produced by LaTeXParser#sec.
-    def enterSec(self, ctx:LaTeXParser.SecContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#sec.
-    def exitSec(self, ctx:LaTeXParser.SecContext):
-        pass
-
-
-    # Enter a parse tree produced by LaTeXParser#csc.
-    def enterCsc(self, ctx:LaTeXParser.CscContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#csc.
-    def exitCsc(self, ctx:LaTeXParser.CscContext):
-        pass
-
-
-    # Enter a parse tree produced by LaTeXParser#cot.
-    def enterCot(self, ctx:LaTeXParser.CotContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#cot.
-    def exitCot(self, ctx:LaTeXParser.CotContext):
-        pass
-
-
-    # Enter a parse tree produced by LaTeXParser#exp.
-    def enterExp(self, ctx:LaTeXParser.ExpContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#exp.
-    def exitExp(self, ctx:LaTeXParser.ExpContext):
-        pass
-
-
-    # Enter a parse tree produced by LaTeXParser#ln.
-    def enterLn(self, ctx:LaTeXParser.LnContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#ln.
-    def exitLn(self, ctx:LaTeXParser.LnContext):
-        pass
-
-
-    # Enter a parse tree produced by LaTeXParser#log.
-    def enterLog(self, ctx:LaTeXParser.LogContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#log.
-    def exitLog(self, ctx:LaTeXParser.LogContext):
+    # Exit a parse tree produced by LaTeXParser#func_builtin.
+    def exitFunc_builtin(self, ctx:LaTeXParser.Func_builtinContext):
         pass
 
 
@@ -293,6 +221,15 @@ class LaTeXListener(ParseTreeListener):
 
     # Exit a parse tree produced by LaTeXParser#relation.
     def exitRelation(self, ctx:LaTeXParser.RelationContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#relop.
+    def enterRelop(self, ctx:LaTeXParser.RelopContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#relop.
+    def exitRelop(self, ctx:LaTeXParser.RelopContext):
         pass
 
 

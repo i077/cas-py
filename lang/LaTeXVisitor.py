@@ -74,48 +74,8 @@ class LaTeXVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LaTeXParser#sin.
-    def visitSin(self, ctx:LaTeXParser.SinContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by LaTeXParser#cos.
-    def visitCos(self, ctx:LaTeXParser.CosContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by LaTeXParser#tan.
-    def visitTan(self, ctx:LaTeXParser.TanContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by LaTeXParser#sec.
-    def visitSec(self, ctx:LaTeXParser.SecContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by LaTeXParser#csc.
-    def visitCsc(self, ctx:LaTeXParser.CscContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by LaTeXParser#cot.
-    def visitCot(self, ctx:LaTeXParser.CotContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by LaTeXParser#exp.
-    def visitExp(self, ctx:LaTeXParser.ExpContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by LaTeXParser#ln.
-    def visitLn(self, ctx:LaTeXParser.LnContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by LaTeXParser#log.
-    def visitLog(self, ctx:LaTeXParser.LogContext):
+    # Visit a parse tree produced by LaTeXParser#func_builtin.
+    def visitFunc_builtin(self, ctx:LaTeXParser.Func_builtinContext):
         return self.visitChildren(ctx)
 
 
@@ -166,6 +126,11 @@ class LaTeXVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by LaTeXParser#relation.
     def visitRelation(self, ctx:LaTeXParser.RelationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#relop.
+    def visitRelop(self, ctx:LaTeXParser.RelopContext):
         return self.visitChildren(ctx)
 
 

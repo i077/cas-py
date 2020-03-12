@@ -3,11 +3,12 @@ from antlr4 import FileStream, InputStream, CommonTokenStream
 from LaTeXVisitor import LaTeXVisitor
 from LaTeXParser import LaTeXParser as parse
 from LaTeXLexer import LaTeXLexer
-from structures import Number, Polynomial, Variable, Expression
+from structures import Number, Polynomial, Variable, Expression, Cases, Relation
+from State import State
 import operator as op
 
 class CastleVisitor(LaTeXVisitor):
-    def __init__(self, state: dict):
+    def __init__(self, state: State):
         self.state = state
 
     def visitEntry(self, ctx:parse.EntryContext):
@@ -127,7 +128,7 @@ class CastleVisitor(LaTeXVisitor):
         assign_var ASSIGN expr
         assign a value to a variable in the state"""
         expr = self.visit(ctx.expr())
-        self.state[self.visit(ctx.var_def()).name] = expr
+        self.state.set(self.visit(ctx.var_def()), expr)
         return expr
 
     def visitFunc_assign(self, ctx: parse.Func_assignContext):
@@ -135,16 +136,51 @@ class CastleVisitor(LaTeXVisitor):
         assign_var ASSIGN func_def 
         assign a value to a function in the state"""
         func_def = self.visit(ctx.func_def())
-        self.state[self.visit(ctx.var_def()).name] = func_def
+        self.state.set(self.visit(ctx.var_def()), func_def)
         return func_def
 
     # Function definitions ======================================================
 
-    # Cases =====================================================================
-    def visitCases_last_row(self, ctx: parse.Cases_last_rowContext):
-        pass
+    # Relations =================================================================
+    def visitRelop(self, ctx:parse.RelopContext):
+        return ctx.op.type
 
-def evaluate_expression(state: dict, expr: str):
+    def visitRelation(self, ctx: parse.RelationContext):
+        rep = []
+        rel_dict = {
+            parse.LT: op.lt,
+            parse.GT: op.gt,
+            parse.LTE: op.le,
+            parse.GTE: op.ge,
+            parse.EQ: op.eq,
+            parse.NEQ: op.ne
+        }
+        ops = [self.visit(op) for op in ctx.relop()]
+        exprs = [self.visit(expr) for expr in ctx.expr()]
+        for i in range(len(ctx.relop())):
+            rep.append(exprs[i])
+            rep.append(rel_dict[ops[i]])
+        rep.append(exprs[-1])
+        return Relation(rep)
+
+    # Cases =====================================================================
+    def visitCases_env(self, ctx: parse.Cases_envContext):
+        return self.visit(ctx.cases_exp())
+
+    def visitCases_last_row(self, ctx: parse.Cases_last_rowContext):
+        return (self.visit(ctx.expr()), self.visit(ctx.relation()))
+
+    def visitCases_row(self, ctx: parse.Cases_rowContext):
+        return (self.visit(ctx.expr()), self.visit(ctx.relation()))
+
+    def visitCases_exp(self, ctx:parse.Cases_expContext):
+        return Cases(
+            [self.visit(row) for row in ctx.cases_row()] +
+            [self.visit(ctx.cases_last_row())]
+        )
+
+
+def evaluate_expression(state: State, expr: str):
     stream = InputStream(expr)
     lexer = LaTeXLexer(stream)
     tokens = CommonTokenStream(lexer)
@@ -155,7 +191,7 @@ def evaluate_expression(state: dict, expr: str):
 
 
 def main(argv):
-    state = dict()
+    state = State()
     FILEPATH = 'lang/input.txt'
     for line in open(FILEPATH, 'r').readlines():
         evaluate_expression(state, line)

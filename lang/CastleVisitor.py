@@ -91,7 +91,7 @@ class CastleVisitor(LaTeXVisitor):
         if ctx.DIGIT():
             return Number(int(text))
         else:
-            return text
+            return Variable(self.state, text)
 
     def visitTex_symb_multi(self, ctx: parse.Tex_symb_multiContext):
         """tex_symb_multi
@@ -107,11 +107,9 @@ class CastleVisitor(LaTeXVisitor):
         """var
         var_name (UNDERSCORE tex_symb)?
         var used to reference variable's value in an expression"""
-        if ctx.tex_symb():
-            var_string = self.visit(ctx.var_name()) + '_' + self.visit(ctx.tex_symb())
-        else:
-            var_string = self.visit(ctx.var_name())
-        return Variable(var_string)
+        var = self.visit(ctx.var_name()) 
+        subscript = self.visit(ctx.tex_symb()) if ctx.tex_symb() else None
+        return Variable(self.state, var, subscript)
 
 
     # Variable and function assignments ========================================
@@ -119,18 +117,17 @@ class CastleVisitor(LaTeXVisitor):
         """var_def
         var_name (UNDERSCORE tex_symb)?
         variable name used in assignment (as opposed to var)"""
-        if ctx.tex_symb():
-            var_string = self.visit(ctx.var_name()) + '_' + self.visit(ctx.tex_symb())
-        else:
-            var_string = self.visit(ctx.var_name())
-        return Variable(var_string)
+        var = self.visit(ctx.var_name()) 
+        subscript = self.visit(ctx.tex_symb()) if ctx.tex_symb() else None
+        return Variable(self.state, var, subscript)
+
 
     def visitVar_assign(self, ctx: parse.Var_assignContext):
         """var_assign
         assign_var ASSIGN expr
         assign a value to a variable in the state"""
         expr = self.visit(ctx.expr())
-        self.state[self.visit(ctx.var_def()).name] = expr.evaluate(self.state)
+        self.state[self.visit(ctx.var_def()).name] = expr
         return expr
 
     def visitFunc_assign(self, ctx: parse.Func_assignContext):
@@ -138,7 +135,7 @@ class CastleVisitor(LaTeXVisitor):
         assign_var ASSIGN func_def 
         assign a value to a function in the state"""
         func_def = self.visit(ctx.func_def())
-        self.state[self.visit(ctx.var_def())] = func_def
+        self.state[self.visit(ctx.var_def()).name] = func_def
         return func_def
 
     # Function definitions ======================================================

@@ -62,8 +62,22 @@ class Expression(Function):
         self.pow = power
 
     def evaluate(self, state: dict):
+        l_val = self.left.evaluate(state)
+        r_val = self.right.evaluate(state)
+
+        #TODO: Fix this once we've implemented simplification of expressions with variables
+        if isinstance(l_val, str) or isinstance(r_val, str):
+            op_str = {
+                op.mul: '*',
+                op.truediv: '/',
+                op.add: '+',
+                op.sub: '-',
+                op.pow: '^'
+            }
+            return str(l_val) + op_str[self.op] + str(r_val)
+
         if self.op == op.pow:
-            power = self.right.evaluate(state)
+            power = r_val
             if isinstance(power, Number):
                 if power == 1:
                     return self
@@ -73,11 +87,11 @@ class Expression(Function):
                 if power == 0:
                     return Number(1)
                 if power < 0:
-                    return Number(1) / Expression(op.pow, self.left.evaluate(state), abs(power))
+                    return Number(1) / Expression(op.pow, l_val, abs(power))
 
-            return self.op(self.left.evaluate(state), power)
+            return self.op(l_val, power)
 
-        return self.op(self.left.evaluate(state), self.right.evaluate(state))
+        return self.op(l_val, r_val)
 
     def __eq__(self, other):
         return (
@@ -115,11 +129,30 @@ class Expression(Function):
 
 
 class Variable(Function):
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, state, base_var, subscript=None):
+        self.base_var = base_var
+        self.name = base_var
+        self.subscript = subscript
+        if subscript is not None:
+            self.name += '_{' + str(subscript.evaluate(state)) + '}'
 
     def evaluate(self, state: dict):
-        return state[self.name]
+        #reevaluate subscript with current state
+        if self.subscript is not None:
+            new_name = self.base_var + '_{' + str(self.subscript.evaluate(state)) + '}'
+        else:
+            new_name = self.name
+
+        if self.name in state or new_name in state:
+            #replace this variable's key in state with new variable name
+            if new_name != self.name and self.name in state:
+                state[new_name] = state[self.name]
+                del state[self.name]
+                self.name = new_name
+            return state[new_name].evaluate(state)
+
+        self.name = new_name
+        return self.name
 
     def __eq__(self, f) -> bool:
         return isinstance(f, Variable) and f.name == self.name
@@ -221,6 +254,8 @@ class Number(Function):
             return Number(self.value - other.value)
 
     def evaluate(self, state=None):
+        if int(self.value) == self.value:
+            return int(self.value)
         return self.value
 
     def __eq__(self, other):

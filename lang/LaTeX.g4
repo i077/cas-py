@@ -75,6 +75,12 @@ FUNC_TAN        : '\\tan';
 FUNC_SEC        : '\\sec';
 FUNC_CSC        : '\\csc';
 FUNC_COT        : '\\cot';
+FUNC_ASIN       : '\\arcsin' | '\\asin' | '\\sin^{-1}';
+FUNC_ACOS       : '\\arccos' | '\\acos' | '\\cos^{-1}';
+FUNC_ATAN       : '\\arctan' | '\\atan' | '\\tan^{-1}';
+FUNC_ASEC       : '\\arcsec' | '\\asec' | '\\sec^{-1}';
+FUNC_ACSC       : '\\arccsc' | '\\acsc' | '\\csc^{-1}';
+FUNC_ACOT       : '\\arccot' | '\\acot' | '\\cot^{-1}';
 
 CMD_LFLOOR      : '\\lfloor';
 CMD_RFLOOR      : '\\rfloor';
@@ -119,12 +125,14 @@ func_name
 func_builtin
     : name=(FUNC_SIN | FUNC_COS | FUNC_TAN
     | FUNC_SEC | FUNC_CSC | FUNC_COT
-    | FUNC_EXP | FUNC_LN | FUNC_LOG)
+    | FUNC_EXP | FUNC_LN | FUNC_LOG
+    | FUNC_ASIN | FUNC_ACOS | FUNC_ATAN
+    | FUNC_ASEC | FUNC_ACSC | FUNC_ACOT)
     ;
 
 func_call
     // Function calls with normal syntax
-    : func_name LPAREN (expr ((COMMA expr)+)*) RPAREN                                                          #func_call_var
+    : func_name LPAREN (expr ((COMMA expr)+)*)? RPAREN                                                          #func_call_var
     // Limits
     | FUNC_LIM UNDERSCORE LCURLY limitvar=var (CMD_TO | CMD_RIGHTARROW) limitto=expr RCURLY LCURLY expr RCURLY #func_lim
     // Integrals
@@ -183,8 +191,7 @@ var_def
     : var_name (UNDERSCORE tex_symb)?;
 
 arg_list
-    : LPAREN var_def? RPAREN                    #arg_list_single
-    | LPAREN (var_def COMMA)* var_def RPAREN    #arg_list_multi
+    : LPAREN (var_def (COMMA var_def)*)? RPAREN
     ;
 
 func_def

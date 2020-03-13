@@ -219,13 +219,8 @@ class LaTeXVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LaTeXParser#arg_list_single.
-    def visitArg_list_single(self, ctx:LaTeXParser.Arg_list_singleContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by LaTeXParser#arg_list_multi.
-    def visitArg_list_multi(self, ctx:LaTeXParser.Arg_list_multiContext):
+    # Visit a parse tree produced by LaTeXParser#arg_list.
+    def visitArg_list(self, ctx:LaTeXParser.Arg_listContext):
         return self.visitChildren(ctx)
 
 

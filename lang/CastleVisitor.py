@@ -1,9 +1,11 @@
 import sys
+import sympy
+import math
 from antlr4 import FileStream, InputStream, CommonTokenStream
 from LaTeXVisitor import LaTeXVisitor
 from LaTeXParser import LaTeXParser as parse
 from LaTeXLexer import LaTeXLexer
-from structures import Number, Polynomial, Variable, Expression, Cases, Relation
+from structures import Number, Polynomial, Variable, Expression, Cases, Relation, UserDefinedFunc, FunctionCall
 from State import State
 import operator as op
 
@@ -66,9 +68,6 @@ class CastleVisitor(LaTeXVisitor):
         return Number(float(ctx.getText()))
 
 
-    # def visitFraction(self, ctx:parse.FractionContext):
-    #     return Fraction(self.visit(ctx.expr(0)), self.visit(ctx.expr(1)))
-
     # Variable names and TeX symbols ===============================================
     def visitVar_name_letter(self, ctx: parse.Var_name_letterContext):
         """var_name_letter
@@ -128,7 +127,7 @@ class CastleVisitor(LaTeXVisitor):
         assign_var ASSIGN expr
         assign a value to a variable in the state"""
         expr = self.visit(ctx.expr())
-        self.state.set(self.visit(ctx.var_def()), expr)
+        self.state[self.visit(ctx.var_def())] = expr
         return expr
 
     def visitFunc_assign(self, ctx: parse.Func_assignContext):
@@ -136,10 +135,42 @@ class CastleVisitor(LaTeXVisitor):
         assign_var ASSIGN func_def 
         assign a value to a function in the state"""
         func_def = self.visit(ctx.func_def())
-        self.state.set(self.visit(ctx.var_def()), func_def)
+        self.state[self.visit(ctx.var_def())] = func_def
         return func_def
 
+
     # Function definitions ======================================================
+    def visitArg_list(self, ctx: parse.Arg_listContext):
+        args = ctx.var_def()
+        if not args:
+            return None
+        if not isinstance(args, (list, tuple)):
+            return [self.visit(args)]
+        return [self.visit(arg) for arg in args]
+
+    def visitFunc_def(self, ctx: parse.Func_defContext):
+        args = self.visit(ctx.arg_list())
+        func_body = self.visit(ctx.expr())
+        return UserDefinedFunc(args, func_body)
+
+    def visitFunc_builtin(self, ctx: parse.Func_builtinContext):
+        return CastleVisitor.builtin_func_dict[ctx.name.type]
+
+
+    # Function calls ============================================================
+    def visitFunc_call_var(self, ctx: parse.Func_call_varContext):
+        function = self.visit(ctx.func_name())
+        args = ctx.expr()
+        if not args:
+            args = ()
+        elif not isinstance(args, (list, tuple)):
+            args = (self.visit(args))
+        else:
+            args = (self.visit(arg) for arg in args)
+        if isinstance(function, Variable):
+            return FunctionCall(self.state[function.name], args)
+        return FunctionCall(function, args)
+
 
     # Relations =================================================================
     def visitRelop(self, ctx:parse.RelopContext):
@@ -147,21 +178,14 @@ class CastleVisitor(LaTeXVisitor):
 
     def visitRelation(self, ctx: parse.RelationContext):
         rep = []
-        rel_dict = {
-            parse.LT: op.lt,
-            parse.GT: op.gt,
-            parse.LTE: op.le,
-            parse.GTE: op.ge,
-            parse.EQ: op.eq,
-            parse.NEQ: op.ne
-        }
         ops = [self.visit(op) for op in ctx.relop()]
         exprs = [self.visit(expr) for expr in ctx.expr()]
         for i in range(len(ctx.relop())):
             rep.append(exprs[i])
-            rep.append(rel_dict[ops[i]])
+            rep.append(CastleVisitor.rel_dict[ops[i]])
         rep.append(exprs[-1])
         return Relation(rep)
+
 
     # Cases =====================================================================
     def visitCases_env(self, ctx: parse.Cases_envContext):
@@ -179,6 +203,32 @@ class CastleVisitor(LaTeXVisitor):
             [self.visit(ctx.cases_last_row())]
         )
 
+    builtin_func_dict = {
+        parse.FUNC_SIN: math.sin,
+        parse.FUNC_COS: math.cos,
+        parse.FUNC_TAN: math.tan,
+        parse.FUNC_SEC: sympy.sec,
+        parse.FUNC_CSC: sympy.csc,
+        parse.FUNC_COT: sympy.cot, 
+        parse.FUNC_ASIN: sympy.asin,
+        parse.FUNC_ACOS: sympy.acos, 
+        parse.FUNC_ATAN: sympy.atan, 
+        parse.FUNC_ASEC: sympy.asec, 
+        parse.FUNC_ACSC: sympy.acsc, 
+        parse.FUNC_ACOT: sympy.acot,
+        parse.FUNC_EXP: math.exp,
+        parse.FUNC_LN: math.log,
+        parse.FUNC_LOG: math.log
+    }
+
+    rel_dict = {
+        parse.LT: op.lt,
+        parse.GT: op.gt,
+        parse.LTE: op.le,
+        parse.GTE: op.ge,
+        parse.EQ: op.eq,
+        parse.NEQ: op.ne
+    }
 
 def evaluate_expression(state: State, expr: str):
     stream = InputStream(expr)

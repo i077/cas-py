@@ -1,21 +1,40 @@
 class State():
     def __init__(self, vars=dict()):
-        self.vars = vars
+        self.vars = [vars]
 
-    def set(self, var, value):
-        self.vars[var.name] = value
+    def __setitem__(self, var, value):
+        self.vars[0][var.name] = value
+        
+    def __getitem__(self, var_name):
+        for layer in self.vars:
+            if var_name in layer:
+                return layer[var_name]
 
-    def get(self, var, if_missing=None):
-        return self.vars.get(var, if_missing)
+        raise KeyError(var_name)
 
-    def __getitem__(self, var):
-        return self.vars[var]
+    def get(self, var_name, if_missing=None):
+        for layer in self.vars:
+            if var_name in layer:
+                return layer[var_name]
 
-    def __contains__(self, var):
-        return var in self.vars
+        return if_missing
+
+    def push_layer(self):
+        self.vars.insert(0, dict())
+
+    def pop_layer(self):
+        self.vars.pop(0)
+
+
+    def __contains__(self, var_name):
+        return any(var_name in layer for layer in self.vars)
 
     def replace(self, key1, key2):
         """replace item key1 with item key2 in vars"""
-        self.vars[key2] = self.vars[key1]
-        del self.vars[key1]
+        for layer in self.vars:
+            if key1 in layer:
+                layer[key2] = layer[key1]
+                del layer[key1]
+                return
+        raise KeyError(key1)
         

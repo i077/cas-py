@@ -311,7 +311,6 @@ class Cases(Function):
         rep += '\n\\end{cases}'
         return rep
 
-    
 class Relation():
     def __init__(self, rel_chain):
         self.rel_chain = rel_chain
@@ -327,3 +326,35 @@ class Relation():
             else:
                 raise ValueError(f'Cannot compute relation {rel} on {left} and {right}')
         return True
+
+
+class UserDefinedFunc():
+    def __init__(self, args: list, func_body: Expression):
+        self.args = args
+        self.func_body = func_body
+
+    def evaluate(self, state: State):
+        return None
+
+    def __repr__(self):
+        return str(tuple(self.args)) + '\\to' + str(self.func_body)
+
+class FunctionCall():
+    def __init__(self, function, passed_args: tuple):
+        self.function = function
+        self.passed_args = passed_args
+
+    def evaluate(self, state: State):
+        if isinstance(self.function, UserDefinedFunc):
+            if self.passed_args:
+                state.push_layer()
+                for arg, value in zip(self.function.args, self.passed_args):
+                    state[arg] = value
+                result = self.function.func_body.evaluate(state)
+                state.pop_layer()
+            else:
+                result = self.function.func_body.evaluate(state)
+            return result
+        else:
+            eval_args = [float(arg.evaluate(state)) for arg in self.passed_args]
+            return self.function(*eval_args)

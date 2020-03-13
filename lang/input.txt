@@ -1,5 +1,4 @@
-k := 1
-j_k := 1
-i_1 := 2
-1 < i_1 = 2 \geq j_1 < 3 < 4 < 5 \leq 6 > i_1
-2 * \begin{cases} i_1 & j_k \neq 1 \\ 69 & 2 > 3 \\ 420 & k + j_k = 2 \end{cases}
+f := (a,b) \to a + b
+f(6,9)
+g := (c,d,e) \to \sin(c)^2 + \cos(c)^2 + f(d,e)
+g(420,10,20)

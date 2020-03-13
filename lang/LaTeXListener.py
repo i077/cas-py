@@ -386,21 +386,12 @@ class LaTeXListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by LaTeXParser#arg_list_single.
-    def enterArg_list_single(self, ctx:LaTeXParser.Arg_list_singleContext):
+    # Enter a parse tree produced by LaTeXParser#arg_list.
+    def enterArg_list(self, ctx:LaTeXParser.Arg_listContext):
         pass
 
-    # Exit a parse tree produced by LaTeXParser#arg_list_single.
-    def exitArg_list_single(self, ctx:LaTeXParser.Arg_list_singleContext):
-        pass
-
-
-    # Enter a parse tree produced by LaTeXParser#arg_list_multi.
-    def enterArg_list_multi(self, ctx:LaTeXParser.Arg_list_multiContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#arg_list_multi.
-    def exitArg_list_multi(self, ctx:LaTeXParser.Arg_list_multiContext):
+    # Exit a parse tree produced by LaTeXParser#arg_list.
+    def exitArg_list(self, ctx:LaTeXParser.Arg_listContext):
         pass
 
 

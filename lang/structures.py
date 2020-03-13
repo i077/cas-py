@@ -340,7 +340,7 @@ class UserDefinedFunc():
         return str(tuple(self.args)) + '\\to' + str(self.func_body)
 
 class FunctionCall():
-    def __init__(self, function, passed_args: tuple):
+    def __init__(self, function, passed_args: list):
         self.function = function
         self.passed_args = passed_args
 
@@ -349,7 +349,7 @@ class FunctionCall():
             if self.passed_args:
                 state.push_layer()
                 for arg, value in zip(self.function.args, self.passed_args):
-                    state[arg] = value
+                    state[arg.name] = value
                 result = self.function.func_body.evaluate(state)
                 state.pop_layer()
             else:
@@ -358,3 +358,59 @@ class FunctionCall():
         else:
             eval_args = [float(arg.evaluate(state)) for arg in self.passed_args]
             return self.function(*eval_args)
+
+class SumFunc():
+    def __init__(self, var: Variable, lower_bound_expr, upper_bound_expr, sum_expr):
+        self.var = var
+        self.sum_expr = sum_expr
+        self.upper_bound_expr = upper_bound_expr
+        self.lower_bound_expr = lower_bound_expr
+    
+    def evaluate(self, state: State):
+        lower_bound = self.lower_bound_expr.evaluate(state)
+        if not isinstance(lower_bound, int):
+            raise Exception("Sum lower bound must evaluate to integer")
+        upper_bound = self.upper_bound_expr.evaluate(state)
+        if upper_bound == float('inf'):
+            #TODO
+            pass 
+        if not isinstance(upper_bound, int):
+            raise Exception("Sum upper bound must evaluate to integer")
+
+        state.push_layer()
+        max_bound = max(upper_bound, lower_bound)
+        min_bound = min(upper_bound, lower_bound)
+        sum_val = 0
+        for i in range(min_bound, max_bound+1):
+            state[self.var.name] = Number(i)
+            sum_val += float(self.sum_expr.evaluate(state))
+        state.pop_layer()
+        return sum_val
+
+class ProdFunc():
+    def __init__(self, var: Variable, lower_bound_expr, upper_bound_expr, prod_expr):
+        self.var = var
+        self.prod_expr = prod_expr
+        self.upper_bound_expr = upper_bound_expr
+        self.lower_bound_expr = lower_bound_expr
+    
+    def evaluate(self, state: State):
+        lower_bound = self.lower_bound_expr.evaluate(state)
+        if not isinstance(lower_bound, int):
+            raise Exception("Prod lower bound must evaluate to integer")
+        upper_bound = self.upper_bound_expr.evaluate(state)
+        if upper_bound == float('inf'):
+            #TODO
+            pass 
+        if not isinstance(upper_bound, int):
+            raise Exception("Prod upper bound must evaluate to integer")
+
+        state.push_layer()
+        max_bound = max(upper_bound, lower_bound)
+        min_bound = min(upper_bound, lower_bound)
+        prod_val = 1
+        for i in range(min_bound, max_bound+1):
+            state[self.var.name] = Number(i)
+            prod_val *= float(self.prod_expr.evaluate(state))
+        state.pop_layer()
+        return prod_val

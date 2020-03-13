@@ -84,6 +84,16 @@ class LaTeXVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by LaTeXParser#func_sum.
+    def visitFunc_sum(self, ctx:LaTeXParser.Func_sumContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#func_prod.
+    def visitFunc_prod(self, ctx:LaTeXParser.Func_prodContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by LaTeXParser#func_lim.
     def visitFunc_lim(self, ctx:LaTeXParser.Func_limContext):
         return self.visitChildren(ctx)
@@ -191,6 +201,11 @@ class LaTeXVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by LaTeXParser#unit_number.
     def visitUnit_number(self, ctx:LaTeXParser.Unit_numberContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#unit_infinity.
+    def visitUnit_infinity(self, ctx:LaTeXParser.Unit_infinityContext):
         return self.visitChildren(ctx)
 
 

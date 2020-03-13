@@ -5,7 +5,7 @@ from antlr4 import FileStream, InputStream, CommonTokenStream
 from LaTeXVisitor import LaTeXVisitor
 from LaTeXParser import LaTeXParser as parse
 from LaTeXLexer import LaTeXLexer
-from structures import Number, Polynomial, Variable, Expression, Cases, Relation, UserDefinedFunc, FunctionCall
+from structures import Number, Polynomial, Variable, Expression, Cases, Relation, UserDefinedFunc, FunctionCall, SumFunc, ProdFunc
 from State import State
 import operator as op
 
@@ -61,6 +61,12 @@ class CastleVisitor(LaTeXVisitor):
             return Expression(op.mul, Number(-1), self.visit(ctx.expr()))
         else:
             return self.visit(ctx.expr())
+
+    def visitUnit_infinity(self, ctx:parse.Unit_infinityContext):
+        if ctx.inf.type == parse.INFINITY:
+            return Number(float('inf'))
+        else:
+            return Number(float('-inf'))
 
     def visitNumber(self, ctx:parse.NumberContext):
         """number
@@ -127,7 +133,7 @@ class CastleVisitor(LaTeXVisitor):
         assign_var ASSIGN expr
         assign a value to a variable in the state"""
         expr = self.visit(ctx.expr())
-        self.state[self.visit(ctx.var_def())] = expr
+        self.state[self.visit(ctx.var_def()).name] = expr
         return expr
 
     def visitFunc_assign(self, ctx: parse.Func_assignContext):
@@ -135,7 +141,7 @@ class CastleVisitor(LaTeXVisitor):
         assign_var ASSIGN func_def 
         assign a value to a function in the state"""
         func_def = self.visit(ctx.func_def())
-        self.state[self.visit(ctx.var_def())] = func_def
+        self.state[self.visit(ctx.var_def()).name] = func_def
         return func_def
 
 
@@ -162,14 +168,40 @@ class CastleVisitor(LaTeXVisitor):
         function = self.visit(ctx.func_name())
         args = ctx.expr()
         if not args:
-            args = ()
+            args = []
         elif not isinstance(args, (list, tuple)):
-            args = (self.visit(args))
+            args = [self.visit(args)]
         else:
-            args = (self.visit(arg) for arg in args)
+            args = [self.visit(arg) for arg in args]
         if isinstance(function, Variable):
             return FunctionCall(self.state[function.name], args)
         return FunctionCall(function, args)
+
+    def visitFunc_sum(self, ctx:parse.Func_sumContext):
+        lower = self.visit(ctx.relation())
+        upper_bound = self.visit(ctx.tex_symb())
+        sum_expr = self.visit(ctx.expr())
+
+        if not (isinstance(lower, Relation) \
+                and len(lower.rel_chain) == 3 \
+                and lower.rel_chain[1] == CastleVisitor.rel_dict[parse.EQ] \
+                and isinstance(lower.rel_chain[0], Variable)):
+            raise Exception("Sum lower argument should be of form <variable> = <expression>")
+
+        return SumFunc(lower.rel_chain[0], lower.rel_chain[2], upper_bound, sum_expr)
+
+    def visitFunc_prod(self, ctx:parse.Func_prodContext):
+        lower = self.visit(ctx.relation())
+        upper_bound = self.visit(ctx.tex_symb())
+        prod_expr = self.visit(ctx.expr())
+
+        if not (isinstance(lower, Relation) \
+                and len(lower.rel_chain) == 3 \
+                and lower.rel_chain[1] == CastleVisitor.rel_dict[parse.EQ] \
+                and isinstance(lower.rel_chain[0], Variable)):
+            raise Exception("Product lower argument should be of form <variable> = <expression>")
+
+        return ProdFunc(lower.rel_chain[0], lower.rel_chain[2], upper_bound, prod_expr)
 
 
     # Relations =================================================================

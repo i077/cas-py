@@ -143,6 +143,24 @@ class LaTeXListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by LaTeXParser#func_sum.
+    def enterFunc_sum(self, ctx:LaTeXParser.Func_sumContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#func_sum.
+    def exitFunc_sum(self, ctx:LaTeXParser.Func_sumContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#func_prod.
+    def enterFunc_prod(self, ctx:LaTeXParser.Func_prodContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#func_prod.
+    def exitFunc_prod(self, ctx:LaTeXParser.Func_prodContext):
+        pass
+
+
     # Enter a parse tree produced by LaTeXParser#func_lim.
     def enterFunc_lim(self, ctx:LaTeXParser.Func_limContext):
         pass
@@ -338,6 +356,15 @@ class LaTeXListener(ParseTreeListener):
 
     # Exit a parse tree produced by LaTeXParser#unit_number.
     def exitUnit_number(self, ctx:LaTeXParser.Unit_numberContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#unit_infinity.
+    def enterUnit_infinity(self, ctx:LaTeXParser.Unit_infinityContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#unit_infinity.
+    def exitUnit_infinity(self, ctx:LaTeXParser.Unit_infinityContext):
         pass
 
 

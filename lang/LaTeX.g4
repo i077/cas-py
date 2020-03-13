@@ -63,6 +63,7 @@ CMD_DD          : '\\dd';
 FUNC_LIM        : '\\lim';
 FUNC_INT        : '\\int';
 FUNC_SUM        : '\\sum';
+FUNC_PROD       : '\\prod';
 FUNC_DV         : '\\dv';
 FUNC_PDV        : '\\pdv';
 
@@ -86,6 +87,9 @@ CMD_LFLOOR      : '\\lfloor';
 CMD_RFLOOR      : '\\rfloor';
 CMD_LCEIL       : '\\lceil';
 CMD_RCEIL       : '\\rceil';
+
+INFINITY        : '\\infty';
+NEG_INFINITY    : '-\\infty';
 
 // History tokens
 DOLLAR          : '$';
@@ -132,7 +136,13 @@ func_builtin
 
 func_call
     // Function calls with normal syntax
-    : func_name LPAREN (expr ((COMMA expr)+)*)? RPAREN                                                          #func_call_var
+    : func_name LPAREN (expr ((COMMA expr)+)*)? RPAREN                                                         #func_call_var
+    // Sums
+    | FUNC_SUM UNDERSCORE (LCURLY relation RCURLY CARET tex_symb | CARET tex_symb LCURLY relation RCURLY)
+                          (expr | LCURLY expr RCURLY)                                                          #func_sum
+    // Products
+    | FUNC_PROD UNDERSCORE (LCURLY relation RCURLY CARET tex_symb | CARET tex_symb LCURLY relation RCURLY)
+                           (expr | LCURLY expr RCURLY)                                                         #func_prod
     // Limits
     | FUNC_LIM UNDERSCORE LCURLY limitvar=var (CMD_TO | CMD_RIGHTARROW) limitto=expr RCURLY LCURLY expr RCURLY #func_lim
     // Integrals
@@ -176,15 +186,16 @@ pow_expr
     ;
 
 unit
-    : sign=(PLUS | MINUS) unit  #unit_recurse      // Signed unit expressions
-    | MINUS? LPAREN expr RPAREN #unit_paren        // Parentheticals, optionally signed
-    | func_call                 #unit_func         // Function calls
-    | var                       #unit_var          // Variable identifiers
-    | number                    #unit_number       // Number literals
-    | fraction                  #unit_fraction     // Fraction expressions
-    | matrix_env                #unit_matrix       // Matrices
-    | cases_env                 #unit_cases        // Branching (cases)
-    | hist_entry                #unit_hist         // History reference
+    : sign=(PLUS | MINUS) unit      #unit_recurse      // Signed unit expressions
+    | MINUS? LPAREN expr RPAREN     #unit_paren        // Parentheticals, optionally signed
+    | func_call                     #unit_func         // Function calls
+    | var                           #unit_var          // Variable identifiers
+    | number                        #unit_number       // Number literals
+    | inf=(INFINITY | NEG_INFINITY) #unit_infinity     // Infinity
+    | fraction                      #unit_fraction     // Fraction expressions
+    | matrix_env                    #unit_matrix       // Matrices
+    | cases_env                     #unit_cases        // Branching (cases)
+    | hist_entry                    #unit_hist         // History reference
     ;
 
 var_def

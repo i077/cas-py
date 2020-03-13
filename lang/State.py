@@ -2,8 +2,8 @@ class State():
     def __init__(self, vars=dict()):
         self.vars = [vars]
 
-    def __setitem__(self, var, value):
-        self.vars[0][var.name] = value
+    def __setitem__(self, var_name, value):
+        self.vars[0][var_name] = value
         
     def __getitem__(self, var_name):
         for layer in self.vars:

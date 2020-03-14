@@ -1244,8 +1244,6 @@ class LaTeXParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a LaTeXParser.Func_callContext
             super().__init__(parser)
-            self.limitvar = None # VarContext
-            self.limitto = None # ExprContext
             self.copyFrom(ctx)
 
         def FUNC_LIM(self):
@@ -1257,20 +1255,20 @@ class LaTeXParser ( Parser ):
                 return self.getTokens(LaTeXParser.LCURLY)
             else:
                 return self.getToken(LaTeXParser.LCURLY, i)
-        def RCURLY(self, i:int=None):
-            if i is None:
-                return self.getTokens(LaTeXParser.RCURLY)
-            else:
-                return self.getToken(LaTeXParser.RCURLY, i)
+        def var(self):
+            return self.getTypedRuleContext(LaTeXParser.VarContext,0)
+
         def expr(self, i:int=None):
             if i is None:
                 return self.getTypedRuleContexts(LaTeXParser.ExprContext)
             else:
                 return self.getTypedRuleContext(LaTeXParser.ExprContext,i)
 
-        def var(self):
-            return self.getTypedRuleContext(LaTeXParser.VarContext,0)
-
+        def RCURLY(self, i:int=None):
+            if i is None:
+                return self.getTokens(LaTeXParser.RCURLY)
+            else:
+                return self.getToken(LaTeXParser.RCURLY, i)
         def CMD_TO(self):
             return self.getToken(LaTeXParser.CMD_TO, 0)
         def CMD_RIGHTARROW(self):
@@ -1730,7 +1728,7 @@ class LaTeXParser ( Parser ):
                 self.state = 192
                 self.match(LaTeXParser.LCURLY)
                 self.state = 193
-                localctx.limitvar = self.var()
+                self.var()
                 self.state = 194
                 _la = self._input.LA(1)
                 if not(_la==LaTeXParser.CMD_TO or _la==LaTeXParser.CMD_RIGHTARROW):
@@ -1739,7 +1737,7 @@ class LaTeXParser ( Parser ):
                     self._errHandler.reportMatch(self)
                     self.consume()
                 self.state = 195
-                localctx.limitto = self.expr()
+                self.expr()
                 self.state = 196
                 self.match(LaTeXParser.RCURLY)
                 self.state = 197

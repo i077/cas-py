@@ -144,7 +144,7 @@ func_call
     | FUNC_PROD UNDERSCORE (LCURLY relation RCURLY CARET tex_symb | CARET tex_symb LCURLY relation RCURLY)
                            (expr | LCURLY expr RCURLY)                                                         #func_prod
     // Limits
-    | FUNC_LIM UNDERSCORE LCURLY limitvar=var (CMD_TO | CMD_RIGHTARROW) limitto=expr RCURLY LCURLY expr RCURLY #func_lim
+    | FUNC_LIM UNDERSCORE LCURLY var (CMD_TO | CMD_RIGHTARROW) expr RCURLY LCURLY expr RCURLY                  #func_lim
     // Integrals
     | FUNC_INT (UNDERSCORE tex_symb CARET tex_symb)? LCURLY expr CMD_DD var RCURLY                             #func_int
     // Floor/ceilings

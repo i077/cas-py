@@ -1,4 +1,10 @@
-x := 4
-f := (a,b) \to a + b
-f(3,4)
-\prod_{i=1}^{f(2,3)}{f(x,i)}
+x_1 := 1
+x_2 := 2
+x_3 := 3
+x_4 := 4
+\prod_{i=1}^{4}{x_i}
+\lfloor 5.5 \rfloor
+\lceil 5.5 \rceil
+\begin{bmatrix} x_1+x_2 & 2 \\ x_3+x_4 & 3 \\ \end{bmatrix}
+\begin{vmatrix} x_1+x_2 \\ x_3+x_4 \end{vmatrix}
+\begin{matrix} x_1+x_2 & x_3+x_4 \end{matrix}

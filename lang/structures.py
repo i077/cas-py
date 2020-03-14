@@ -1,4 +1,5 @@
 import math
+import numpy as np
 import operator as op
 from abc import ABC, abstractmethod
 from State import State
@@ -54,6 +55,14 @@ class Function(ABC):
 
 
 class Expression(Function):
+    op_str = {
+        op.mul: '*',
+        op.truediv: '/',
+        op.add: '+',
+        op.sub: '-',
+        op.pow: '^'
+    }
+
     def __init__(self, op: callable, left: Function, right: Function, power=1):
         # how should we handle expressions taken to powers?
         self.op = op
@@ -67,14 +76,7 @@ class Expression(Function):
 
         #TODO: Fix this once we've implemented simplification of expressions with variables
         if isinstance(l_val, str) or isinstance(r_val, str):
-            op_str = {
-                op.mul: '*',
-                op.truediv: '/',
-                op.add: '+',
-                op.sub: '-',
-                op.pow: '^'
-            }
-            return str(l_val) + op_str[self.op] + str(r_val)
+            return str(l_val) + Expression.op_str[self.op] + str(r_val)
 
         if self.op == op.pow:
             power = r_val
@@ -126,6 +128,9 @@ class Expression(Function):
     # TODO: how tf do we do this
     def integral(self):
         pass
+
+    def __repr__(self):
+        return str(self.left) + Expression.op_str[self.op] + str(self.right)
 
 
 class Variable(Function):
@@ -274,6 +279,10 @@ class Number(Function):
 
     def __repr__(self):
         #if it's an integer, print as an integer
+        if self.value == float('inf'):
+            return '\\infty'
+        if self.value == float('-inf'):
+            return '-\\infty'
         if int(self.value) == self.value:
             return str(int(self.value))
         return str(self.value)
@@ -310,6 +319,41 @@ class Cases(Function):
             rep += str(row[0]) + '&' + str(row[1]) + '\\\\'
         rep += '\n\\end{cases}'
         return rep
+
+
+class Matrix(Function):
+    def __init__(self, mat: list, type: str):
+        self.mat = np.array(mat)
+        self.type = type
+
+    def evaluate(self, state: State):
+        return np.vectorize(lambda entry: entry.evaluate(state))(
+            self.mat
+        )
+
+    def __eq__(self, other):
+        if not isinstance(other, Matrix) or self.mat.shape != other.mat.shape:
+            return False
+        return (self.mat == other.mat).all()
+        
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def derivative(self):
+        pass
+
+    def integral(self):
+        pass
+
+    def __repr__(self):
+        mat_string = ''
+        for row in self.mat:
+            for entry in row[:-1]:
+                mat_string += str(entry) + '&'
+            mat_string += str(row[-1]) + '\\\\'
+
+        return f'\\begin{{{self.type}}}{mat_string}\\end{{{self.type}}}'
+
 
 class Relation():
     def __init__(self, rel_chain):
@@ -387,6 +431,9 @@ class SumFunc():
         state.pop_layer()
         return sum_val
 
+    def __repr__(self):
+        return f'\\sum_{{{self.var.name} = {self.lower_bound_expr}}}^{{{self.upper_bound_expr}}}{{{self.sum_expr}}}'
+
 class ProdFunc():
     def __init__(self, var: Variable, lower_bound_expr, upper_bound_expr, prod_expr):
         self.var = var
@@ -414,3 +461,70 @@ class ProdFunc():
             prod_val *= float(self.prod_expr.evaluate(state))
         state.pop_layer()
         return prod_val
+
+    def __repr__(self):
+        return f'\\prod_{{{self.var.name} = {self.lower_bound_expr}}}^{{{self.upper_bound_expr}}}{{{self.prod_expr}}}'
+
+class Limit():
+    def __init__(self, var: Variable, lim_to, expr):
+        self.var = var
+        self.lim_to = lim_to
+        self.expr = expr
+
+    def evaluate(self, state: State):
+        #TODO
+        pass
+
+    def __repr__(self):
+        return f'\\lim_{{{self.var} \\to {self.lim_to}}}{{{self.expr}}}'
+
+class Integral():
+    def __init__(self, lower, upper, expr, var):
+        self.lower = lower
+        self.upper = upper
+        self.expr = expr
+        self.var = var
+
+    def evaluate(self, state: State):
+        #TODO
+        pass
+
+    def __repr__(self):
+        return f'\\int_{{{self.lower}}}^{{{self.upper}}}{{{self.expr}\\dd {self.var}}}'
+
+class Floor():
+    def __init__(self, expr):
+        self.expr = expr
+
+    def evaluate(self, state: State):
+        return math.floor(self.expr.evaluate(state))
+
+    def __repr__(self):
+        return f'\\lfloor {self.expr} \\rfloor'
+
+class Ceiling():
+    def __init__(self, expr):
+        self.expr = expr
+
+    def evaluate(self, state: State):
+        return math.ceil(self.expr.evaluate(state))
+
+    def __repr__(self):
+        return f'\\lceil {self.expr} \\rceil'
+
+class Derivative():
+    def __init__(self, cmd: str, order: Number, expr, var):
+        self.cmd = cmd
+        self.order = order
+        self.expr = expr
+        self.var = var
+
+    def evaluate(self, state: State):
+        #TODO
+        pass
+
+    def __repr__(self):
+        if self.order:
+            return f'{self.cmd}[{self.order}]{{{self.expr}}}{{{self.var}}}'
+        else:
+            return f'{self.cmd}{{{self.expr}}}{{{self.var}}}'

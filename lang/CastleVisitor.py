@@ -5,7 +5,7 @@ from antlr4 import FileStream, InputStream, CommonTokenStream
 from LaTeXVisitor import LaTeXVisitor
 from LaTeXParser import LaTeXParser as parse
 from LaTeXLexer import LaTeXLexer
-from structures import Number, Polynomial, Variable, Expression, Cases, Relation, UserDefinedFunc, FunctionCall, SumFunc, ProdFunc
+from structures import Number, Polynomial, Variable, Expression, Cases, Matrix, Relation, UserDefinedFunc, FunctionCall, SumFunc, ProdFunc, Limit, Integral, Floor, Ceiling, Derivative
 from State import State
 import operator as op
 
@@ -13,7 +13,7 @@ class CastleVisitor(LaTeXVisitor):
     def __init__(self, state: State):
         self.state = state
 
-    def visitEntry(self, ctx:parse.EntryContext):
+    def visitEntry(self, ctx: parse.EntryContext):
         """entry
         castle_input EOF """
         return self.visit(ctx.castle_input()).evaluate(self.state)
@@ -28,7 +28,7 @@ class CastleVisitor(LaTeXVisitor):
             self.visit(ctx.add_expr(1)),
         )
 
-    def visitMult_expr_recurse(self, ctx:parse.Mult_expr_recurseContext):
+    def visitMult_expr_recurse(self, ctx: parse.Mult_expr_recurseContext):
         """mult_expr_recurse
         mult_expr op=(MULT | CMD_TIMES | CMD_CDOT | DIV | CMD_DIV) mult_expr """
         return Expression(
@@ -37,7 +37,7 @@ class CastleVisitor(LaTeXVisitor):
             self.visit(ctx.mult_expr(1)),
         )
 
-    def visitPow_expr_recurse(self, ctx:parse.Pow_expr_recurseContext):
+    def visitPow_expr_recurse(self, ctx: parse.Pow_expr_recurseContext):
         """pow_expr_recurse
         pow_expr CARET tex_symb """
         return Expression(
@@ -46,7 +46,7 @@ class CastleVisitor(LaTeXVisitor):
             self.visit(ctx.tex_symb()),
         )
 
-    def visitUnit_recurse(self, ctx:parse.Unit_recurseContext):
+    def visitUnit_recurse(self, ctx: parse.Unit_recurseContext):
         """unit_recurse
         sign=(PLUS | MINUS) unit """
         if ctx.sign.type == parse.MINUS:
@@ -54,7 +54,7 @@ class CastleVisitor(LaTeXVisitor):
         else:
             return self.visit(ctx.unit())
 
-    def visitUnit_paren(self, ctx:parse.Unit_parenContext):
+    def visitUnit_paren(self, ctx: parse.Unit_parenContext):
         """unit_paren
         MINUS? LPAREN expr RPAREN """
         if ctx.MINUS():
@@ -62,16 +62,23 @@ class CastleVisitor(LaTeXVisitor):
         else:
             return self.visit(ctx.expr())
 
-    def visitUnit_infinity(self, ctx:parse.Unit_infinityContext):
+    def visitUnit_infinity(self, ctx: parse.Unit_infinityContext):
+        """unit_infinity
+        inf=(INFINITY | NEG_INFINITY)"""
         if ctx.inf.type == parse.INFINITY:
             return Number(float('inf'))
         else:
             return Number(float('-inf'))
 
-    def visitNumber(self, ctx:parse.NumberContext):
+    def visitNumber(self, ctx: parse.NumberContext):
         """number
         MINUS? DIGIT+ (POINT DIGIT*)? """
         return Number(float(ctx.getText()))
+
+    def visitNnint(self, ctx: parse.NnintContext):
+        """nnint
+        DIGIT+ """
+        return Number(int(ctx.getText()))
 
 
     # Variable names and TeX symbols ===============================================
@@ -190,7 +197,7 @@ class CastleVisitor(LaTeXVisitor):
 
         return SumFunc(lower.rel_chain[0], lower.rel_chain[2], upper_bound, sum_expr)
 
-    def visitFunc_prod(self, ctx:parse.Func_prodContext):
+    def visitFunc_prod(self, ctx: parse.Func_prodContext):
         lower = self.visit(ctx.relation())
         upper_bound = self.visit(ctx.tex_symb())
         prod_expr = self.visit(ctx.expr())
@@ -203,7 +210,42 @@ class CastleVisitor(LaTeXVisitor):
 
         return ProdFunc(lower.rel_chain[0], lower.rel_chain[2], upper_bound, prod_expr)
 
+    def visitFunc_lim(self, ctx: parse.Func_limContext):
+        return Limit(
+            self.visit(ctx.var()),
+            self.visit(ctx.expr(0)),
+            self.visit(ctx.expr(1))
+        )
 
+    def visitFunc_int(self, ctx: parse.Func_intContext):
+        return Integral(
+            self.visit(ctx.tex_symb(0)),
+            self.visit(ctx.tex_symb(1)),
+            self.visit(ctx.expr()),
+            self.visit(ctx.var())
+        )
+
+    def visitFunc_floorceil(self, ctx: parse.Func_floorceilContext):
+        left, right = ctx.lop.type, ctx.rop.type
+        if left == parse.CMD_LFLOOR:
+            if right != parse.CMD_RFLOOR:
+                raise Exception("Left floor operator must have matching right floor")
+            return Floor(self.visit(ctx.expr()))
+
+        if left == parse.CMD_LCEIL:
+            if right != parse.CMD_RCEIL:
+                raise Exception("Left ceiling operator must have matching right ceiling")
+            return Ceiling(self.visit(ctx.expr()))
+
+    def visitFunc_deriv(self, ctx: parse.Func_derivContext):
+        order = ctx.nnint()
+        return Derivative(
+            '\\dv' if ctx.op.type == parse.FUNC_DV else '\\pdv',
+            self.visit(order) if order else None,
+            self.visit(ctx.expr()),
+            self.visit(ctx.var())
+        )
+        
     # Relations =================================================================
     def visitRelop(self, ctx:parse.RelopContext):
         return ctx.op.type
@@ -235,6 +277,36 @@ class CastleVisitor(LaTeXVisitor):
             [self.visit(ctx.cases_last_row())]
         )
 
+    
+    # Matrices ===================================================================
+    def visitMatrix_env(self, ctx: parse.Matrix_envContext):
+        begin_type = ctx.open_mat_type.type
+        end_type = ctx.close_mat_type.type
+        if begin_type != end_type:
+            raise Exception("Matrix \\begin and \\end types much match")
+
+        return Matrix(
+            self.visit(ctx.matrix_exp()),
+            CastleVisitor.matrix_type_dict[begin_type]
+        )
+
+    def visitMatrix_exp(self, ctx: parse.Matrix_expContext):
+        return [self.visit(row) for row in ctx.matrix_row()] + \
+               [self.visit(ctx.matrix_last_row())]
+
+    def visitMatrix_row(self, ctx: parse.Matrix_rowContext):
+        entries = ctx.expr()
+        if not isinstance(entries, list):
+            return self.visit(entries)
+        return [self.visit(entry) for entry in entries]
+
+    def visitMatrix_last_row(self, ctx: parse.Matrix_last_rowContext):
+        entries = ctx.expr()
+        if not isinstance(entries, list):
+            return self.visit(entries)
+        return [self.visit(entry) for entry in entries]
+
+
     builtin_func_dict = {
         parse.FUNC_SIN: math.sin,
         parse.FUNC_COS: math.cos,
@@ -260,6 +332,13 @@ class CastleVisitor(LaTeXVisitor):
         parse.GTE: op.ge,
         parse.EQ: op.eq,
         parse.NEQ: op.ne
+    }
+
+    matrix_type_dict = {
+        parse.MATRIX: 'matrix',
+        parse.P_MATRIX: 'pmatrix',
+        parse.B_MATRIX: 'bmatrix',
+        parse.V_MATRIX: 'vmatrix',
     }
 
 def evaluate_expression(state: State, expr: str):

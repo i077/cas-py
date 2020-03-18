@@ -3,6 +3,8 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { LiveInput } from "./LiveInput";
 import './InputArea.css';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
 
 export class InputArea extends React.Component {
     constructor(props) {
@@ -71,10 +73,14 @@ export class InputArea extends React.Component {
             <div className="input-div">
                 <Form id="input-form" >
                     <Form.Group>
-                        <Form.Label>Enter Latex:</Form.Label>
-                        <Form.Control as="textarea" rows="6" value={this.state.input} onChange={this.textAreaChange} onKeyUp={this.handleKeyPress} />
-
-                        <LiveInput input={this.state.replacedInput} />
+                        <Row>
+                            <Col>
+                                <Form.Control as="textarea" rows="6" value={this.state.input} onChange={this.textAreaChange} onKeyUp={this.handleKeyPress} />
+                            </Col>
+                            <Col>
+                                <LiveInput input={this.state.replacedInput} />
+                            </Col>
+                        </Row>
                     </Form.Group>
                     <Button onClick={this.handleSubmit}>Submit LaTeX</Button>
                 </Form>

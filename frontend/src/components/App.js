@@ -99,6 +99,17 @@ class App extends React.Component {
       });
   }
 
+  getLastCalculation() {
+    const blankCalculation = {
+      id: NaN,
+      input: "",
+      error: "",
+      output: ""
+    }
+    const history = this.state.history;
+    return (history.length === 0) ? blankCalculation : history[history.length - 1];
+  }
+
   handleHistoryClick(calculation) {
     this.setState({
       selectedText: calculation.input,
@@ -115,11 +126,8 @@ class App extends React.Component {
         <Row className="App-main-row">
           <Col className="App-col">
             <History history={this.state.history} handleHistory={this.handleHistoryClick} />
-            <InputArea submitHandler={this.handleSubmit} history={this.state.history} selectedText={this.state.selectedText} />
+            <InputArea submitHandler={this.handleSubmit} resetHandler={this.handleReset} history={this.state.history} selectedText={this.state.selectedText} />
           </Col>
-        </Row>
-        <Row className="App-footer-row">
-          <Button onClick={this.handleReset}>Reset Session</Button>
         </Row>
       </Container>
     );

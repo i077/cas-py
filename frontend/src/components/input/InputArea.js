@@ -18,6 +18,7 @@ export class InputArea extends React.Component {
 
         this.textAreaChange = this.textAreaChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleReset = this.handleReset.bind(this);
         this.handleKeyPress = this.handleKeyPress.bind(this);
     }
 
@@ -67,6 +68,9 @@ export class InputArea extends React.Component {
         this.props.submitHandler(this.state.replacedInput);
     }
 
+    handleReset() {
+        this.props.resetHandler();
+    }
 
     render() {
         return (
@@ -81,8 +85,11 @@ export class InputArea extends React.Component {
                                 <LiveInput input={this.state.replacedInput} />
                             </Col>
                         </Row>
+                        <Row className='input-button-row'>
+                            <Button onClick={this.handleSubmit}>Submit LaTeX</Button>
+                            <Button onClick={this.handleReset}>Reset State</Button>
+                        </Row>
                     </Form.Group>
-                    <Button onClick={this.handleSubmit}>Submit LaTeX</Button>
                 </Form>
             </div >
         );

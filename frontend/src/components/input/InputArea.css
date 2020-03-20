@@ -1,3 +1,9 @@
 .input-div {
     width: 100%;
+    height: 20vh;
+}
+
+.input-button-row {
+    padding: 15px;
+    justify-content: space-between;
 }

@@ -12,7 +12,6 @@ export class InputArea extends React.Component {
 
         this.state = {
             input: "",
-            replacedInput: "",
             previousSelect: props.selectedText
         };
 
@@ -58,15 +57,14 @@ export class InputArea extends React.Component {
     }
 
     textAreaChange(e) {
-        const val = e.target.value;
         this.setState({
-            input: val,
-            replacedInput: this.getReplacedInput(val)
+            input: e.target.value,
         });
     }
 
     handleSubmit() {
-        this.props.submitHandler(this.state.replacedInput);
+        var replacedInput = this.getReplacedInput(this.state.input);
+        this.props.submitHandler(replacedInput);
     }
 
     handleReset() {
@@ -83,7 +81,7 @@ export class InputArea extends React.Component {
                                 <Form.Control as="textarea" rows="6" value={this.state.input} onChange={this.textAreaChange} onKeyUp={this.handleKeyPress} />
                             </Col>
                             <Col>
-                                <LiveInput input={this.state.replacedInput} />
+                                <LiveInput input={this.getReplacedInput(this.state.input)} />
                             </Col>
                         </Row>
                         <Row className='input-button-row'>

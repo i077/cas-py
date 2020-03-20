@@ -17,6 +17,7 @@ export class InputArea extends React.Component {
         };
 
         this.textAreaChange = this.textAreaChange.bind(this);
+
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleReset = this.handleReset.bind(this);
         this.handleKeyPress = this.handleKeyPress.bind(this);

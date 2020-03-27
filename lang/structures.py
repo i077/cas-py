@@ -3,6 +3,7 @@ import numpy as np
 import operator as op
 from abc import ABC, abstractmethod
 from State import State
+from functools import reduce
 
 class Function(ABC):
     @abstractmethod
@@ -63,37 +64,21 @@ class Expression(Function):
         op.pow: '^'
     }
 
-    def __init__(self, op: callable, left: Function, right: Function, power=1):
+    def __init__(self, op: callable, *terms: List[Function]):
         # how should we handle expressions taken to powers?
+        # nvm we don't handle it here
         self.op = op
-        self.left = left
-        self.right = right
-        self.pow = power
+        self.terms = *terms
 
     def evaluate(self, state: State):
-        l_val = self.left.evaluate(state)
-        r_val = self.right.evaluate(state)
 
-        #TODO: Fix this once we've implemented simplification of expressions with variables
-        if isinstance(l_val, str) or isinstance(r_val, str):
-            return str(l_val) + Expression.op_str[self.op] + str(r_val)
+        # TODO: Fix this once we've implemented simplification of expressions with variables
+        # TODO: WHY IS THIS HERE AND NOT IN REPR
+        if any(isinstance(term, str) for term in self.terms):
+            return Expression.op_str[self.op].join(str(term) for term in self.terms)
+        else:
+            return reduce(self.op, [term.evaluate(state) for term in self.terms])
 
-        if self.op == op.pow:
-            power = r_val
-            if isinstance(power, Number):
-                if power == 1:
-                    return self
-                    # why this?
-                    # else:
-                    #     return self * Expression(op.mul, self, r - 1)
-                if power == 0:
-                    return Number(1)
-                if power < 0:
-                    return Number(1) / Expression(op.pow, l_val, abs(power))
-
-            return self.op(l_val, power)
-
-        return self.op(l_val, r_val)
 
     def __eq__(self, other):
         return (
@@ -130,7 +115,8 @@ class Expression(Function):
         pass
 
     def __repr__(self):
-        return str(self.left) + Expression.op_str[self.op] + str(self.right)
+        return Expression.op_str[self.op].join(str(term) for term in self.terms)
+
 
 
 class Variable(Function):
@@ -297,7 +283,7 @@ class Cases(Function):
                 raise Exception(f"Improper Cases: {row[1]} is not a relation")
             if row[1].evaluate(state):
                 return row[0].evaluate(state)
-            
+
         #no conditions were satisfied
         raise Exception("Improper Cases: No case satisfied!")
 
@@ -335,7 +321,7 @@ class Matrix(Function):
         if not isinstance(other, Matrix) or self.mat.shape != other.mat.shape:
             return False
         return (self.mat == other.mat).all()
-        
+
     def __ne__(self, other):
         return not self.__eq__(other)
 
@@ -409,7 +395,7 @@ class SumFunc():
         self.sum_expr = sum_expr
         self.upper_bound_expr = upper_bound_expr
         self.lower_bound_expr = lower_bound_expr
-    
+
     def evaluate(self, state: State):
         lower_bound = self.lower_bound_expr.evaluate(state)
         if not isinstance(lower_bound, int):
@@ -417,7 +403,7 @@ class SumFunc():
         upper_bound = self.upper_bound_expr.evaluate(state)
         if upper_bound == float('inf'):
             #TODO
-            pass 
+            pass
         if not isinstance(upper_bound, int):
             raise Exception("Sum upper bound must evaluate to integer")
 
@@ -440,7 +426,7 @@ class ProdFunc():
         self.prod_expr = prod_expr
         self.upper_bound_expr = upper_bound_expr
         self.lower_bound_expr = lower_bound_expr
-    
+
     def evaluate(self, state: State):
         lower_bound = self.lower_bound_expr.evaluate(state)
         if not isinstance(lower_bound, int):
@@ -448,7 +434,7 @@ class ProdFunc():
         upper_bound = self.upper_bound_expr.evaluate(state)
         if upper_bound == float('inf'):
             #TODO
-            pass 
+            pass
         if not isinstance(upper_bound, int):
             raise Exception("Prod upper bound must evaluate to integer")
 

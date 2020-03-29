@@ -3,6 +3,8 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { LiveInput } from "./LiveInput";
 import './InputArea.css';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
 
 export class InputArea extends React.Component {
     constructor(props) {
@@ -10,12 +12,13 @@ export class InputArea extends React.Component {
 
         this.state = {
             input: "",
-            replacedInput: "",
             previousSelect: props.selectedText
         };
 
         this.textAreaChange = this.textAreaChange.bind(this);
+
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleReset = this.handleReset.bind(this);
         this.handleKeyPress = this.handleKeyPress.bind(this);
     }
 
@@ -54,29 +57,38 @@ export class InputArea extends React.Component {
     }
 
     textAreaChange(e) {
-        const val = e.target.value;
         this.setState({
-            input: val,
-            replacedInput: this.getReplacedInput(val)
+            input: e.target.value,
         });
     }
 
     handleSubmit() {
-        this.props.submitHandler(this.state.replacedInput);
+        var replacedInput = this.getReplacedInput(this.state.input);
+        this.props.submitHandler(replacedInput);
     }
 
+    handleReset() {
+        this.props.resetHandler();
+    }
 
     render() {
         return (
             <div className="input-div">
                 <Form id="input-form" >
                     <Form.Group>
-                        <Form.Label>Enter Latex:</Form.Label>
-                        <Form.Control as="textarea" rows="6" value={this.state.input} onChange={this.textAreaChange} onKeyUp={this.handleKeyPress} />
-
-                        <LiveInput input={this.state.replacedInput} />
+                        <Row>
+                            <Col>
+                                <Form.Control as="textarea" rows="6" value={this.state.input} onChange={this.textAreaChange} onKeyUp={this.handleKeyPress} />
+                            </Col>
+                            <Col>
+                                <LiveInput input={this.getReplacedInput(this.state.input)} />
+                            </Col>
+                        </Row>
+                        <Row className='input-button-row'>
+                            <Button onClick={this.handleSubmit}>Submit LaTeX</Button>
+                            <Button onClick={this.handleReset}>Reset State</Button>
+                        </Row>
                     </Form.Group>
-                    <Button onClick={this.handleSubmit}>Submit LaTeX</Button>
                 </Form>
             </div >
         );

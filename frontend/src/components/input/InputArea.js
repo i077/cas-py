@@ -44,11 +44,11 @@ export class InputArea extends React.Component {
             const foundCalc = this.props.history.find((calc) => calc.id === replNum);
 
             if (foundCalc === undefined) {
-                input = input.replace(replace[0], '\\left( \\text{Reference Not Found} \\right)');
+                input = input.replace(replace[0], '( \\text{Reference Not Found})');
             } else if (foundCalc.output === "") {
-                input = input.replace(replace[0], '\\left( \\text{Reference has No Output} \\right)');
+                input = input.replace(replace[0], '( \\text{Reference has No Output})');
             } else {
-                input = input.replace(replace[0], '\\left(' + foundCalc.output + '\\right)');
+                input = input.replace(replace[0], '(' + foundCalc.output + ')');
             }
 
             replace = re.exec(input);

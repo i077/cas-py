@@ -31,9 +31,10 @@ AMPERSAND   : '&';
 POINT   : '.';
 
 EQ      : '=';
+NEQ     : '\\neq';
 LT      : '<' | '\\lt';
 LTE     : '\\leq';
-GT      : '>';
+GT      : '>' | '\\gt';
 GTE     : '\\geq';
 ASSIGN  : ':=';
 
@@ -62,6 +63,7 @@ CMD_DD          : '\\dd';
 FUNC_LIM        : '\\lim';
 FUNC_INT        : '\\int';
 FUNC_SUM        : '\\sum';
+FUNC_PROD       : '\\prod';
 FUNC_DV         : '\\dv';
 FUNC_PDV        : '\\pdv';
 
@@ -74,11 +76,20 @@ FUNC_TAN        : '\\tan';
 FUNC_SEC        : '\\sec';
 FUNC_CSC        : '\\csc';
 FUNC_COT        : '\\cot';
+FUNC_ASIN       : '\\arcsin' | '\\asin' | '\\sin^{-1}';
+FUNC_ACOS       : '\\arccos' | '\\acos' | '\\cos^{-1}';
+FUNC_ATAN       : '\\arctan' | '\\atan' | '\\tan^{-1}';
+FUNC_ASEC       : '\\arcsec' | '\\asec' | '\\sec^{-1}';
+FUNC_ACSC       : '\\arccsc' | '\\acsc' | '\\csc^{-1}';
+FUNC_ACOT       : '\\arccot' | '\\acot' | '\\cot^{-1}';
 
 CMD_LFLOOR      : '\\lfloor';
 CMD_RFLOOR      : '\\rfloor';
 CMD_LCEIL       : '\\lceil';
 CMD_RCEIL       : '\\rceil';
+
+INFINITY        : '\\infty';
+NEG_INFINITY    : '-\\infty';
 
 // History tokens
 DOLLAR          : '$';
@@ -116,16 +127,24 @@ func_name
     ;
 
 func_builtin
-    : FUNC_SIN #sin | FUNC_COS #cos | FUNC_TAN #tan
-    | FUNC_SEC #sec | FUNC_CSC #csc | FUNC_COT #cot
-    | FUNC_EXP #exp | FUNC_LN #ln | FUNC_LOG #log
+    : name=(FUNC_SIN | FUNC_COS | FUNC_TAN
+    | FUNC_SEC | FUNC_CSC | FUNC_COT
+    | FUNC_EXP | FUNC_LN | FUNC_LOG
+    | FUNC_ASIN | FUNC_ACOS | FUNC_ATAN
+    | FUNC_ASEC | FUNC_ACSC | FUNC_ACOT)
     ;
 
 func_call
     // Function calls with normal syntax
-    : func_name LPAREN (expr ((COMMA expr)+)*) RPAREN                                                          #func_call_var
+    : func_name LPAREN (expr ((COMMA expr)+)*)? RPAREN                                                         #func_call_var
+    // Sums
+    | FUNC_SUM UNDERSCORE (LCURLY relation RCURLY CARET tex_symb | CARET tex_symb LCURLY relation RCURLY)
+                          (expr | LCURLY expr RCURLY)                                                          #func_sum
+    // Products
+    | FUNC_PROD UNDERSCORE (LCURLY relation RCURLY CARET tex_symb | CARET tex_symb LCURLY relation RCURLY)
+                           (expr | LCURLY expr RCURLY)                                                         #func_prod
     // Limits
-    | FUNC_LIM UNDERSCORE LCURLY limitvar=var (CMD_TO | CMD_RIGHTARROW) limitto=expr RCURLY LCURLY expr RCURLY #func_lim
+    | FUNC_LIM UNDERSCORE LCURLY var (CMD_TO | CMD_RIGHTARROW) expr RCURLY LCURLY expr RCURLY                  #func_lim
     // Integrals
     | FUNC_INT (UNDERSCORE tex_symb CARET tex_symb)? LCURLY expr CMD_DD var RCURLY                             #func_int
     // Floor/ceilings
@@ -135,17 +154,19 @@ func_call
     ;
 
 // Rules
-entry: start EOF;
+entry: castle_input EOF;
 
-start
-    : expr       #start_expr
-    | relation   #start_relation
-    | assignment #start_assignment
+castle_input
+    : expr       #castle_input_expr
+    | relation   #castle_input_relation
+    | assignment #castle_input_assignment
     ;
 
 relation
-    : expr relop=(EQ | LT | LTE | GT | GTE) expr
+    : (expr relop)+ expr
     ;
+
+relop: op=(EQ | NEQ | LT | LTE | GT | GTE);
 
 expr: add_expr;
 
@@ -165,20 +186,23 @@ pow_expr
     ;
 
 unit
-    : sign=(PLUS | MINUS) unit  #unit_recurse      // Signed unit expressions
-    | MINUS? LPAREN expr RPAREN #unit_paren        // Parentheticals, optionally signed
-    | func_call                 #unit_func         // Function calls
-    | var                       #unit_var          // Variable identifiers
-    | number                    #unit_number       // Number literals
-    | fraction                  #unit_fraction     // Fraction expressions
-    | matrix_env                #unit_matrix       // Matrices
-    | cases_env                 #unit_cases        // Branching (cases)
-    | hist_entry                #unit_hist         // History reference
+    : sign=(PLUS | MINUS) unit      #unit_recurse      // Signed unit expressions
+    | MINUS? LPAREN expr RPAREN     #unit_paren        // Parentheticals, optionally signed
+    | func_call                     #unit_func         // Function calls
+    | var                           #unit_var          // Variable identifiers
+    | number                        #unit_number       // Number literals
+    | inf=(INFINITY | NEG_INFINITY) #unit_infinity     // Infinity
+    | fraction                      #unit_fraction     // Fraction expressions
+    | matrix_env                    #unit_matrix       // Matrices
+    | cases_env                     #unit_cases        // Branching (cases)
+    | hist_entry                    #unit_hist         // History reference
     ;
 
+var_def
+    : var_name (UNDERSCORE tex_symb)?;
+
 arg_list
-    : LPAREN var? RPAREN             #arg_list_single
-    | LPAREN (var COMMA)* var RPAREN #arg_list_multi
+    : LPAREN (var_def (COMMA var_def)*)? RPAREN
     ;
 
 func_def
@@ -186,8 +210,8 @@ func_def
     ;
 
 assignment
-    : var ASSIGN expr     #var_assign
-    | var ASSIGN func_def #func_assign
+    : var_def ASSIGN expr     #var_assign
+    | var_def ASSIGN func_def #func_assign
     ;
 
 fraction

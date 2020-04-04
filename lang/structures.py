@@ -80,16 +80,16 @@ class Expression(Function):
 
         if self.op == op.pow:
             power = r_val
-            if isinstance(power, Number):
+            if isinstance(power, RealNumber):
                 if power == 1:
                     return self
                     # why this?
                     # else:
                     #     return self * Expression(op.mul, self, r - 1)
                 if power == 0:
-                    return Number(1)
+                    return RealNumber(1)
                 if power < 0:
-                    return Number(1) / Expression(op.pow, l_val, abs(power))
+                    return RealNumber(1) / Expression(op.pow, l_val, abs(power))
 
             return self.op(l_val, power)
 
@@ -240,22 +240,76 @@ class Polynomial(Function):
         )
 
 
-class Number(Function):
+class Number(Function, ABC):
+    @abstractmethod
+    def __add__(self, other):
+        pass
+
+    @abstractmethod
+    def __sub__(self, other):
+        pass
+
+    @abstractmethod
+    def __mul__(self, other):
+        pass
+
+    @abstractmethod
+    def __truediv__(self, other):
+        pass
+
+    @abstractmethod
+    def evaluate(self, state=None):
+        pass
+
+    @abstractmethod
+    def __eq__(self, other):
+        pass
+
+    @abstractmethod
+    def __ne__(self, other):
+        pass
+
+    @abstractmethod
+    def derivative(self):
+        pass
+
+    @abstractmethod
+    def __repr__(self):
+        pass
+
+
+class RealNumber(Number):
     def __init__(self, value):
-        if isinstance(value, Number):
+        if isinstance(value, RealNumber):
             self.value = value.value
-        else:
+        elif isinstance(value, (float, int)):
             self.value = value
+        else:
+            raise ValueError("Improper instantiation of real number")
 
     def __add__(self, other):
-        if isinstance(other, Number):
-            return Number(self.value + other.value)
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value + other.value)
         else:
-            super().__add__(other)
+            return other.__add__(self)
 
     def __sub__(self, other):
-        if isinstance(other, Number):
-            return Number(self.value - other.value)
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value - other.value)
+        else:
+            return other.__sub__(self)
+
+    def __mul__(self, other):
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value * other.value)
+        else:
+            return other.__mul__(self)
+
+    def __truediv__(self, other):
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value / other.value)
+        else:
+            return other.__truediv__(self)
 
     def evaluate(self, state=None):
         if int(self.value) == self.value:
@@ -263,10 +317,10 @@ class Number(Function):
         return self.value
 
     def __eq__(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, RealNumber):
             return self.value == other.value
         else:
-            return False
+            return other.__eq__(self)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -286,6 +340,7 @@ class Number(Function):
         if int(self.value) == self.value:
             return str(int(self.value))
         return str(self.value)
+
 
 class Cases(Function):
     def __init__(self, cases_list):
@@ -426,7 +481,7 @@ class SumFunc():
         min_bound = min(upper_bound, lower_bound)
         sum_val = 0
         for i in range(min_bound, max_bound+1):
-            state[self.var.name] = Number(i)
+            state[self.var.name] = RealNumber(i)
             sum_val += float(self.sum_expr.evaluate(state))
         state.pop_layer()
         return sum_val
@@ -457,7 +512,7 @@ class ProdFunc():
         min_bound = min(upper_bound, lower_bound)
         prod_val = 1
         for i in range(min_bound, max_bound+1):
-            state[self.var.name] = Number(i)
+            state[self.var.name] = RealNumber(i)
             prod_val *= float(self.prod_expr.evaluate(state))
         state.pop_layer()
         return prod_val
@@ -513,7 +568,7 @@ class Ceiling():
         return f'\\lceil {self.expr} \\rceil'
 
 class Derivative():
-    def __init__(self, cmd: str, order: Number, expr, var):
+    def __init__(self, cmd: str, order: RealNumber, expr, var):
         self.cmd = cmd
         self.order = order
         self.expr = expr

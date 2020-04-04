@@ -5,7 +5,7 @@ from antlr4 import FileStream, InputStream, CommonTokenStream
 from LaTeXVisitor import LaTeXVisitor
 from LaTeXParser import LaTeXParser as parse
 from LaTeXLexer import LaTeXLexer
-from structures import Number, Polynomial, Variable, Expression, Cases, Matrix, Relation, UserDefinedFunc, FunctionCall, SumFunc, ProdFunc, Limit, Integral, Floor, Ceiling, Derivative
+from structures import Number, RealNumber, Polynomial, Variable, Expression, Cases, Matrix, Relation, UserDefinedFunc, FunctionCall, SumFunc, ProdFunc, Limit, Integral, Floor, Ceiling, Derivative
 from State import State
 import operator as op
 
@@ -50,7 +50,7 @@ class CastleVisitor(LaTeXVisitor):
         """unit_recurse
         sign=(PLUS | MINUS) unit """
         if ctx.sign.type == parse.MINUS:
-            return Expression(op.mul, Number(-1), self.visit(ctx.unit()))
+            return Expression(op.mul, RealNumber(-1), self.visit(ctx.unit()))
         else:
             return self.visit(ctx.unit())
 
@@ -58,7 +58,7 @@ class CastleVisitor(LaTeXVisitor):
         """unit_paren
         MINUS? LPAREN expr RPAREN """
         if ctx.MINUS():
-            return Expression(op.mul, Number(-1), self.visit(ctx.expr()))
+            return Expression(op.mul, RealNumber(-1), self.visit(ctx.expr()))
         else:
             return self.visit(ctx.expr())
 
@@ -66,19 +66,19 @@ class CastleVisitor(LaTeXVisitor):
         """unit_infinity
         inf=(INFINITY | NEG_INFINITY)"""
         if ctx.inf.type == parse.INFINITY:
-            return Number(float('inf'))
+            return RealNumber(float('inf'))
         else:
-            return Number(float('-inf'))
+            return RealNumber(float('-inf'))
 
     def visitNumber(self, ctx: parse.NumberContext):
         """number
         MINUS? DIGIT+ (POINT DIGIT*)? """
-        return Number(float(ctx.getText()))
+        return RealNumber(float(ctx.getText()))
 
     def visitNnint(self, ctx: parse.NnintContext):
         """nnint
         DIGIT+ """
-        return Number(int(ctx.getText()))
+        return RealNumber(int(ctx.getText()))
 
 
     # Variable names and TeX symbols ===============================================
@@ -102,7 +102,7 @@ class CastleVisitor(LaTeXVisitor):
         (LETTER | DIGIT) """
         text = ctx.getText()
         if ctx.DIGIT():
-            return Number(int(text))
+            return RealNumber(int(text))
         else:
             return Variable(self.state, text)
 

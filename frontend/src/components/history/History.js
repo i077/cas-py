@@ -21,7 +21,6 @@ export class History extends React.Component {
         );
         return (
             <div className="history-div">
-                <p>History:</p>
                 <div className="history-list-div">
                     {historyList}
                     <HistoryScroll />

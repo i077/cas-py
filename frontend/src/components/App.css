@@ -9,7 +9,7 @@
 }
 
 .App-header-row {
-  height: 15vh;
+  height: 15%;
   width: 100%;
   display: flex;
   align-items: center;
@@ -17,17 +17,8 @@
   font-size: 75px;
 }
 
-.App-footer-row {
-  height: 5vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: right;
-  font-size: 75px;
-}
-
 .App-main-row {
-  height: 80vh;
+  height: 85%;
   width: 100%;
 }
 

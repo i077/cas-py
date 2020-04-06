@@ -3,6 +3,7 @@ import numpy as np
 import operator as op
 from abc import ABC, abstractmethod
 from State import State
+from Dicts import builtin_func_dict, inv_rel_dict
 
 class Function(ABC):
     @abstractmethod
@@ -241,6 +242,13 @@ class Polynomial(Function):
 
 
 class Number(Function, ABC):
+    @staticmethod
+    def number_init(value):
+        if isinstance(value, (RealNumber, float, int)):
+            return RealNumber(value)
+        return None
+
+
     @abstractmethod
     def __add__(self, other):
         pass
@@ -426,6 +434,12 @@ class Relation():
                 raise ValueError(f'Cannot compute relation {rel} on {left} and {right}')
         return True
 
+    def __repr__(self):
+        output = ''
+        for ex in self.rel_chain:
+            output += str(inv_rel_dict.get(ex, ex))
+        return output
+
 
 class UserDefinedFunc():
     def __init__(self, args: list, func_body: Expression):
@@ -439,24 +453,27 @@ class UserDefinedFunc():
         return str(tuple(self.args)) + '\\to' + str(self.func_body)
 
 class FunctionCall():
-    def __init__(self, function, passed_args: list):
-        self.function = function
+    def __init__(self, function_name, passed_args: list):
+        self.function_name = function_name
         self.passed_args = passed_args
 
     def evaluate(self, state: State):
-        if isinstance(self.function, UserDefinedFunc):
+        if self.function_name in builtin_func_dict:
+            eval_args = [float(arg.evaluate(state)) for arg in self.passed_args]
+            return builtin_func_dict[self.function_name](*eval_args)
+        else:
+            function = state[self.function_name]
             if self.passed_args:
                 state.push_layer()
-                for arg, value in zip(self.function.args, self.passed_args):
+                for arg, value in zip(function.args, self.passed_args):
+                    # evaluate args here to avoid bugs where passed variable has same name as function arg
+                    value = Number.number_init(value.evaluate(state))
                     state[arg.name] = value
-                result = self.function.func_body.evaluate(state)
+                result = function.func_body.evaluate(state)
                 state.pop_layer()
             else:
-                result = self.function.func_body.evaluate(state)
+                result = function.func_body.evaluate(state)
             return result
-        else:
-            eval_args = [float(arg.evaluate(state)) for arg in self.passed_args]
-            return self.function(*eval_args)
 
 class SumFunc():
     def __init__(self, var: Variable, lower_bound_expr, upper_bound_expr, sum_expr):

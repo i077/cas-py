@@ -1,5 +1,4 @@
 import sys
-import sympy
 import math
 from antlr4 import FileStream, InputStream, CommonTokenStream
 from LaTeXVisitor import LaTeXVisitor
@@ -7,6 +6,7 @@ from LaTeXParser import LaTeXParser as parse
 from LaTeXLexer import LaTeXLexer
 from structures import Number, RealNumber, Polynomial, Variable, Expression, Cases, Matrix, Relation, UserDefinedFunc, FunctionCall, SumFunc, ProdFunc, Limit, Integral, Floor, Ceiling, Derivative
 from State import State
+from Dicts import rel_dict, matrix_type_dict
 import operator as op
 
 class CastleVisitor(LaTeXVisitor):
@@ -166,13 +166,10 @@ class CastleVisitor(LaTeXVisitor):
         func_body = self.visit(ctx.expr())
         return UserDefinedFunc(args, func_body)
 
-    def visitFunc_builtin(self, ctx: parse.Func_builtinContext):
-        return CastleVisitor.builtin_func_dict[ctx.name.type]
-
 
     # Function calls ============================================================
     def visitFunc_call_var(self, ctx: parse.Func_call_varContext):
-        function = self.visit(ctx.func_name())
+        function_name = self.visit(ctx.func_name())
         args = ctx.expr()
         if not args:
             args = []
@@ -180,9 +177,10 @@ class CastleVisitor(LaTeXVisitor):
             args = [self.visit(args)]
         else:
             args = [self.visit(arg) for arg in args]
-        if isinstance(function, Variable):
-            return FunctionCall(self.state[function.name], args)
-        return FunctionCall(function, args)
+        
+        if isinstance(function_name, Variable):
+            function_name = function_name.name
+        return FunctionCall(function_name, args)
 
     def visitFunc_sum(self, ctx:parse.Func_sumContext):
         lower = self.visit(ctx.relation())
@@ -191,7 +189,7 @@ class CastleVisitor(LaTeXVisitor):
 
         if not (isinstance(lower, Relation) \
                 and len(lower.rel_chain) == 3 \
-                and lower.rel_chain[1] == CastleVisitor.rel_dict[parse.EQ] \
+                and lower.rel_chain[1] == rel_dict[parse.EQ] \
                 and isinstance(lower.rel_chain[0], Variable)):
             raise Exception("Sum lower argument should be of form <variable> = <expression>")
 
@@ -204,7 +202,7 @@ class CastleVisitor(LaTeXVisitor):
 
         if not (isinstance(lower, Relation) \
                 and len(lower.rel_chain) == 3 \
-                and lower.rel_chain[1] == CastleVisitor.rel_dict[parse.EQ] \
+                and lower.rel_chain[1] == rel_dict[parse.EQ] \
                 and isinstance(lower.rel_chain[0], Variable)):
             raise Exception("Product lower argument should be of form <variable> = <expression>")
 
@@ -245,6 +243,10 @@ class CastleVisitor(LaTeXVisitor):
             self.visit(ctx.expr()),
             self.visit(ctx.var())
         )
+
+    def visitFunc_builtin(self, ctx: parse.Func_builtinContext):
+        return ctx.name.type
+
         
     # Relations =================================================================
     def visitRelop(self, ctx:parse.RelopContext):
@@ -256,7 +258,7 @@ class CastleVisitor(LaTeXVisitor):
         exprs = [self.visit(expr) for expr in ctx.expr()]
         for i in range(len(ctx.relop())):
             rep.append(exprs[i])
-            rep.append(CastleVisitor.rel_dict[ops[i]])
+            rep.append(rel_dict[ops[i]])
         rep.append(exprs[-1])
         return Relation(rep)
 
@@ -287,7 +289,7 @@ class CastleVisitor(LaTeXVisitor):
 
         return Matrix(
             self.visit(ctx.matrix_exp()),
-            CastleVisitor.matrix_type_dict[begin_type]
+            matrix_type_dict[begin_type]
         )
 
     def visitMatrix_exp(self, ctx: parse.Matrix_expContext):
@@ -307,39 +309,6 @@ class CastleVisitor(LaTeXVisitor):
         return [self.visit(entry) for entry in entries]
 
 
-    builtin_func_dict = {
-        parse.FUNC_SIN: math.sin,
-        parse.FUNC_COS: math.cos,
-        parse.FUNC_TAN: math.tan,
-        parse.FUNC_SEC: sympy.sec,
-        parse.FUNC_CSC: sympy.csc,
-        parse.FUNC_COT: sympy.cot, 
-        parse.FUNC_ASIN: sympy.asin,
-        parse.FUNC_ACOS: sympy.acos, 
-        parse.FUNC_ATAN: sympy.atan, 
-        parse.FUNC_ASEC: sympy.asec, 
-        parse.FUNC_ACSC: sympy.acsc, 
-        parse.FUNC_ACOT: sympy.acot,
-        parse.FUNC_EXP: math.exp,
-        parse.FUNC_LN: math.log,
-        parse.FUNC_LOG: math.log
-    }
-
-    rel_dict = {
-        parse.LT: op.lt,
-        parse.GT: op.gt,
-        parse.LTE: op.le,
-        parse.GTE: op.ge,
-        parse.EQ: op.eq,
-        parse.NEQ: op.ne
-    }
-
-    matrix_type_dict = {
-        parse.MATRIX: 'matrix',
-        parse.P_MATRIX: 'pmatrix',
-        parse.B_MATRIX: 'bmatrix',
-        parse.V_MATRIX: 'vmatrix',
-    }
 
 def evaluate_expression(state: State, expr: str):
     stream = InputStream(expr)
@@ -353,7 +322,7 @@ def evaluate_expression(state: State, expr: str):
 
 def main(argv):
     state = State()
-    FILEPATH = 'lang/input.txt'
+    FILEPATH = 'input.txt'
     for line in open(FILEPATH, 'r').readlines():
         evaluate_expression(state, line)
 

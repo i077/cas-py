@@ -1,10 +1,5 @@
-x_1 := 1
-x_2 := 2
-x_3 := 3
-x_4 := 4
-\prod_{i=1}^{4}{x_i}
-\lfloor 5.5 \rfloor
-\lceil 5.5 \rceil
-\begin{bmatrix} x_1+x_2 & 2 \\ x_3+x_4 & 3 \\ \end{bmatrix}
-\begin{vmatrix} x_1+x_2 \\ x_3+x_4 \end{vmatrix}
-\begin{matrix} x_1+x_2 & x_3+x_4 \end{matrix}
+f := (a) \to \begin{cases} 1 & a \leq 1 \\ a*f(a-1) & a > 1 \end{cases}
+a := 5
+f(a)
+c := (n,k) \to \begin{cases} n & k = 1 \\ 1 & k = n \\ c(n-1, k-1)+c(n-1,k) & k \neq n \end{cases}
+c(6,4)

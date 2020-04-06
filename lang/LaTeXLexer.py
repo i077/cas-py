@@ -57,13 +57,13 @@ def serializedATN():
         buf.write("\359\36;\37= ?!A\"C#E$G%I&K\'M(O)Q*S+U,W-Y.[/]\60_\61")
         buf.write("a\62c\63e\64g\65i\66k\67m8o9q:s;u<w=y>{?}@\177A\u0081")
         buf.write("B\u0083C\u0085D\u0087E\u0089F\u008bG\u008dH\u008fI\u0091")
-        buf.write("J\u0093K\u0095L\3\2\5\5\2\13\f\17\17\"\"\4\2C\\c|\3\2")
-        buf.write("\62;\2\u0269\2\3\3\2\2\2\2\5\3\2\2\2\2\7\3\2\2\2\2\t\3")
-        buf.write("\2\2\2\2\13\3\2\2\2\2\r\3\2\2\2\2\17\3\2\2\2\2\21\3\2")
-        buf.write("\2\2\2\23\3\2\2\2\2\25\3\2\2\2\2\27\3\2\2\2\2\31\3\2\2")
-        buf.write("\2\2\33\3\2\2\2\2\35\3\2\2\2\2\37\3\2\2\2\2!\3\2\2\2\2")
-        buf.write("#\3\2\2\2\2%\3\2\2\2\2\'\3\2\2\2\2)\3\2\2\2\2+\3\2\2\2")
-        buf.write("\2-\3\2\2\2\2/\3\2\2\2\2\61\3\2\2\2\2\63\3\2\2\2\2\65")
+        buf.write("J\u0093K\u0095L\3\2\5\5\2\13\f\17\17\"\"\5\2C\\cfh|\3")
+        buf.write("\2\62;\2\u0269\2\3\3\2\2\2\2\5\3\2\2\2\2\7\3\2\2\2\2\t")
+        buf.write("\3\2\2\2\2\13\3\2\2\2\2\r\3\2\2\2\2\17\3\2\2\2\2\21\3")
+        buf.write("\2\2\2\2\23\3\2\2\2\2\25\3\2\2\2\2\27\3\2\2\2\2\31\3\2")
+        buf.write("\2\2\2\33\3\2\2\2\2\35\3\2\2\2\2\37\3\2\2\2\2!\3\2\2\2")
+        buf.write("\2#\3\2\2\2\2%\3\2\2\2\2\'\3\2\2\2\2)\3\2\2\2\2+\3\2\2")
+        buf.write("\2\2-\3\2\2\2\2/\3\2\2\2\2\61\3\2\2\2\2\63\3\2\2\2\2\65")
         buf.write("\3\2\2\2\2\67\3\2\2\2\29\3\2\2\2\2;\3\2\2\2\2=\3\2\2\2")
         buf.write("\2?\3\2\2\2\2A\3\2\2\2\2C\3\2\2\2\2E\3\2\2\2\2G\3\2\2")
         buf.write("\2\2I\3\2\2\2\2K\3\2\2\2\2M\3\2\2\2\2O\3\2\2\2\2Q\3\2")
@@ -299,7 +299,7 @@ class LaTeXLexer(Lexer):
     COMMA = 31
     PI = 32
     E = 33
-    LETTER = 34
+    NON_E_LETTER = 34
     DIGIT = 35
     CMD_CDOT = 36
     CMD_TIMES = 37
@@ -362,7 +362,7 @@ class LaTeXLexer(Lexer):
             "LBRACK", "RBRACK", "PLUS", "MINUS", "MULT", "DIV", "CARET", 
             "AMPERSAND", "POINT", "EQ", "NEQ", "LT", "LTE", "GT", "GTE", 
             "ASSIGN", "CASES", "MATRIX", "P_MATRIX", "B_MATRIX", "V_MATRIX", 
-            "UNDERSCORE", "COMMA", "PI", "E", "LETTER", "DIGIT", "CMD_CDOT", 
+            "UNDERSCORE", "COMMA", "PI", "E", "NON_E_LETTER", "DIGIT", "CMD_CDOT", 
             "CMD_TIMES", "CMD_DIV", "CMD_FRAC", "CMD_BEGIN", "CMD_END", 
             "CMD_TO", "CMD_RIGHTARROW", "CMD_DD", "FUNC_LIM", "FUNC_INT", 
             "FUNC_SUM", "FUNC_PROD", "FUNC_DV", "FUNC_PDV", "FUNC_SQRT", 
@@ -377,7 +377,7 @@ class LaTeXLexer(Lexer):
                   "DIV", "CARET", "AMPERSAND", "POINT", "EQ", "NEQ", "LT", 
                   "LTE", "GT", "GTE", "ASSIGN", "CASES", "MATRIX", "P_MATRIX", 
                   "B_MATRIX", "V_MATRIX", "UNDERSCORE", "COMMA", "PI", "E", 
-                  "LETTER", "DIGIT", "CMD_CDOT", "CMD_TIMES", "CMD_DIV", 
+                  "NON_E_LETTER", "DIGIT", "CMD_CDOT", "CMD_TIMES", "CMD_DIV", 
                   "CMD_FRAC", "CMD_BEGIN", "CMD_END", "CMD_TO", "CMD_RIGHTARROW", 
                   "CMD_DD", "FUNC_LIM", "FUNC_INT", "FUNC_SUM", "FUNC_PROD", 
                   "FUNC_DV", "FUNC_PDV", "FUNC_SQRT", "FUNC_CHOOSE", "FUNC_LOG", 

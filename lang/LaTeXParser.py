@@ -61,7 +61,7 @@ def serializedATN():
         buf.write("\n\37\f\37\16\37\u01c9\13\37\3\37\3\37\3\37\3\37\3 \7")
         buf.write(" \u01d0\n \f \16 \u01d3\13 \3 \3 \3!\3!\3!\3!\3!\3!\3")
         buf.write("!\3!\3!\3!\3!\2\5 \"$\"\2\4\6\b\n\f\16\20\22\24\26\30")
-        buf.write("\32\34\36 \"$&(*,.\60\62\64\668:<>@\2\r\3\2$%\3\2\67E")
+        buf.write("\32\34\36 \"$&(*,.\60\62\64\668:<>@\2\r\3\2#%\3\2\67E")
         buf.write("\3\2,-\4\2FFHH\4\2GGII\3\2\63\64\3\2\24\31\3\2\r\16\4")
         buf.write("\2\17\20&(\3\2JK\3\2\34\37\2\u0202\2F\3\2\2\2\4I\3\2\2")
         buf.write("\2\6Z\3\2\2\2\b_\3\2\2\2\nh\3\2\2\2\fj\3\2\2\2\16x\3\2")
@@ -274,7 +274,7 @@ class LaTeXParser ( Parser ):
                       "RBRACK", "PLUS", "MINUS", "MULT", "DIV", "CARET", 
                       "AMPERSAND", "POINT", "EQ", "NEQ", "LT", "LTE", "GT", 
                       "GTE", "ASSIGN", "CASES", "MATRIX", "P_MATRIX", "B_MATRIX", 
-                      "V_MATRIX", "UNDERSCORE", "COMMA", "PI", "E", "LETTER", 
+                      "V_MATRIX", "UNDERSCORE", "COMMA", "PI", "E", "NON_E_LETTER", 
                       "DIGIT", "CMD_CDOT", "CMD_TIMES", "CMD_DIV", "CMD_FRAC", 
                       "CMD_BEGIN", "CMD_END", "CMD_TO", "CMD_RIGHTARROW", 
                       "CMD_DD", "FUNC_LIM", "FUNC_INT", "FUNC_SUM", "FUNC_PROD", 
@@ -360,7 +360,7 @@ class LaTeXParser ( Parser ):
     COMMA=31
     PI=32
     E=33
-    LETTER=34
+    NON_E_LETTER=34
     DIGIT=35
     CMD_CDOT=36
     CMD_TIMES=37
@@ -677,11 +677,17 @@ class LaTeXParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def LETTER(self, i:int=None):
+        def NON_E_LETTER(self, i:int=None):
             if i is None:
-                return self.getTokens(LaTeXParser.LETTER)
+                return self.getTokens(LaTeXParser.NON_E_LETTER)
             else:
-                return self.getToken(LaTeXParser.LETTER, i)
+                return self.getToken(LaTeXParser.NON_E_LETTER, i)
+
+        def E(self, i:int=None):
+            if i is None:
+                return self.getTokens(LaTeXParser.E)
+            else:
+                return self.getToken(LaTeXParser.E, i)
 
         def DIGIT(self, i:int=None):
             if i is None:
@@ -722,7 +728,7 @@ class LaTeXParser ( Parser ):
             while True:
                 self.state = 92
                 _la = self._input.LA(1)
-                if not(_la==LaTeXParser.LETTER or _la==LaTeXParser.DIGIT):
+                if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << LaTeXParser.E) | (1 << LaTeXParser.NON_E_LETTER) | (1 << LaTeXParser.DIGIT))) != 0)):
                     self._errHandler.recoverInline(self)
                 else:
                     self._errHandler.reportMatch(self)
@@ -730,7 +736,7 @@ class LaTeXParser ( Parser ):
                 self.state = 95 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if not (_la==LaTeXParser.LETTER or _la==LaTeXParser.DIGIT):
+                if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << LaTeXParser.E) | (1 << LaTeXParser.NON_E_LETTER) | (1 << LaTeXParser.DIGIT))) != 0)):
                     break
 
         except RecognitionException as re:
@@ -795,8 +801,8 @@ class LaTeXParser ( Parser ):
             super().__init__(parser)
             self.copyFrom(ctx)
 
-        def LETTER(self):
-            return self.getToken(LaTeXParser.LETTER, 0)
+        def NON_E_LETTER(self):
+            return self.getToken(LaTeXParser.NON_E_LETTER, 0)
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterVar_name_letter" ):
@@ -822,11 +828,11 @@ class LaTeXParser ( Parser ):
             self.state = 102
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [LaTeXParser.LETTER]:
+            if token in [LaTeXParser.NON_E_LETTER]:
                 localctx = LaTeXParser.Var_name_letterContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
                 self.state = 97
-                self.match(LaTeXParser.LETTER)
+                self.match(LaTeXParser.NON_E_LETTER)
                 pass
             elif token in [LaTeXParser.BACKTICK]:
                 localctx = LaTeXParser.Var_name_multicharContext(self, localctx)
@@ -936,8 +942,10 @@ class LaTeXParser ( Parser ):
             super().__init__(parser)
             self.copyFrom(ctx)
 
-        def LETTER(self):
-            return self.getToken(LaTeXParser.LETTER, 0)
+        def NON_E_LETTER(self):
+            return self.getToken(LaTeXParser.NON_E_LETTER, 0)
+        def E(self):
+            return self.getToken(LaTeXParser.E, 0)
         def DIGIT(self):
             return self.getToken(LaTeXParser.DIGIT, 0)
 
@@ -1029,7 +1037,7 @@ class LaTeXParser ( Parser ):
                 self.enterOuterAlt(localctx, 1)
                 self.state = 109
                 _la = self._input.LA(1)
-                if not(_la==LaTeXParser.LETTER or _la==LaTeXParser.DIGIT):
+                if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << LaTeXParser.E) | (1 << LaTeXParser.NON_E_LETTER) | (1 << LaTeXParser.DIGIT))) != 0)):
                     self._errHandler.recoverInline(self)
                 else:
                     self._errHandler.reportMatch(self)
@@ -1149,7 +1157,7 @@ class LaTeXParser ( Parser ):
                 self.state = 120
                 self.func_builtin()
                 pass
-            elif token in [LaTeXParser.BACKTICK, LaTeXParser.LETTER]:
+            elif token in [LaTeXParser.BACKTICK, LaTeXParser.NON_E_LETTER]:
                 localctx = LaTeXParser.Func_name_varContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
                 self.state = 121
@@ -1685,7 +1693,7 @@ class LaTeXParser ( Parser ):
             self.state = 287
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [LaTeXParser.BACKTICK, LaTeXParser.LETTER, LaTeXParser.FUNC_LOG, LaTeXParser.FUNC_LN, LaTeXParser.FUNC_EXP, LaTeXParser.FUNC_SIN, LaTeXParser.FUNC_COS, LaTeXParser.FUNC_TAN, LaTeXParser.FUNC_SEC, LaTeXParser.FUNC_CSC, LaTeXParser.FUNC_COT, LaTeXParser.FUNC_ASIN, LaTeXParser.FUNC_ACOS, LaTeXParser.FUNC_ATAN, LaTeXParser.FUNC_ASEC, LaTeXParser.FUNC_ACSC, LaTeXParser.FUNC_ACOT]:
+            if token in [LaTeXParser.BACKTICK, LaTeXParser.NON_E_LETTER, LaTeXParser.FUNC_LOG, LaTeXParser.FUNC_LN, LaTeXParser.FUNC_EXP, LaTeXParser.FUNC_SIN, LaTeXParser.FUNC_COS, LaTeXParser.FUNC_TAN, LaTeXParser.FUNC_SEC, LaTeXParser.FUNC_CSC, LaTeXParser.FUNC_COT, LaTeXParser.FUNC_ASIN, LaTeXParser.FUNC_ACOS, LaTeXParser.FUNC_ATAN, LaTeXParser.FUNC_ASEC, LaTeXParser.FUNC_ACSC, LaTeXParser.FUNC_ACOT]:
                 localctx = LaTeXParser.Func_call_varContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
                 self.state = 126
@@ -1699,7 +1707,7 @@ class LaTeXParser ( Parser ):
                     self.state = 140
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << LaTeXParser.BACKTICK) | (1 << LaTeXParser.LPAREN) | (1 << LaTeXParser.PLUS) | (1 << LaTeXParser.MINUS) | (1 << LaTeXParser.PI) | (1 << LaTeXParser.E) | (1 << LaTeXParser.LETTER) | (1 << LaTeXParser.DIGIT) | (1 << LaTeXParser.CMD_FRAC) | (1 << LaTeXParser.CMD_BEGIN) | (1 << LaTeXParser.FUNC_LIM) | (1 << LaTeXParser.FUNC_INT) | (1 << LaTeXParser.FUNC_SUM) | (1 << LaTeXParser.FUNC_PROD) | (1 << LaTeXParser.FUNC_DV) | (1 << LaTeXParser.FUNC_PDV) | (1 << LaTeXParser.FUNC_SQRT) | (1 << LaTeXParser.FUNC_CHOOSE) | (1 << LaTeXParser.FUNC_LOG) | (1 << LaTeXParser.FUNC_LN) | (1 << LaTeXParser.FUNC_EXP) | (1 << LaTeXParser.FUNC_SIN) | (1 << LaTeXParser.FUNC_COS) | (1 << LaTeXParser.FUNC_TAN) | (1 << LaTeXParser.FUNC_SEC) | (1 << LaTeXParser.FUNC_CSC) | (1 << LaTeXParser.FUNC_COT) | (1 << LaTeXParser.FUNC_ASIN) | (1 << LaTeXParser.FUNC_ACOS))) != 0) or ((((_la - 64)) & ~0x3f) == 0 and ((1 << (_la - 64)) & ((1 << (LaTeXParser.FUNC_ATAN - 64)) | (1 << (LaTeXParser.FUNC_ASEC - 64)) | (1 << (LaTeXParser.FUNC_ACSC - 64)) | (1 << (LaTeXParser.FUNC_ACOT - 64)) | (1 << (LaTeXParser.CMD_LFLOOR - 64)) | (1 << (LaTeXParser.CMD_LCEIL - 64)) | (1 << (LaTeXParser.INFINITY - 64)) | (1 << (LaTeXParser.NEG_INFINITY - 64)) | (1 << (LaTeXParser.DOLLAR - 64)))) != 0):
+                    if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << LaTeXParser.BACKTICK) | (1 << LaTeXParser.LPAREN) | (1 << LaTeXParser.PLUS) | (1 << LaTeXParser.MINUS) | (1 << LaTeXParser.PI) | (1 << LaTeXParser.E) | (1 << LaTeXParser.NON_E_LETTER) | (1 << LaTeXParser.DIGIT) | (1 << LaTeXParser.CMD_FRAC) | (1 << LaTeXParser.CMD_BEGIN) | (1 << LaTeXParser.FUNC_LIM) | (1 << LaTeXParser.FUNC_INT) | (1 << LaTeXParser.FUNC_SUM) | (1 << LaTeXParser.FUNC_PROD) | (1 << LaTeXParser.FUNC_DV) | (1 << LaTeXParser.FUNC_PDV) | (1 << LaTeXParser.FUNC_SQRT) | (1 << LaTeXParser.FUNC_CHOOSE) | (1 << LaTeXParser.FUNC_LOG) | (1 << LaTeXParser.FUNC_LN) | (1 << LaTeXParser.FUNC_EXP) | (1 << LaTeXParser.FUNC_SIN) | (1 << LaTeXParser.FUNC_COS) | (1 << LaTeXParser.FUNC_TAN) | (1 << LaTeXParser.FUNC_SEC) | (1 << LaTeXParser.FUNC_CSC) | (1 << LaTeXParser.FUNC_COT) | (1 << LaTeXParser.FUNC_ASIN) | (1 << LaTeXParser.FUNC_ACOS))) != 0) or ((((_la - 64)) & ~0x3f) == 0 and ((1 << (_la - 64)) & ((1 << (LaTeXParser.FUNC_ATAN - 64)) | (1 << (LaTeXParser.FUNC_ASEC - 64)) | (1 << (LaTeXParser.FUNC_ACSC - 64)) | (1 << (LaTeXParser.FUNC_ACOT - 64)) | (1 << (LaTeXParser.CMD_LFLOOR - 64)) | (1 << (LaTeXParser.CMD_LCEIL - 64)) | (1 << (LaTeXParser.INFINITY - 64)) | (1 << (LaTeXParser.NEG_INFINITY - 64)) | (1 << (LaTeXParser.DOLLAR - 64)))) != 0):
                         self.state = 128
                         self.expr()
                         self.state = 137
@@ -1740,7 +1748,7 @@ class LaTeXParser ( Parser ):
                     self.state = 157
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << LaTeXParser.BACKTICK) | (1 << LaTeXParser.LPAREN) | (1 << LaTeXParser.PLUS) | (1 << LaTeXParser.MINUS) | (1 << LaTeXParser.PI) | (1 << LaTeXParser.E) | (1 << LaTeXParser.LETTER) | (1 << LaTeXParser.DIGIT) | (1 << LaTeXParser.CMD_FRAC) | (1 << LaTeXParser.CMD_BEGIN) | (1 << LaTeXParser.FUNC_LIM) | (1 << LaTeXParser.FUNC_INT) | (1 << LaTeXParser.FUNC_SUM) | (1 << LaTeXParser.FUNC_PROD) | (1 << LaTeXParser.FUNC_DV) | (1 << LaTeXParser.FUNC_PDV) | (1 << LaTeXParser.FUNC_SQRT) | (1 << LaTeXParser.FUNC_CHOOSE) | (1 << LaTeXParser.FUNC_LOG) | (1 << LaTeXParser.FUNC_LN) | (1 << LaTeXParser.FUNC_EXP) | (1 << LaTeXParser.FUNC_SIN) | (1 << LaTeXParser.FUNC_COS) | (1 << LaTeXParser.FUNC_TAN) | (1 << LaTeXParser.FUNC_SEC) | (1 << LaTeXParser.FUNC_CSC) | (1 << LaTeXParser.FUNC_COT) | (1 << LaTeXParser.FUNC_ASIN) | (1 << LaTeXParser.FUNC_ACOS))) != 0) or ((((_la - 64)) & ~0x3f) == 0 and ((1 << (_la - 64)) & ((1 << (LaTeXParser.FUNC_ATAN - 64)) | (1 << (LaTeXParser.FUNC_ASEC - 64)) | (1 << (LaTeXParser.FUNC_ACSC - 64)) | (1 << (LaTeXParser.FUNC_ACOT - 64)) | (1 << (LaTeXParser.CMD_LFLOOR - 64)) | (1 << (LaTeXParser.CMD_LCEIL - 64)) | (1 << (LaTeXParser.INFINITY - 64)) | (1 << (LaTeXParser.NEG_INFINITY - 64)) | (1 << (LaTeXParser.DOLLAR - 64)))) != 0):
+                    if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << LaTeXParser.BACKTICK) | (1 << LaTeXParser.LPAREN) | (1 << LaTeXParser.PLUS) | (1 << LaTeXParser.MINUS) | (1 << LaTeXParser.PI) | (1 << LaTeXParser.E) | (1 << LaTeXParser.NON_E_LETTER) | (1 << LaTeXParser.DIGIT) | (1 << LaTeXParser.CMD_FRAC) | (1 << LaTeXParser.CMD_BEGIN) | (1 << LaTeXParser.FUNC_LIM) | (1 << LaTeXParser.FUNC_INT) | (1 << LaTeXParser.FUNC_SUM) | (1 << LaTeXParser.FUNC_PROD) | (1 << LaTeXParser.FUNC_DV) | (1 << LaTeXParser.FUNC_PDV) | (1 << LaTeXParser.FUNC_SQRT) | (1 << LaTeXParser.FUNC_CHOOSE) | (1 << LaTeXParser.FUNC_LOG) | (1 << LaTeXParser.FUNC_LN) | (1 << LaTeXParser.FUNC_EXP) | (1 << LaTeXParser.FUNC_SIN) | (1 << LaTeXParser.FUNC_COS) | (1 << LaTeXParser.FUNC_TAN) | (1 << LaTeXParser.FUNC_SEC) | (1 << LaTeXParser.FUNC_CSC) | (1 << LaTeXParser.FUNC_COT) | (1 << LaTeXParser.FUNC_ASIN) | (1 << LaTeXParser.FUNC_ACOS))) != 0) or ((((_la - 64)) & ~0x3f) == 0 and ((1 << (_la - 64)) & ((1 << (LaTeXParser.FUNC_ATAN - 64)) | (1 << (LaTeXParser.FUNC_ASEC - 64)) | (1 << (LaTeXParser.FUNC_ACSC - 64)) | (1 << (LaTeXParser.FUNC_ACOT - 64)) | (1 << (LaTeXParser.CMD_LFLOOR - 64)) | (1 << (LaTeXParser.CMD_LCEIL - 64)) | (1 << (LaTeXParser.INFINITY - 64)) | (1 << (LaTeXParser.NEG_INFINITY - 64)) | (1 << (LaTeXParser.DOLLAR - 64)))) != 0):
                         self.state = 145
                         self.expr()
                         self.state = 154
@@ -1781,7 +1789,7 @@ class LaTeXParser ( Parser ):
                     self.state = 174
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << LaTeXParser.BACKTICK) | (1 << LaTeXParser.LPAREN) | (1 << LaTeXParser.PLUS) | (1 << LaTeXParser.MINUS) | (1 << LaTeXParser.PI) | (1 << LaTeXParser.E) | (1 << LaTeXParser.LETTER) | (1 << LaTeXParser.DIGIT) | (1 << LaTeXParser.CMD_FRAC) | (1 << LaTeXParser.CMD_BEGIN) | (1 << LaTeXParser.FUNC_LIM) | (1 << LaTeXParser.FUNC_INT) | (1 << LaTeXParser.FUNC_SUM) | (1 << LaTeXParser.FUNC_PROD) | (1 << LaTeXParser.FUNC_DV) | (1 << LaTeXParser.FUNC_PDV) | (1 << LaTeXParser.FUNC_SQRT) | (1 << LaTeXParser.FUNC_CHOOSE) | (1 << LaTeXParser.FUNC_LOG) | (1 << LaTeXParser.FUNC_LN) | (1 << LaTeXParser.FUNC_EXP) | (1 << LaTeXParser.FUNC_SIN) | (1 << LaTeXParser.FUNC_COS) | (1 << LaTeXParser.FUNC_TAN) | (1 << LaTeXParser.FUNC_SEC) | (1 << LaTeXParser.FUNC_CSC) | (1 << LaTeXParser.FUNC_COT) | (1 << LaTeXParser.FUNC_ASIN) | (1 << LaTeXParser.FUNC_ACOS))) != 0) or ((((_la - 64)) & ~0x3f) == 0 and ((1 << (_la - 64)) & ((1 << (LaTeXParser.FUNC_ATAN - 64)) | (1 << (LaTeXParser.FUNC_ASEC - 64)) | (1 << (LaTeXParser.FUNC_ACSC - 64)) | (1 << (LaTeXParser.FUNC_ACOT - 64)) | (1 << (LaTeXParser.CMD_LFLOOR - 64)) | (1 << (LaTeXParser.CMD_LCEIL - 64)) | (1 << (LaTeXParser.INFINITY - 64)) | (1 << (LaTeXParser.NEG_INFINITY - 64)) | (1 << (LaTeXParser.DOLLAR - 64)))) != 0):
+                    if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << LaTeXParser.BACKTICK) | (1 << LaTeXParser.LPAREN) | (1 << LaTeXParser.PLUS) | (1 << LaTeXParser.MINUS) | (1 << LaTeXParser.PI) | (1 << LaTeXParser.E) | (1 << LaTeXParser.NON_E_LETTER) | (1 << LaTeXParser.DIGIT) | (1 << LaTeXParser.CMD_FRAC) | (1 << LaTeXParser.CMD_BEGIN) | (1 << LaTeXParser.FUNC_LIM) | (1 << LaTeXParser.FUNC_INT) | (1 << LaTeXParser.FUNC_SUM) | (1 << LaTeXParser.FUNC_PROD) | (1 << LaTeXParser.FUNC_DV) | (1 << LaTeXParser.FUNC_PDV) | (1 << LaTeXParser.FUNC_SQRT) | (1 << LaTeXParser.FUNC_CHOOSE) | (1 << LaTeXParser.FUNC_LOG) | (1 << LaTeXParser.FUNC_LN) | (1 << LaTeXParser.FUNC_EXP) | (1 << LaTeXParser.FUNC_SIN) | (1 << LaTeXParser.FUNC_COS) | (1 << LaTeXParser.FUNC_TAN) | (1 << LaTeXParser.FUNC_SEC) | (1 << LaTeXParser.FUNC_CSC) | (1 << LaTeXParser.FUNC_COT) | (1 << LaTeXParser.FUNC_ASIN) | (1 << LaTeXParser.FUNC_ACOS))) != 0) or ((((_la - 64)) & ~0x3f) == 0 and ((1 << (_la - 64)) & ((1 << (LaTeXParser.FUNC_ATAN - 64)) | (1 << (LaTeXParser.FUNC_ASEC - 64)) | (1 << (LaTeXParser.FUNC_ACSC - 64)) | (1 << (LaTeXParser.FUNC_ACOT - 64)) | (1 << (LaTeXParser.CMD_LFLOOR - 64)) | (1 << (LaTeXParser.CMD_LCEIL - 64)) | (1 << (LaTeXParser.INFINITY - 64)) | (1 << (LaTeXParser.NEG_INFINITY - 64)) | (1 << (LaTeXParser.DOLLAR - 64)))) != 0):
                         self.state = 162
                         self.expr()
                         self.state = 171
@@ -1856,7 +1864,7 @@ class LaTeXParser ( Parser ):
                 self.state = 200
                 self._errHandler.sync(self)
                 token = self._input.LA(1)
-                if token in [LaTeXParser.BACKTICK, LaTeXParser.LPAREN, LaTeXParser.PLUS, LaTeXParser.MINUS, LaTeXParser.PI, LaTeXParser.E, LaTeXParser.LETTER, LaTeXParser.DIGIT, LaTeXParser.CMD_FRAC, LaTeXParser.CMD_BEGIN, LaTeXParser.FUNC_LIM, LaTeXParser.FUNC_INT, LaTeXParser.FUNC_SUM, LaTeXParser.FUNC_PROD, LaTeXParser.FUNC_DV, LaTeXParser.FUNC_PDV, LaTeXParser.FUNC_SQRT, LaTeXParser.FUNC_CHOOSE, LaTeXParser.FUNC_LOG, LaTeXParser.FUNC_LN, LaTeXParser.FUNC_EXP, LaTeXParser.FUNC_SIN, LaTeXParser.FUNC_COS, LaTeXParser.FUNC_TAN, LaTeXParser.FUNC_SEC, LaTeXParser.FUNC_CSC, LaTeXParser.FUNC_COT, LaTeXParser.FUNC_ASIN, LaTeXParser.FUNC_ACOS, LaTeXParser.FUNC_ATAN, LaTeXParser.FUNC_ASEC, LaTeXParser.FUNC_ACSC, LaTeXParser.FUNC_ACOT, LaTeXParser.CMD_LFLOOR, LaTeXParser.CMD_LCEIL, LaTeXParser.INFINITY, LaTeXParser.NEG_INFINITY, LaTeXParser.DOLLAR]:
+                if token in [LaTeXParser.BACKTICK, LaTeXParser.LPAREN, LaTeXParser.PLUS, LaTeXParser.MINUS, LaTeXParser.PI, LaTeXParser.E, LaTeXParser.NON_E_LETTER, LaTeXParser.DIGIT, LaTeXParser.CMD_FRAC, LaTeXParser.CMD_BEGIN, LaTeXParser.FUNC_LIM, LaTeXParser.FUNC_INT, LaTeXParser.FUNC_SUM, LaTeXParser.FUNC_PROD, LaTeXParser.FUNC_DV, LaTeXParser.FUNC_PDV, LaTeXParser.FUNC_SQRT, LaTeXParser.FUNC_CHOOSE, LaTeXParser.FUNC_LOG, LaTeXParser.FUNC_LN, LaTeXParser.FUNC_EXP, LaTeXParser.FUNC_SIN, LaTeXParser.FUNC_COS, LaTeXParser.FUNC_TAN, LaTeXParser.FUNC_SEC, LaTeXParser.FUNC_CSC, LaTeXParser.FUNC_COT, LaTeXParser.FUNC_ASIN, LaTeXParser.FUNC_ACOS, LaTeXParser.FUNC_ATAN, LaTeXParser.FUNC_ASEC, LaTeXParser.FUNC_ACSC, LaTeXParser.FUNC_ACOT, LaTeXParser.CMD_LFLOOR, LaTeXParser.CMD_LCEIL, LaTeXParser.INFINITY, LaTeXParser.NEG_INFINITY, LaTeXParser.DOLLAR]:
                     self.state = 195
                     self.expr()
                     pass
@@ -1912,7 +1920,7 @@ class LaTeXParser ( Parser ):
                 self.state = 223
                 self._errHandler.sync(self)
                 token = self._input.LA(1)
-                if token in [LaTeXParser.BACKTICK, LaTeXParser.LPAREN, LaTeXParser.PLUS, LaTeXParser.MINUS, LaTeXParser.PI, LaTeXParser.E, LaTeXParser.LETTER, LaTeXParser.DIGIT, LaTeXParser.CMD_FRAC, LaTeXParser.CMD_BEGIN, LaTeXParser.FUNC_LIM, LaTeXParser.FUNC_INT, LaTeXParser.FUNC_SUM, LaTeXParser.FUNC_PROD, LaTeXParser.FUNC_DV, LaTeXParser.FUNC_PDV, LaTeXParser.FUNC_SQRT, LaTeXParser.FUNC_CHOOSE, LaTeXParser.FUNC_LOG, LaTeXParser.FUNC_LN, LaTeXParser.FUNC_EXP, LaTeXParser.FUNC_SIN, LaTeXParser.FUNC_COS, LaTeXParser.FUNC_TAN, LaTeXParser.FUNC_SEC, LaTeXParser.FUNC_CSC, LaTeXParser.FUNC_COT, LaTeXParser.FUNC_ASIN, LaTeXParser.FUNC_ACOS, LaTeXParser.FUNC_ATAN, LaTeXParser.FUNC_ASEC, LaTeXParser.FUNC_ACSC, LaTeXParser.FUNC_ACOT, LaTeXParser.CMD_LFLOOR, LaTeXParser.CMD_LCEIL, LaTeXParser.INFINITY, LaTeXParser.NEG_INFINITY, LaTeXParser.DOLLAR]:
+                if token in [LaTeXParser.BACKTICK, LaTeXParser.LPAREN, LaTeXParser.PLUS, LaTeXParser.MINUS, LaTeXParser.PI, LaTeXParser.E, LaTeXParser.NON_E_LETTER, LaTeXParser.DIGIT, LaTeXParser.CMD_FRAC, LaTeXParser.CMD_BEGIN, LaTeXParser.FUNC_LIM, LaTeXParser.FUNC_INT, LaTeXParser.FUNC_SUM, LaTeXParser.FUNC_PROD, LaTeXParser.FUNC_DV, LaTeXParser.FUNC_PDV, LaTeXParser.FUNC_SQRT, LaTeXParser.FUNC_CHOOSE, LaTeXParser.FUNC_LOG, LaTeXParser.FUNC_LN, LaTeXParser.FUNC_EXP, LaTeXParser.FUNC_SIN, LaTeXParser.FUNC_COS, LaTeXParser.FUNC_TAN, LaTeXParser.FUNC_SEC, LaTeXParser.FUNC_CSC, LaTeXParser.FUNC_COT, LaTeXParser.FUNC_ASIN, LaTeXParser.FUNC_ACOS, LaTeXParser.FUNC_ATAN, LaTeXParser.FUNC_ASEC, LaTeXParser.FUNC_ACSC, LaTeXParser.FUNC_ACOT, LaTeXParser.CMD_LFLOOR, LaTeXParser.CMD_LCEIL, LaTeXParser.INFINITY, LaTeXParser.NEG_INFINITY, LaTeXParser.DOLLAR]:
                     self.state = 218
                     self.expr()
                     pass
@@ -3430,7 +3438,7 @@ class LaTeXParser ( Parser ):
             self.state = 378
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==LaTeXParser.BACKTICK or _la==LaTeXParser.LETTER:
+            if _la==LaTeXParser.BACKTICK or _la==LaTeXParser.NON_E_LETTER:
                 self.state = 370
                 self.var_def()
                 self.state = 375

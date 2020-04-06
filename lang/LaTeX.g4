@@ -50,7 +50,7 @@ COMMA      : ',';
 PI : '\\pi';
 E  : 'e';
 
-LETTER  : [a-zA-Z];
+NON_E_LETTER  : [a-df-zA-Z];
 DIGIT   : [0-9];
 
 CMD_CDOT        : '\\cdot';
@@ -108,11 +108,11 @@ hist_entry
 number  : MINUS? DIGIT+ (POINT DIGIT*)?;
 nnint   : DIGIT+;
 
-multichar_var : (LETTER | DIGIT)+;
+multichar_var : (NON_E_LETTER | E | DIGIT)+;
 
 // Variable names
 var_name
-    : LETTER                               #var_name_letter
+    : NON_E_LETTER                               #var_name_letter
     | BACKTICK name=multichar_var BACKTICK #var_name_multichar
     ;
 
@@ -120,7 +120,7 @@ var
     : var_name (UNDERSCORE tex_symb)?;
 
 tex_symb
-    : (LETTER | DIGIT)   #tex_symb_single
+    : (NON_E_LETTER | E | DIGIT)   #tex_symb_single
     | LCURLY expr RCURLY #tex_symb_multi
     | LCURLY var RCURLY  #tex_symb_recurse
     ;

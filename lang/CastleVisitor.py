@@ -102,7 +102,7 @@ class CastleVisitor(LaTeXVisitor):
     def visitVar_name_multichar(self, ctx: parse.Var_name_multicharContext):
         """var_name_multichar
         BACKTICK name=multichar_var BACKTICK """
-        return self.visit(ctx.name())
+        return self.visit(ctx.name)
 
     def visitTex_symb_single(self, ctx: parse.Tex_symb_singleContext):
         """tex_symb_single

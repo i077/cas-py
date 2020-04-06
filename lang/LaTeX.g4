@@ -186,9 +186,27 @@ add_expr
     | mult_expr                           #add_expr_mult
     ;
 
+implicit_mult_expr
+    : implicit_mult_expr implicit_mult_expr      #implicit_mult_expr_mult
+    | left_implicit_pow_expr implicit_mult_expr  #implicit_mult_expr_left
+    | implicit_pow_expr                          #implicit_mult_expr_pow
+    ;
+
 mult_expr
     : mult_expr op=(MULT | CMD_TIMES | CMD_CDOT | DIV | CMD_DIV) mult_expr #mult_expr_recurse
+    | implicit_mult_expr                                                   #mult_implicit
+    | sign=(PLUS | MINUS) mult_expr                                        #mult_sign
     | pow_expr                                                             #mult_expr_pow
+    ;
+
+implicit_pow_expr
+    : implicit_pow_expr CARET tex_symb  #implicit_pow_expr_recurse
+    | implicit_mult_unit                #implicit_pow_expr_unit
+    ;
+
+left_implicit_pow_expr
+    : left_implicit_pow_expr CARET tex_symb  #left_implicit_pow_expr_recurse
+    | left_implicit_mult_unit                #left_implicit_pow_expr_unit
     ;
 
 pow_expr
@@ -197,18 +215,28 @@ pow_expr
     ;
 
 unit
-    : sign=(PLUS | MINUS) unit      #unit_recurse      // Signed unit expressions
-    | MINUS? LPAREN expr RPAREN     #unit_paren        // Parentheticals, optionally signed
-    | PI                            #unit_pi           // 3.14159...
-    | E                             #unit_e            // 2.71828...
-    | func_call                     #unit_func         // Function calls
+    : inf=(INFINITY | NEG_INFINITY) #unit_infinity     // Infinity
+    | implicit_mult_unit            #unit_implicit
+    | left_implicit_mult_unit       #unit_left_implicit
+    ;
+    
+//units that can be multiplied together without * or \cdot on both sides:
+//for example x\sqrt{x}
+implicit_mult_unit
+    : func_call                     #unit_func         // Function calls
     | var                           #unit_var          // Variable identifiers
-    | number                        #unit_number       // Number literals
-    | inf=(INFINITY | NEG_INFINITY) #unit_infinity     // Infinity
     | fraction                      #unit_fraction     // Fraction expressions
     | matrix_env                    #unit_matrix       // Matrices
     | cases_env                     #unit_cases        // Branching (cases)
     | hist_entry                    #unit_hist         // History reference
+    | LPAREN expr RPAREN            #unit_paren        // Expressions inside parentheses
+    | PI                            #unit_pi           // 3.14159...
+    | E                             #unit_e            // 2.71828...
+    ;
+    
+//units that can only be explicitly multiplied on the left
+left_implicit_mult_unit
+    : number                        #unit_number       // Number literals
     ;
 
 var_def

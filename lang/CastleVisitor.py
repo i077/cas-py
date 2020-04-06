@@ -18,14 +18,32 @@ class CastleVisitor(LaTeXVisitor):
         castle_input EOF """
         return self.visit(ctx.castle_input()).evaluate(self.state)
 
-    # Basic arithmetic and expr ===================================================
-    def visitAdd_expr_recurse(self, ctx:parse.Add_expr_recurseContext):
+    # 5-function Arithmetic ====================================================
+    def visitAdd_expr_recurse(self, ctx: parse.Add_expr_recurseContext):
         """add_expr_recurse
         add_expr op=(PLUS | MINUS) add_expr"""
         return Expression(
             op.add if ctx.op.type == parse.PLUS else op.sub,
             self.visit(ctx.add_expr(0)),
             self.visit(ctx.add_expr(1)),
+        )
+
+    def visitImplicit_mult_expr_mult(self, ctx: parse.Implicit_mult_expr_multContext):
+        """implicit_mult_expr_mult
+        implicit_mult_expr implicit_mult_expr"""
+        return Expression(
+            op.mul, 
+            self.visit(ctx.implicit_mult_expr(0)),
+            self.visit(ctx.implicit_mult_expr(1))
+        )
+
+    def visitImplicit_mult_expr_left(self, ctx: parse.Implicit_mult_expr_leftContext):
+        """implicit_mult_expr_left
+        left_implicit_mult_expr implicit_mult_expr"""
+        return Expression(
+            op.mul, 
+            self.visit(ctx.left_implicit_pow_expr()),
+            self.visit(ctx.implicit_mult_expr())
         )
 
     def visitMult_expr_recurse(self, ctx: parse.Mult_expr_recurseContext):
@@ -37,6 +55,32 @@ class CastleVisitor(LaTeXVisitor):
             self.visit(ctx.mult_expr(1)),
         )
 
+    def visitMult_sign(self, ctx: parse.Mult_signContext):
+        """mult_sign
+        sign=(PLUS | MINUS) mult_expr """
+        if ctx.sign.type == parse.MINUS:
+            return Expression(op.mul, RealNumber(-1), self.visit(ctx.mult_expr()))
+        else:
+            return self.visit(ctx.mult_expr())
+
+    def visitImplicit_pow_expr_recurse(self, ctx: parse.Implicit_pow_expr_recurseContext):
+        """implicit_pow_expr_recurse
+        implicit_pow_expr CARET tex_symb """
+        return Expression(
+            op.pow,
+            self.visit(ctx.implicit_pow_expr()),
+            self.visit(ctx.tex_symb()),
+        )
+
+    def visitLeft_implicit_pow_expr_recurse(self, ctx: parse.Left_implicit_pow_expr_recurseContext):
+        """left_implicit_pow_expr_recurse
+        left_implicit_pow_expr CARET tex_symb """
+        return Expression(
+            op.pow,
+            self.visit(ctx.left_implicit_pow_expr()),
+            self.visit(ctx.tex_symb()),
+        )
+
     def visitPow_expr_recurse(self, ctx: parse.Pow_expr_recurseContext):
         """pow_expr_recurse
         pow_expr CARET tex_symb """
@@ -46,21 +90,11 @@ class CastleVisitor(LaTeXVisitor):
             self.visit(ctx.tex_symb()),
         )
 
-    def visitUnit_recurse(self, ctx: parse.Unit_recurseContext):
-        """unit_recurse
-        sign=(PLUS | MINUS) unit """
-        if ctx.sign.type == parse.MINUS:
-            return Expression(op.mul, RealNumber(-1), self.visit(ctx.unit()))
-        else:
-            return self.visit(ctx.unit())
-
+    # Units =====================================================================
     def visitUnit_paren(self, ctx: parse.Unit_parenContext):
         """unit_paren
-        MINUS? LPAREN expr RPAREN """
-        if ctx.MINUS():
-            return Expression(op.mul, RealNumber(-1), self.visit(ctx.expr()))
-        else:
-            return self.visit(ctx.expr())
+        LPAREN expr RPAREN """
+        return self.visit(ctx.expr())
 
     def visitUnit_infinity(self, ctx: parse.Unit_infinityContext):
         """unit_infinity

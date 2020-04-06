@@ -1,4 +1,4 @@
-`test`_1 := 3
-`function` := (`ecks`, `dee`) \to `ecks` + `dee`
-`function`(`test`_1, 240)
-\sin(e * \pi)
+x := 2
+y := 4
+-(2xy-1)^2x
+x(y+1)

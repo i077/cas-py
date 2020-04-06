@@ -197,6 +197,24 @@ class LaTeXListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by LaTeXParser#func_root.
+    def enterFunc_root(self, ctx:LaTeXParser.Func_rootContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#func_root.
+    def exitFunc_root(self, ctx:LaTeXParser.Func_rootContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#func_choose.
+    def enterFunc_choose(self, ctx:LaTeXParser.Func_chooseContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#func_choose.
+    def exitFunc_choose(self, ctx:LaTeXParser.Func_chooseContext):
+        pass
+
+
     # Enter a parse tree produced by LaTeXParser#entry.
     def enterEntry(self, ctx:LaTeXParser.EntryContext):
         pass
@@ -329,6 +347,24 @@ class LaTeXListener(ParseTreeListener):
 
     # Exit a parse tree produced by LaTeXParser#unit_paren.
     def exitUnit_paren(self, ctx:LaTeXParser.Unit_parenContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#unit_pi.
+    def enterUnit_pi(self, ctx:LaTeXParser.Unit_piContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#unit_pi.
+    def exitUnit_pi(self, ctx:LaTeXParser.Unit_piContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#unit_e.
+    def enterUnit_e(self, ctx:LaTeXParser.Unit_eContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#unit_e.
+    def exitUnit_e(self, ctx:LaTeXParser.Unit_eContext):
         pass
 
 

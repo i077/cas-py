@@ -4,7 +4,7 @@ from antlr4 import FileStream, InputStream, CommonTokenStream
 from LaTeXVisitor import LaTeXVisitor
 from LaTeXParser import LaTeXParser as parse
 from LaTeXLexer import LaTeXLexer
-from structures import Number, RealNumber, Polynomial, Variable, Expression, Cases, Matrix, Relation, UserDefinedFunc, FunctionCall, SumFunc, ProdFunc, Limit, Integral, Floor, Ceiling, Derivative
+from structures import Number, RealNumber, Polynomial, Variable, Expression, Cases, Matrix, Relation, UserDefinedFunc, FunctionCall, SumFunc, ProdFunc, Limit, Integral, Floor, Ceiling, Derivative, Root
 from State import State
 from Dicts import rel_dict, matrix_type_dict
 import operator as op
@@ -70,6 +70,12 @@ class CastleVisitor(LaTeXVisitor):
         else:
             return RealNumber(float('-inf'))
 
+    def visitUnit_pi(self, ctx: parse.Unit_piContext):
+        return RealNumber(math.pi)
+
+    def visitUnit_e(self, ctx: parse.Unit_eContext):
+        return RealNumber(math.e)
+
     def visitNumber(self, ctx: parse.NumberContext):
         """number
         MINUS? DIGIT+ (POINT DIGIT*)? """
@@ -79,6 +85,7 @@ class CastleVisitor(LaTeXVisitor):
         """nnint
         DIGIT+ """
         return RealNumber(int(ctx.getText()))
+
 
 
     # Variable names and TeX symbols ===============================================
@@ -243,6 +250,13 @@ class CastleVisitor(LaTeXVisitor):
             self.visit(ctx.expr()),
             self.visit(ctx.var())
         )
+
+    def visitFunc_root(self, ctx: parse.Func_rootContext):
+        exprs = ctx.expr()
+        if isinstance(exprs, (list, tuple)):
+            # n-th root instead of default square root
+            return Root(self.visit(exprs[1]), n=self.visit(exprs[0]))
+        return Root(self.visit(exprs))
 
     def visitFunc_builtin(self, ctx: parse.Func_builtinContext):
         return ctx.name.type

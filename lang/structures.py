@@ -600,3 +600,21 @@ class Derivative():
             return f'{self.cmd}[{self.order}]{{{self.expr}}}{{{self.var}}}'
         else:
             return f'{self.cmd}{{{self.expr}}}{{{self.var}}}'
+
+class Root():
+    def __init__(self, expr, n=None):
+        self.expr = expr
+        self.n = n
+    
+    def evaluate(self, state: State):
+        if self.n is None:
+            return math.sqrt(self.expr.evaluate(state))
+        n = self.n.evaluate()
+        if n == 0:
+            raise ValueError(f"Can't take 0th root of {self.expr}")
+        return math.pow(self.expr.evaluate(state), 1/n)
+
+    def __repr__(self):
+        if self.n is None:
+            return f'\\sqrt{{{self.expr}}}'
+        return f'\\sqrt[{self.n}]{{{self.expr}}}'

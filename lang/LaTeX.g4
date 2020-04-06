@@ -47,6 +47,9 @@ V_MATRIX: 'vmatrix';
 UNDERSCORE : '_';
 COMMA      : ',';
 
+PI : '\\pi';
+E  : 'e';
+
 LETTER  : [a-zA-Z];
 DIGIT   : [0-9];
 
@@ -66,6 +69,8 @@ FUNC_SUM        : '\\sum';
 FUNC_PROD       : '\\prod';
 FUNC_DV         : '\\dv';
 FUNC_PDV        : '\\pdv';
+FUNC_SQRT       : '\\sqrt';
+FUNC_CHOOSE     : '\\binom';
 
 FUNC_LOG        : '\\log';
 FUNC_LN         : '\\ln';
@@ -136,7 +141,9 @@ func_builtin
 
 func_call
     // Function calls with normal syntax
-    : func_name LPAREN (expr ((COMMA expr)+)*)? RPAREN                                                         #func_call_var
+    : func_name (LPAREN (expr ((COMMA expr)+)*)? RPAREN | 
+                 LCURLY LPAREN (expr ((COMMA expr)+)*)? RPAREN RCURLY |
+                 LCURLY (expr ((COMMA expr)+)*)? RCURLY) #func_call_var
     // Sums
     | FUNC_SUM UNDERSCORE (LCURLY relation RCURLY CARET tex_symb | CARET tex_symb LCURLY relation RCURLY)
                           (expr | LCURLY expr RCURLY)                                                          #func_sum
@@ -151,6 +158,10 @@ func_call
     | lop=(CMD_LFLOOR | CMD_LCEIL) expr rop=(CMD_RFLOOR | CMD_RCEIL)                                           #func_floorceil
     // (Partial) derivatives
     | op=(FUNC_DV | FUNC_PDV) (LBRACK nnint RBRACK)? LCURLY expr RCURLY LCURLY var RCURLY                      #func_deriv
+    // n-th rootssqrt
+    | FUNC_SQRT (LBRACK expr RBRACK)? LCURLY expr RCURLY                                                       #func_root
+    // choose function
+    | FUNC_CHOOSE LCURLY expr RCURLY LCURLY expr RCURLY                                                        #func_choose
     ;
 
 // Rules
@@ -188,6 +199,8 @@ pow_expr
 unit
     : sign=(PLUS | MINUS) unit      #unit_recurse      // Signed unit expressions
     | MINUS? LPAREN expr RPAREN     #unit_paren        // Parentheticals, optionally signed
+    | PI                            #unit_pi           // 3.14159...
+    | E                             #unit_e            // 2.71828...
     | func_call                     #unit_func         // Function calls
     | var                           #unit_var          // Variable identifiers
     | number                        #unit_number       // Number literals

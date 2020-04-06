@@ -114,6 +114,16 @@ class LaTeXVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by LaTeXParser#func_root.
+    def visitFunc_root(self, ctx:LaTeXParser.Func_rootContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#func_choose.
+    def visitFunc_choose(self, ctx:LaTeXParser.Func_chooseContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by LaTeXParser#entry.
     def visitEntry(self, ctx:LaTeXParser.EntryContext):
         return self.visitChildren(ctx)
@@ -186,6 +196,16 @@ class LaTeXVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by LaTeXParser#unit_paren.
     def visitUnit_paren(self, ctx:LaTeXParser.Unit_parenContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#unit_pi.
+    def visitUnit_pi(self, ctx:LaTeXParser.Unit_piContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#unit_e.
+    def visitUnit_e(self, ctx:LaTeXParser.Unit_eContext):
         return self.visitChildren(ctx)
 
 

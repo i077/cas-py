@@ -1,5 +1,1 @@
-f := (a) \to \begin{cases} 1 & a \leq 1 \\ a*f(a-1) & a > 1 \end{cases}
-a := 5
-f(a)
-c := (n,k) \to \begin{cases} n & k = 1 \\ 1 & k = n \\ c(n-1, k-1)+c(n-1,k) & k \neq n \end{cases}
-c(6,4)
+\sqrt[3]{e * \pi}

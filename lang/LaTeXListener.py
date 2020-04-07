@@ -107,24 +107,6 @@ class LaTeXListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by LaTeXParser#func_name_builtin.
-    def enterFunc_name_builtin(self, ctx:LaTeXParser.Func_name_builtinContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#func_name_builtin.
-    def exitFunc_name_builtin(self, ctx:LaTeXParser.Func_name_builtinContext):
-        pass
-
-
-    # Enter a parse tree produced by LaTeXParser#func_name_var.
-    def enterFunc_name_var(self, ctx:LaTeXParser.Func_name_varContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#func_name_var.
-    def exitFunc_name_var(self, ctx:LaTeXParser.Func_name_varContext):
-        pass
-
-
     # Enter a parse tree produced by LaTeXParser#func_builtin.
     def enterFunc_builtin(self, ctx:LaTeXParser.Func_builtinContext):
         pass
@@ -134,12 +116,21 @@ class LaTeXListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by LaTeXParser#func_call_var.
-    def enterFunc_call_var(self, ctx:LaTeXParser.Func_call_varContext):
+    # Enter a parse tree produced by LaTeXParser#func_custom.
+    def enterFunc_custom(self, ctx:LaTeXParser.Func_customContext):
         pass
 
-    # Exit a parse tree produced by LaTeXParser#func_call_var.
-    def exitFunc_call_var(self, ctx:LaTeXParser.Func_call_varContext):
+    # Exit a parse tree produced by LaTeXParser#func_custom.
+    def exitFunc_custom(self, ctx:LaTeXParser.Func_customContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#func_call_builtin.
+    def enterFunc_call_builtin(self, ctx:LaTeXParser.Func_call_builtinContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#func_call_builtin.
+    def exitFunc_call_builtin(self, ctx:LaTeXParser.Func_call_builtinContext):
         pass
 
 
@@ -296,33 +287,6 @@ class LaTeXListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by LaTeXParser#implicit_mult_expr_left.
-    def enterImplicit_mult_expr_left(self, ctx:LaTeXParser.Implicit_mult_expr_leftContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#implicit_mult_expr_left.
-    def exitImplicit_mult_expr_left(self, ctx:LaTeXParser.Implicit_mult_expr_leftContext):
-        pass
-
-
-    # Enter a parse tree produced by LaTeXParser#implicit_mult_expr_pow.
-    def enterImplicit_mult_expr_pow(self, ctx:LaTeXParser.Implicit_mult_expr_powContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#implicit_mult_expr_pow.
-    def exitImplicit_mult_expr_pow(self, ctx:LaTeXParser.Implicit_mult_expr_powContext):
-        pass
-
-
-    # Enter a parse tree produced by LaTeXParser#implicit_mult_expr_mult.
-    def enterImplicit_mult_expr_mult(self, ctx:LaTeXParser.Implicit_mult_expr_multContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#implicit_mult_expr_mult.
-    def exitImplicit_mult_expr_mult(self, ctx:LaTeXParser.Implicit_mult_expr_multContext):
-        pass
-
-
     # Enter a parse tree produced by LaTeXParser#mult_implicit.
     def enterMult_implicit(self, ctx:LaTeXParser.Mult_implicitContext):
         pass
@@ -356,6 +320,96 @@ class LaTeXListener(ParseTreeListener):
 
     # Exit a parse tree produced by LaTeXParser#mult_expr_recurse.
     def exitMult_expr_recurse(self, ctx:LaTeXParser.Mult_expr_recurseContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#ime_pow.
+    def enterIme_pow(self, ctx:LaTeXParser.Ime_powContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#ime_pow.
+    def exitIme_pow(self, ctx:LaTeXParser.Ime_powContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#ime_var_parens.
+    def enterIme_var_parens(self, ctx:LaTeXParser.Ime_var_parensContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#ime_var_parens.
+    def exitIme_var_parens(self, ctx:LaTeXParser.Ime_var_parensContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#ime_var_unit_paren_left.
+    def enterIme_var_unit_paren_left(self, ctx:LaTeXParser.Ime_var_unit_paren_leftContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#ime_var_unit_paren_left.
+    def exitIme_var_unit_paren_left(self, ctx:LaTeXParser.Ime_var_unit_paren_leftContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#ime_mult.
+    def enterIme_mult(self, ctx:LaTeXParser.Ime_multContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#ime_mult.
+    def exitIme_mult(self, ctx:LaTeXParser.Ime_multContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#ime_paren_paren.
+    def enterIme_paren_paren(self, ctx:LaTeXParser.Ime_paren_parenContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#ime_paren_paren.
+    def exitIme_paren_paren(self, ctx:LaTeXParser.Ime_paren_parenContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#ime_var_unit_paren_right.
+    def enterIme_var_unit_paren_right(self, ctx:LaTeXParser.Ime_var_unit_paren_rightContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#ime_var_unit_paren_right.
+    def exitIme_var_unit_paren_right(self, ctx:LaTeXParser.Ime_var_unit_paren_rightContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#ime_var_var.
+    def enterIme_var_var(self, ctx:LaTeXParser.Ime_var_varContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#ime_var_var.
+    def exitIme_var_var(self, ctx:LaTeXParser.Ime_var_varContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#ime_left.
+    def enterIme_left(self, ctx:LaTeXParser.Ime_leftContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#ime_left.
+    def exitIme_left(self, ctx:LaTeXParser.Ime_leftContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#var_pow_expr.
+    def enterVar_pow_expr(self, ctx:LaTeXParser.Var_pow_exprContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#var_pow_expr.
+    def exitVar_pow_expr(self, ctx:LaTeXParser.Var_pow_exprContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#paren_pow_expr.
+    def enterParen_pow_expr(self, ctx:LaTeXParser.Paren_pow_exprContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#paren_pow_expr.
+    def exitParen_pow_expr(self, ctx:LaTeXParser.Paren_pow_exprContext):
         pass
 
 
@@ -413,6 +467,15 @@ class LaTeXListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by LaTeXParser#var_parens.
+    def enterVar_parens(self, ctx:LaTeXParser.Var_parensContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#var_parens.
+    def exitVar_parens(self, ctx:LaTeXParser.Var_parensContext):
+        pass
+
+
     # Enter a parse tree produced by LaTeXParser#unit_infinity.
     def enterUnit_infinity(self, ctx:LaTeXParser.Unit_infinityContext):
         pass
@@ -440,21 +503,39 @@ class LaTeXListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by LaTeXParser#unit_func.
-    def enterUnit_func(self, ctx:LaTeXParser.Unit_funcContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#unit_func.
-    def exitUnit_func(self, ctx:LaTeXParser.Unit_funcContext):
-        pass
-
-
     # Enter a parse tree produced by LaTeXParser#unit_var.
     def enterUnit_var(self, ctx:LaTeXParser.Unit_varContext):
         pass
 
     # Exit a parse tree produced by LaTeXParser#unit_var.
     def exitUnit_var(self, ctx:LaTeXParser.Unit_varContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#unit_unit_paren.
+    def enterUnit_unit_paren(self, ctx:LaTeXParser.Unit_unit_parenContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#unit_unit_paren.
+    def exitUnit_unit_paren(self, ctx:LaTeXParser.Unit_unit_parenContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#unit_paren.
+    def enterUnit_paren(self, ctx:LaTeXParser.Unit_parenContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#unit_paren.
+    def exitUnit_paren(self, ctx:LaTeXParser.Unit_parenContext):
+        pass
+
+
+    # Enter a parse tree produced by LaTeXParser#unit_func.
+    def enterUnit_func(self, ctx:LaTeXParser.Unit_funcContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#unit_func.
+    def exitUnit_func(self, ctx:LaTeXParser.Unit_funcContext):
         pass
 
 
@@ -491,15 +572,6 @@ class LaTeXListener(ParseTreeListener):
 
     # Exit a parse tree produced by LaTeXParser#unit_hist.
     def exitUnit_hist(self, ctx:LaTeXParser.Unit_histContext):
-        pass
-
-
-    # Enter a parse tree produced by LaTeXParser#unit_paren.
-    def enterUnit_paren(self, ctx:LaTeXParser.Unit_parenContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#unit_paren.
-    def exitUnit_paren(self, ctx:LaTeXParser.Unit_parenContext):
         pass
 
 

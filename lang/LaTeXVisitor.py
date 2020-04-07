@@ -64,23 +64,18 @@ class LaTeXVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LaTeXParser#func_name_builtin.
-    def visitFunc_name_builtin(self, ctx:LaTeXParser.Func_name_builtinContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by LaTeXParser#func_name_var.
-    def visitFunc_name_var(self, ctx:LaTeXParser.Func_name_varContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by LaTeXParser#func_builtin.
     def visitFunc_builtin(self, ctx:LaTeXParser.Func_builtinContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LaTeXParser#func_call_var.
-    def visitFunc_call_var(self, ctx:LaTeXParser.Func_call_varContext):
+    # Visit a parse tree produced by LaTeXParser#func_custom.
+    def visitFunc_custom(self, ctx:LaTeXParser.Func_customContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#func_call_builtin.
+    def visitFunc_call_builtin(self, ctx:LaTeXParser.Func_call_builtinContext):
         return self.visitChildren(ctx)
 
 
@@ -169,21 +164,6 @@ class LaTeXVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LaTeXParser#implicit_mult_expr_left.
-    def visitImplicit_mult_expr_left(self, ctx:LaTeXParser.Implicit_mult_expr_leftContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by LaTeXParser#implicit_mult_expr_pow.
-    def visitImplicit_mult_expr_pow(self, ctx:LaTeXParser.Implicit_mult_expr_powContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by LaTeXParser#implicit_mult_expr_mult.
-    def visitImplicit_mult_expr_mult(self, ctx:LaTeXParser.Implicit_mult_expr_multContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by LaTeXParser#mult_implicit.
     def visitMult_implicit(self, ctx:LaTeXParser.Mult_implicitContext):
         return self.visitChildren(ctx)
@@ -201,6 +181,56 @@ class LaTeXVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by LaTeXParser#mult_expr_recurse.
     def visitMult_expr_recurse(self, ctx:LaTeXParser.Mult_expr_recurseContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#ime_pow.
+    def visitIme_pow(self, ctx:LaTeXParser.Ime_powContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#ime_var_parens.
+    def visitIme_var_parens(self, ctx:LaTeXParser.Ime_var_parensContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#ime_var_unit_paren_left.
+    def visitIme_var_unit_paren_left(self, ctx:LaTeXParser.Ime_var_unit_paren_leftContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#ime_mult.
+    def visitIme_mult(self, ctx:LaTeXParser.Ime_multContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#ime_paren_paren.
+    def visitIme_paren_paren(self, ctx:LaTeXParser.Ime_paren_parenContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#ime_var_unit_paren_right.
+    def visitIme_var_unit_paren_right(self, ctx:LaTeXParser.Ime_var_unit_paren_rightContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#ime_var_var.
+    def visitIme_var_var(self, ctx:LaTeXParser.Ime_var_varContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#ime_left.
+    def visitIme_left(self, ctx:LaTeXParser.Ime_leftContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#var_pow_expr.
+    def visitVar_pow_expr(self, ctx:LaTeXParser.Var_pow_exprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#paren_pow_expr.
+    def visitParen_pow_expr(self, ctx:LaTeXParser.Paren_pow_exprContext):
         return self.visitChildren(ctx)
 
 
@@ -234,6 +264,11 @@ class LaTeXVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by LaTeXParser#var_parens.
+    def visitVar_parens(self, ctx:LaTeXParser.Var_parensContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by LaTeXParser#unit_infinity.
     def visitUnit_infinity(self, ctx:LaTeXParser.Unit_infinityContext):
         return self.visitChildren(ctx)
@@ -249,13 +284,23 @@ class LaTeXVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LaTeXParser#unit_func.
-    def visitUnit_func(self, ctx:LaTeXParser.Unit_funcContext):
+    # Visit a parse tree produced by LaTeXParser#unit_var.
+    def visitUnit_var(self, ctx:LaTeXParser.Unit_varContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LaTeXParser#unit_var.
-    def visitUnit_var(self, ctx:LaTeXParser.Unit_varContext):
+    # Visit a parse tree produced by LaTeXParser#unit_unit_paren.
+    def visitUnit_unit_paren(self, ctx:LaTeXParser.Unit_unit_parenContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#unit_paren.
+    def visitUnit_paren(self, ctx:LaTeXParser.Unit_parenContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LaTeXParser#unit_func.
+    def visitUnit_func(self, ctx:LaTeXParser.Unit_funcContext):
         return self.visitChildren(ctx)
 
 
@@ -276,11 +321,6 @@ class LaTeXVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by LaTeXParser#unit_hist.
     def visitUnit_hist(self, ctx:LaTeXParser.Unit_histContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by LaTeXParser#unit_paren.
-    def visitUnit_paren(self, ctx:LaTeXParser.Unit_parenContext):
         return self.visitChildren(ctx)
 
 

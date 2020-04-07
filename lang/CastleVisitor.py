@@ -4,7 +4,7 @@ from antlr4 import FileStream, InputStream, CommonTokenStream
 from LaTeXVisitor import LaTeXVisitor
 from LaTeXParser import LaTeXParser as parse
 from LaTeXLexer import LaTeXLexer
-from structures import Number, RealNumber, Polynomial, Variable, Expression, Cases, Matrix, Relation, UserDefinedFunc, FunctionCall, SumFunc, ProdFunc, Limit, Integral, Floor, Ceiling, Derivative, Root
+from structures import Number, RealNumber, Polynomial, Variable, Expression, Cases, Matrix, Relation, UserDefinedFunc, FunctionCall, SumFunc, ProdFunc, Limit, Integral, Floor, Ceiling, Derivative, Root, Choose
 from State import State
 from Dicts import rel_dict, matrix_type_dict
 import operator as op
@@ -28,7 +28,7 @@ class CastleVisitor(LaTeXVisitor):
             self.visit(ctx.add_expr(1)),
         )
 
-    def visitImplicit_mult_expr_mult(self, ctx: parse.Implicit_mult_expr_multContext):
+    def visitIme_mult(self, ctx: parse.Ime_multContext):
         """implicit_mult_expr_mult
         implicit_mult_expr implicit_mult_expr"""
         return Expression(
@@ -37,13 +37,81 @@ class CastleVisitor(LaTeXVisitor):
             self.visit(ctx.implicit_mult_expr(1))
         )
 
-    def visitImplicit_mult_expr_left(self, ctx: parse.Implicit_mult_expr_leftContext):
+    def visitIme_left(self, ctx: parse.Ime_leftContext):
         """implicit_mult_expr_left
         left_implicit_mult_expr implicit_mult_expr"""
         return Expression(
             op.mul, 
             self.visit(ctx.left_implicit_pow_expr()),
             self.visit(ctx.implicit_mult_expr())
+        )
+
+    def visitIme_var_unit_paren_left(self, ctx: parse.Ime_var_unit_paren_leftContext):
+        """ime_var_unit_paren_left
+        (var_pow_expr | paren_pow_expr) implicit_mult_expr"""
+        if ctx.var_pow_expr():
+            left_expr = self.visit(ctx.var_pow_expr())
+        elif ctx.paren_pow_expr():
+            left_expr = self.visit(ctx.paren_pow_expr())
+        return Expression(
+            op.mul, 
+            left_expr,
+            self.visit(ctx.implicit_mult_expr())
+        )
+
+    def visitIme_var_unit_paren_right(self, ctx: parse.Ime_var_unit_paren_rightContext):
+        """ime_var_unit_paren_right
+        implicit_mult_expr (var_pow_expr | paren_pow_expr)"""
+        if ctx.var_pow_expr():
+            right_expr = self.visit(ctx.var_pow_expr())
+        elif ctx.paren_pow_expr():
+            right_expr = self.visit(ctx.paren_pow_expr())
+        return Expression(
+            op.mul, 
+            self.visit(ctx.implicit_mult_expr()),
+            right_expr
+        )
+
+    def visitIme_var_var(self, ctx: parse.Ime_var_varContext):
+        """ime_var_var
+        var var"""
+        return Expression(
+            op.mul, 
+            self.visit(ctx.var_pow_expr(0)),
+            self.visit(ctx.var_pow_expr(1))
+        )
+
+    def visitIme_paren_paren(self, ctx: parse.Ime_paren_parenContext):
+        """ime_unit_unit
+        unit_paren unit_paren"""
+        return Expression(
+            op.mul, 
+            self.visit(ctx.paren_pow_expr(0)),
+            self.visit(ctx.paren_pow_expr(1))
+        )
+
+    def visitVar_pow_expr(self, ctx: parse.Var_pow_exprContext):
+        """var_pow_expr
+        var (CARET tex_symb)?"""
+        exponent = ctx.tex_symb()
+        if exponent is None:
+            return self.visit(ctx.var())
+        return Expression(
+            op.pow,
+            self.visit(ctx.var()),
+            self.visit(exponent)
+        )
+
+    def visitParen_pow_expr(self, ctx: parse.Paren_pow_exprContext):
+        """paren_pow_expr
+        paren (CARET tex_symb)?"""
+        exponent = ctx.tex_symb()
+        if exponent is None:
+            return self.visit(ctx.unit_paren())
+        return Expression(
+            op.pow,
+            self.visit(ctx.unit_paren()),
+            self.visit(exponent)
         )
 
     def visitMult_expr_recurse(self, ctx: parse.Mult_expr_recurseContext):
@@ -209,8 +277,10 @@ class CastleVisitor(LaTeXVisitor):
 
 
     # Function calls ============================================================
-    def visitFunc_call_var(self, ctx: parse.Func_call_varContext):
-        function_name = self.visit(ctx.func_name())
+    def visitFunc_custom(self, ctx: parse.Func_customContext):
+        """func_custom (user-defined function call)
+        var LPAREN (expr (COMMA expr)+)? RPAREN"""
+        function_name = self.visit(ctx.var()).name
         args = ctx.expr()
         if not args:
             args = []
@@ -219,8 +289,20 @@ class CastleVisitor(LaTeXVisitor):
         else:
             args = [self.visit(arg) for arg in args]
         
-        if isinstance(function_name, Variable):
-            function_name = function_name.name
+        return FunctionCall(function_name, args)
+
+    def visitFunc_call_builtin(self, ctx: parse.Func_call_builtinContext):
+        """func_call_builtin
+        func_builtin (LCURLY and/or LPAREN) expr ((COMMA expr)+)*)? (RCURLY and/or RPAREN)"""
+        function_name = self.visit(ctx.var())
+        args = ctx.expr()
+        if not args:
+            args = []
+        elif not isinstance(args, (list, tuple)):
+            args = [self.visit(args)]
+        else:
+            args = [self.visit(arg) for arg in args]
+        
         return FunctionCall(function_name, args)
 
     def visitFunc_sum(self, ctx:parse.Func_sumContext):
@@ -292,10 +374,48 @@ class CastleVisitor(LaTeXVisitor):
             return Root(self.visit(exprs[1]), n=self.visit(exprs[0]))
         return Root(self.visit(exprs))
 
+    def visitFunc_choose(self, ctx: parse.Func_chooseContext):
+        return Choose(
+            self.visit(ctx.expr(0)),
+            self.visit(ctx.expr(1)),
+        )
+
     def visitFunc_builtin(self, ctx: parse.Func_builtinContext):
         return ctx.name.type
 
-        
+    def visitVar_parens(self, ctx: parse.Var_parensContext):
+        """var_parens (the ambiguous y(x+1) structure)
+        var LPAREN expr RPAREN (CARET tex_symb)?"""
+        # tex_symb is present if the var_parens structure is raised to a power:
+        # for example y(x+1)^2
+        var = self.visit(ctx.var())
+        var_val = self.state.get(var.name)
+        expr = self.visit(ctx.expr())
+        exponent = ctx.tex_symb()
+        if var_val is None:
+            raise Exception(f"Variable {var.name} not found")
+        if isinstance(var_val, UserDefinedFunc):
+            # the variable is a function, so call it
+            if exponent is not None:
+                return Expression(
+                    op.pow,
+                    FunctionCall(var.name, [expr]),
+                    self.visit(exponent)
+                )
+            else:
+                return FunctionCall(var.name, [expr])
+
+        else: #otherwise this is a multiplication
+            if exponent is not None:
+                # x((y+1)^z)
+                return Expression(
+                    op.mul,
+                    var,
+                    Expression(op.pow, expr, self.visit(exponent))
+                )
+            else:
+                return Expression(op.mul, var, expr)
+
     # Relations =================================================================
     def visitRelop(self, ctx:parse.RelopContext):
         return ctx.op.type

@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import operator as op
+from scipy.special import comb
 from abc import ABC, abstractmethod
 from State import State
 from Dicts import builtin_func_dict, inv_rel_dict
@@ -618,3 +619,16 @@ class Root():
         if self.n is None:
             return f'\\sqrt{{{self.expr}}}'
         return f'\\sqrt[{self.n}]{{{self.expr}}}'
+
+class Choose():
+    def __init__(self, n, k):
+        self.n = n
+        self.k = k
+    
+    def evaluate(self, state: State):
+        n = self.n.evaluate(state)
+        k = self.k.evaluate(state)
+        return comb(n, k)
+
+    def __repr__(self):
+        return f'\\binom{{{self.n}}}{{{self.k}}}'

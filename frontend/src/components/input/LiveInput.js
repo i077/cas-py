@@ -1,7 +1,7 @@
 import React from 'react';
 import TeX from '@matejmazur/react-katex';
 import './LiveInput.css';
-
+import { KatexSettings } from "../KatexSettings";
 export class LiveInput extends React.Component {
     render() {
         return (
@@ -9,7 +9,7 @@ export class LiveInput extends React.Component {
                 <TeX
                     math={this.props.input}
                     errorColor={'#cc0000'}
-                    settings={{ macros: { '\\dd': '\\mathrm{d}' } }}
+                    settings={KatexSettings}
                 />
             </div>
         );

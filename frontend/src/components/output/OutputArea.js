@@ -1,6 +1,7 @@
 import React from 'react';
 import TeX from '@matejmazur/react-katex';
 import './OutputArea.css';
+import { KatexSettings } from "../KatexSettings";
 
 export class OutputArea extends React.Component {
     render() {
@@ -9,7 +10,7 @@ export class OutputArea extends React.Component {
             output = <TeX
                 math={this.props.calculation.output}
                 errorColor={'#cc0000'}
-                settings={{ macros: { '\\dd': '\\mathrm{d}' } }}
+                settings={KatexSettings}
             />;
         } else if (this.props.calculation.error) {
             output = <TeX> {this.props.calculation.output} </TeX>;

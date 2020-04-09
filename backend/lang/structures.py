@@ -1,8 +1,9 @@
 import math
-import operator as op
+import operator
 from abc import ABC, abstractmethod
 from collections import Counter
 from functools import reduce
+from typing import List
 
 import numpy as np
 
@@ -15,19 +16,19 @@ class Function(ABC):
         pass
 
     def __add__(self, other):
-        return Expression(op.add, self, other)
+        return Expression(operator.add, self, other)
 
     def __sub__(self, other):
-        return Expression(op.sub, self, other)
+        return Expression(operator.sub, self, other)
 
     def __mul__(self, other):
-        return Expression(op.mul, self, other)
+        return Expression(operator.mul, self, other)
 
     def __truediv__(self, other):
-        return Expression(op.truediv, self, other)
+        return Expression(operator.truediv, self, other)
 
     def __pow__(self, power, modulo=None):
-        return Expression(op.pow, self, power)
+        return Expression(operator.pow, self, power)
 
     @abstractmethod
     def __eq__(self, other):
@@ -47,13 +48,23 @@ class Function(ABC):
 
 
 class Expression(Function):
-    op_str = {op.mul: "*", op.truediv: "/", op.add: "+", op.sub: "-", op.pow: "^"}
+    op_str = {
+        operator.mul: "*",
+        operator.truediv: "/",
+        operator.add: "+",
+        operator.sub: "-",
+        operator.pow: "^",
+    }
 
     def __init__(self, op: callable, *terms):
         # how should we handle expressions taken to powers?
         self.op = op
         self.terms = list(terms)
-        assert len(self.terms) == 2 if op in [op.div, op.pow] else len(self.terms) >= 2
+        assert (
+            len(self.terms) == 2
+            if self.op in [operator.truediv, operator.pow]
+            else len(self.terms) >= 2
+        )
 
     def evaluate(self, state: State):
         return reduce(self.op, [term.evaluate(state) for term in self.terms])
@@ -70,10 +81,10 @@ class Expression(Function):
 
     def derivative(self):
         # if addition or subtraction then we just add or subtract the derivatives
-        if self.op in [op.add, op.sub]:
+        if self.op in [operator.add, operator.sub]:
             return Expression(self.op, *[term.derivative() for term in self.terms])
         # recursive product rule for n terms
-        elif self.op == op.mul:
+        elif self.op == operator.mul:
             # base case for standard product rule
             if len(self.terms) == 2:
                 return (
@@ -87,7 +98,7 @@ class Expression(Function):
                     + self.terms[0] * remaining_terms.derivative()
                 )
         # quotient rule
-        elif self.op == op.truediv:
+        elif self.op == operator.truediv:
             left, right = self.terms[0], self.terms[1]
             return (left.derivative() * right - right.derivative() * left) / (
                 right ** 2
@@ -209,10 +220,18 @@ class Monomial(Function):
             self.power + 1
         )
 
+    def __repr__(self):
+        if self.power == 0:
+            return f"{self.coeff}"
+        elif self.power == 1:
+            return f"{self.coeff if self.coeff != 1 else ''}{self.var}"
+        else:
+            return f"{self.coeff}{self.var}^{{{self.power}}}"
+
 
 class Polynomial(Expression):
     def __init__(self, *terms):
-        super().__init__(op=op.add, *terms)
+        super().__init__(op=operator.add, *terms)
         assert all(isinstance(term, Monomial) for term in self.terms)
 
 
@@ -232,6 +251,8 @@ class Number(Function):
     def __sub__(self, other):
         if isinstance(other, Number):
             return Number(self.value - other.value)
+        elif isinstance(other, int, float):
+            return Number(self.value - other)
 
     def evaluate(self, state=None):
         if int(self.value) == self.value:
@@ -262,6 +283,50 @@ class Number(Function):
         if int(self.value) == self.value:
             return str(int(self.value))
         return str(self.value)
+
+
+def numberGCD(a: int, b: int) -> int:
+    if b == 0:
+        return a
+    else:
+        return numberGCD(b, a % b)
+
+
+def listGCD(values, gcd=numberGCD):
+    """
+    recursively apply a GCD function to a list of values
+
+    Parameters:
+    ----------
+        values: the list of items over which we want to find the gcd
+        gcd: the gcd function
+
+    Returns:
+    -------
+        the gcd of all values in "values"
+    """
+    result = values.pop()
+    while values:
+        result = gcd(result, values.pop())
+    return result
+
+
+def monomialGCD(a, b) -> Function:
+    if isinstance(a, Monomial) and isinstance(b, Monomial) and a.var != b.var:
+        return 1
+    if isinstance(a, (Number, int)) or isinstance(b, (Number, int)):
+        get_value = (
+            lambda v: v.coeff
+            if isinstance(v, Monomial)
+            else (v.value if isinstance(v, Number) else v)
+        )
+        a = get_value(a)
+        b = get_value(b)
+        return numberGCD(a, b)
+
+    return Monomial(
+        coeff=numberGCD(a.coeff, b.coeff), var=a.var, power=min(a.power, b.power)
+    )
 
 
 class Cases(Function):

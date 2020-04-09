@@ -1,30 +1,32 @@
-import sys
-import sympy
 import math
-from antlr4 import FileStream, InputStream, CommonTokenStream
-from backend.lang.LaTeXVisitor import LaTeXVisitor
-from backend.lang.LaTeXParser import LaTeXParser as parse
+import operator as op
+import sys
+
+import sympy
+from antlr4 import CommonTokenStream, FileStream, InputStream
+
 from backend.lang.LaTeXLexer import LaTeXLexer
+from backend.lang.LaTeXParser import LaTeXParser as parse
+from backend.lang.LaTeXVisitor import LaTeXVisitor
+from backend.lang.State import State
 from backend.lang.structures import (
-    Number,
-    Polynomial,
-    Variable,
-    Expression,
     Cases,
-    Matrix,
-    Relation,
-    UserDefinedFunc,
-    FunctionCall,
-    SumFunc,
-    ProdFunc,
-    Limit,
-    Integral,
-    Floor,
     Ceiling,
     Derivative,
+    Expression,
+    Floor,
+    FunctionCall,
+    Integral,
+    Limit,
+    Matrix,
+    Monomial,
+    Number,
+    ProdFunc,
+    Relation,
+    SumFunc,
+    UserDefinedFunc,
+    Variable,
 )
-from backend.lang.State import State
-import operator as op
 
 
 class CastleVisitor(LaTeXVisitor):

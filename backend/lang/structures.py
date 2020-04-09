@@ -1,7 +1,11 @@
 import math
-import numpy as np
 import operator as op
 from abc import ABC, abstractmethod
+from collections import Counter
+from functools import reduce
+
+import numpy as np
+
 from backend.lang.State import State
 
 
@@ -25,19 +29,6 @@ class Function(ABC):
     def __pow__(self, power, modulo=None):
         return Expression(op.pow, self, power)
 
-    # we can't do this unless we specify function domains -- probably too much complexity?
-    #     def __lt__(self, other):
-    #         return Expression(op.lt, self, other)
-
-    #     def __gt__(self, other):
-    #         return Expression(op.gt, self, other)
-
-    #     def __ge__(self, other):
-    #         return Expression(op.ge, self, other)
-
-    #     def __le__(self, other):
-    #         return Expression(op.le, self, other)
-
     @abstractmethod
     def __eq__(self, other):
         pass
@@ -58,44 +49,20 @@ class Function(ABC):
 class Expression(Function):
     op_str = {op.mul: "*", op.truediv: "/", op.add: "+", op.sub: "-", op.pow: "^"}
 
-    def __init__(self, op: callable, left: Function, right: Function, power=1):
+    def __init__(self, op: callable, *terms):
         # how should we handle expressions taken to powers?
         self.op = op
-        self.left = left
-        self.right = right
-        self.pow = power
+        self.terms = list(terms)
+        assert len(self.terms) == 2 if op in [op.div, op.pow] else len(self.terms) >= 2
 
     def evaluate(self, state: State):
-        l_val = self.left.evaluate(state)
-        r_val = self.right.evaluate(state)
-
-        # TODO: Fix this once we've implemented simplification of expressions with variables
-        if isinstance(l_val, str) or isinstance(r_val, str):
-            return str(l_val) + Expression.op_str[self.op] + str(r_val)
-
-        if self.op == op.pow:
-            power = r_val
-            if isinstance(power, Number):
-                if power == 1:
-                    return self
-                    # why this?
-                    # else:
-                    #     return self * Expression(op.mul, self, r - 1)
-                if power == 0:
-                    return Number(1)
-                if power < 0:
-                    return Number(1) / Expression(op.pow, l_val, abs(power))
-
-            return self.op(l_val, power)
-
-        return self.op(l_val, r_val)
+        return reduce(self.op, [term.evaluate(state) for term in self.terms])
 
     def __eq__(self, other):
         return (
             isinstance(other, Expression)
-            and other.left == self.left
-            and other.right == self.right
             and other.op == self.op
+            and Counter(other.terms) == Counter(self.terms)
         )
 
     def __ne__(self, other):
@@ -104,19 +71,27 @@ class Expression(Function):
     def derivative(self):
         # if addition or subtraction then we just add or subtract the derivatives
         if self.op in [op.add, op.sub]:
-            return self.op(self.left.derivative(), self.right.derivative())
-        # product rule
+            return Expression(self.op, *[term.derivative() for term in self.terms])
+        # recursive product rule for n terms
         elif self.op == op.mul:
-            return (
-                self.left.derivative() * self.right
-                + self.left * self.right.derivative()
-            )
+            # base case for standard product rule
+            if len(self.terms) == 2:
+                return (
+                    self.terms[1] * self.terms[0].derivative()
+                    + self.terms[0] * self.terms[1].derivative()
+                )
+            else:
+                remaining_terms = Expression(self.op, *self.terms[1:])
+                return (
+                    self.terms[0].derivative() * remaining_terms
+                    + self.terms[0] * remaining_terms.derivative()
+                )
         # quotient rule
         elif self.op == op.truediv:
-            return (
-                self.left.derivative() * self.right
-                - self.right.derivative() * self.left
-            ) / (self.right ** 2)
+            left, right = self.terms[0], self.terms[1]
+            return (left.derivative() * right - right.derivative() * left) / (
+                right ** 2
+            )
         else:
             raise ValueError
 
@@ -125,7 +100,7 @@ class Expression(Function):
         pass
 
     def __repr__(self):
-        return str(self.left) + Expression.op_str[self.op] + str(self.right)
+        return Expression.op_str[self.op].join([str(term) for term in self.terms])
 
 
 class Variable(Function):
@@ -163,13 +138,13 @@ class Variable(Function):
         return 1
 
     def integral(self):
-        return Polynomial(coeff=1, var=self, power=2) / 2
+        return Monomial(coeff=1, var=self, power=2) / 2
 
     def __repr__(self) -> str:
         return self.name
 
 
-class Polynomial(Function):
+class Monomial(Function):
     def __init__(self, coeff, var: Variable, power):
         self.coeff = coeff
         self.var = var
@@ -177,36 +152,36 @@ class Polynomial(Function):
 
     def __add__(self, other):
         if (
-            isinstance(other, Polynomial)
+            isinstance(other, Monomial)
             and other.var == self.var
             and other.power == self.power
         ):
-            return Polynomial(self.coeff + other.coeff, self.var, self.power)
+            return Monomial(self.coeff + other.coeff, self.var, self.power)
         else:
             return super().__add__(other)
 
     def __sub__(self, other):
         if (
-            isinstance(other, Polynomial)
+            isinstance(other, Monomial)
             and other.var == self.var
             and other.power == self.power
         ):
-            return Polynomial(self.coeff - other.coeff, self.var, self.power)
+            return Monomial(self.coeff - other.coeff, self.var, self.power)
         else:
             return super().__sub__(other)
 
     def __mul__(self, other):
-        if isinstance(other, Polynomial) and other.var == self.var:
-            return Polynomial(
+        if isinstance(other, Monomial) and other.var == self.var:
+            return Monomial(
                 self.coeff * other.coeff, self.var, other.power + self.power
             )
         else:
             return super().__mul__(other)
 
     def __truediv__(self, other):
-        if isinstance(other, Polynomial) and other.var == self.var:
+        if isinstance(other, Monomial) and other.var == self.var:
             return (
-                Polynomial(self.coeff, self.var, self.power - other.power) / other.coeff
+                Monomial(self.coeff, self.var, self.power - other.power) / other.coeff
             )
         else:
             return super().__truediv__(other)
@@ -225,14 +200,20 @@ class Polynomial(Function):
         return not self.__eq__(other)
 
     def derivative(self):
-        return Polynomial(
+        return Monomial(
             coeff=self.coeff * self.power, var=self.var, power=self.power - 1
         )
 
     def integral(self):
-        return Polynomial(coeff=self.coeff, var=self.var, power=self.power + 1) / (
+        return Monomial(coeff=self.coeff, var=self.var, power=self.power + 1) / (
             self.power + 1
         )
+
+
+class Polynomial(Expression):
+    def __init__(self, *terms):
+        super().__init__(op=op.add, *terms)
+        assert all(isinstance(term, Monomial) for term in self.terms)
 
 
 class Number(Function):

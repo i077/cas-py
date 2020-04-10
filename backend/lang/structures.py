@@ -8,8 +8,8 @@ from typing import List
 import numpy as np
 from scipy.special import comb
 
-from backend.lang.State import State
-from backend.lang.Dicts import buildin_func_dict, rel_dict
+from State import State
+from Dicts import builtin_func_dict, inv_rel_dict
 
 
 class Function(ABC):
@@ -28,6 +28,9 @@ class Function(ABC):
 
     def __truediv__(self, other):
         return Expression(operator.truediv, self, other)
+
+    def __floordiv__(self, other):
+        return Expression(operator.floordiv, self, other)
 
     def __pow__(self, power, modulo=None):
         return Expression(operator.pow, self, power)
@@ -53,6 +56,7 @@ class Expression(Function):
     op_str = {
         operator.mul: "*",
         operator.truediv: "/",
+        operator.floordiv: "//",
         operator.add: "+",
         operator.sub: "-",
         operator.pow: "^",
@@ -64,12 +68,16 @@ class Expression(Function):
         self.terms = list(terms)
         assert (
             len(self.terms) == 2
-            if self.op in [operator.truediv, operator.pow]
+            if self.op in [operator.truediv, operator.floordiv, operator.pow]
             else len(self.terms) >= 2
         )
 
     def evaluate(self, state: State):
-        return reduce(self.op, [term.evaluate(state) for term in self.terms])
+        if self.op != operator.floordiv:
+            return reduce(self.op, [term.evaluate(state) for term in self.terms])
+        else:
+            # floordiv indicates that this is a rational expression that should be stored as a fraction
+            if 
 
     def __eq__(self, other):
         return (
@@ -100,7 +108,7 @@ class Expression(Function):
                     + self.terms[0] * remaining_terms.derivative()
                 )
         # quotient rule
-        elif self.op == operator.truediv:
+        elif self.op in [operator.truediv, operator.floordiv]:
             left, right = self.terms[0], self.terms[1]
             return (left.derivative() * right - right.derivative() * left) / (
                 right ** 2
@@ -294,6 +302,101 @@ class RealNumber(Number):
     def __add__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value + other.value)
+        elif isinstance(other, Fraction):
+            #addition is commutative and we already implemented Fraction + RealNumber in Fraction
+            return other + self
+        else:
+            return other.__add__(self)
+
+    def __sub__(self, other):
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value - other.value)
+        elif isinstance(other, Fraction):
+            #subtraction is (almost) commutative and we already implemented Fraction + RealNumber in Fraction
+            return RealNumber(-1) * other + self
+        else:
+            return other.__sub__(self)
+
+    def __mul__(self, other):
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value * other.value)
+        elif isinstance(other, Fraction):
+            #multiplication is commutative and we already implemented Fraction * RealNumber in Fraction
+            return other * self
+        else:
+            return other.__mul__(self)
+
+    def __truediv__(self, other):
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value / other.value)
+        elif isinstance(other, Fraction):
+            #divide real number by fraction: a/(b/c) = (ac)/b
+            return Fraction.create(self.value * other.den, other.num)
+        else:
+            return other.__truediv__(self)
+
+    def evaluate(self, state=None):
+        if int(self.value) == self.value:
+            return int(self.value)
+        return self.value
+
+    def __eq__(self, other):
+        if isinstance(other, RealNumber):
+            return self.value == other.value
+        else:
+            return other.__eq__(self)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def derivative(self):
+        return 0
+
+    def integral(self):
+        pass
+
+    def __repr__(self):
+        # if it's an integer, print as an integer
+        if self.value == float("inf"):
+            return "\\infty"
+        if self.value == float("-inf"):
+            return "-\\infty"
+        if int(self.value) == self.value:
+            return str(int(self.value))
+        return str(self.value)
+
+def Fraction(Number):
+    """This class represents a numerical fraction at evaluation time, not a rational function, which would be stored
+    as Expression with op.truediv/floordiv. For example, this class would hold \\frac{1}{2} but 
+    \\frac{x}{2} is an Expression"""
+    @staticmethod
+    def create(num, den)
+        """return a fraction if num and den are both integers and a RealNumber otherwise"""
+        assert num is Number and den is Number
+        if (isinstance(num, RealNumber) and isinstance(num.value, float)) or
+           (isinstance(den, RealNumber) and isinstance(den.value, float)):
+                #don't make fractions from floats - just divide them
+                return RealNumber(num / den)
+        else:
+            return Fraction(num, den)
+
+    def __init__(self, top, bottom):
+        """don't initialize with Fraction() - use Fraction.create() factory instead"""
+        assert top is Number and bottom is Number
+        if isinstance(top, RealNumber) and isinstance(bottom, RealNumber):
+            self.top = top
+            self.bottom = bottom
+        else:
+            # quotient will be a fraction since either top or bottom is a fraction
+            quotient = top / bottom
+            self.num = quotient.top
+            self.den = quotient.den
+        else:
+            raise ValueError("Improper instantiation of fraction")
+
+    def __add__(self, other):
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value + other.value)
         else:
             return other.__add__(self)
 
@@ -305,13 +408,21 @@ class RealNumber(Number):
 
     def __mul__(self, other):
         if isinstance(other, RealNumber):
-            return RealNumber(self.value * other.value)
+            #multiply fraction by real number: (a/b)*c = (ac)/b
+            return Fraction.create(self.num * other, self.den)
+        elif isinstance(other, Fraction):
+            #multiply fraction by fraction: (a/b)(c/d) = (ac)/(bd)
+            return Fraction.create(self.num * other.num, self.den * other.den)
         else:
             return other.__mul__(self)
 
     def __truediv__(self, other):
         if isinstance(other, RealNumber):
-            return RealNumber(self.value / other.value)
+            #divide fraction by real number: (a/b)/c = a/(bc)
+            return Fraction.create(self.num, other * self.den)
+        if isinstance(other, Fraction):
+            #divide fraction by fraction: (a/b)/(c/d) = (ad)/(bc)
+            return Fraction.create(self.num * other.den, self.den * other.num)
         else:
             return other.__truediv__(self)
 

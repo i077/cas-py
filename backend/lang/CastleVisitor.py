@@ -5,11 +5,12 @@ import sys
 import sympy
 from antlr4 import CommonTokenStream, FileStream, InputStream
 
-from backend.lang.LaTeXLexer import LaTeXLexer
-from backend.lang.LaTeXParser import LaTeXParser as parse
-from backend.lang.LaTeXVisitor import LaTeXVisitor
-from backend.lang.State import State
-from backend.lang.structures import (
+from Dicts import matrix_type_dict, rel_dict
+from LaTeXLexer import LaTeXLexer
+from LaTeXParser import LaTeXParser as parse
+from LaTeXVisitor import LaTeXVisitor
+from State import State
+from structures import (
     Cases,
     Ceiling,
     Derivative,
@@ -21,11 +22,14 @@ from backend.lang.structures import (
     Matrix,
     Monomial,
     Number,
+    RealNumber,
     ProdFunc,
     Relation,
     SumFunc,
     UserDefinedFunc,
     Variable,
+    Root,
+    Choose
 )
 
 
@@ -206,6 +210,16 @@ class CastleVisitor(LaTeXVisitor):
         DIGIT+ """
         return RealNumber(int(ctx.getText()))
 
+    def visitFraction(self, ctx: parse.FractionContext):
+        """fraction
+        CMD_FRAC LCURLY expr RCURLY LCURLY expr RCURLY"""
+        #use the floordiv // operator to represent a fraction
+        return Expression(
+            op.floordiv, 
+            self.visit(ctx.expr(0)),
+            self.visit(ctx.expr(1))
+        )
+
 
     # Variable names and TeX symbols ===============================================
     def visitVar_name_letter(self, ctx: parse.Var_name_letterContext):
@@ -327,7 +341,7 @@ class CastleVisitor(LaTeXVisitor):
         if not (
             isinstance(lower, Relation)
             and len(lower.rel_chain) == 3
-            and lower.rel_chain[1] == CastleVisitor.rel_dict[parse.EQ]
+            and lower.rel_chain[1] == rel_dict[parse.EQ]
             and isinstance(lower.rel_chain[0], Variable)
         ):
             raise Exception(
@@ -344,7 +358,7 @@ class CastleVisitor(LaTeXVisitor):
         if not (
             isinstance(lower, Relation)
             and len(lower.rel_chain) == 3
-            and lower.rel_chain[1] == CastleVisitor.rel_dict[parse.EQ]
+            and lower.rel_chain[1] == rel_dict[parse.EQ]
             and isinstance(lower.rel_chain[0], Variable)
         ):
             raise Exception(
@@ -513,7 +527,7 @@ def main(argv):
     state = State()
     FILEPATH = 'input.txt'
     for line in open(FILEPATH, 'r').readlines():
-        evaluate_expression(state, line)
+        print(evaluate_expression(state, line)[0])
 
 
 if __name__ == "__main__":

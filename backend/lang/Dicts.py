@@ -1,6 +1,8 @@
+import operator as op
+
 import sympy
 import math
-import operator as op
+
 from LaTeXParser import LaTeXParser as parse
 
 builtin_func_dict = {

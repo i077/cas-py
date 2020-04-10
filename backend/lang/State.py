@@ -1,10 +1,10 @@
-class State():
+class State:
     def __init__(self, vars=dict()):
         self.vars = [vars]
 
     def __setitem__(self, var_name, value):
         self.vars[0][var_name] = value
-        
+
     def __getitem__(self, var_name):
         for layer in self.vars:
             if var_name in layer:
@@ -25,7 +25,6 @@ class State():
     def pop_layer(self):
         self.vars.pop(0)
 
-
     def __contains__(self, var_name):
         return any(var_name in layer for layer in self.vars)
 
@@ -37,4 +36,3 @@ class State():
                 del layer[key1]
                 return
         raise KeyError(key1)
-        

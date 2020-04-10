@@ -1,10 +1,16 @@
 import math
-import numpy as np
-import operator as op
-from scipy.special import comb
+import operator
 from abc import ABC, abstractmethod
-from State import State
-from Dicts import builtin_func_dict, inv_rel_dict
+from collections import Counter
+from functools import reduce
+from typing import List
+
+import numpy as np
+from scipy.special import comb
+
+from backend.lang.State import State
+from backend.lang.Dicts import buildin_func_dict, rel_dict
+
 
 class Function(ABC):
     @abstractmethod
@@ -12,32 +18,19 @@ class Function(ABC):
         pass
 
     def __add__(self, other):
-        return Expression(op.add, self, other)
+        return Expression(operator.add, self, other)
 
     def __sub__(self, other):
-        return Expression(op.sub, self, other)
+        return Expression(operator.sub, self, other)
 
     def __mul__(self, other):
-        return Expression(op.mul, self, other)
+        return Expression(operator.mul, self, other)
 
     def __truediv__(self, other):
-        return Expression(op.truediv, self, other)
+        return Expression(operator.truediv, self, other)
 
     def __pow__(self, power, modulo=None):
-        return Expression(op.pow, self, power)
-
-    # we can't do this unless we specify function domains -- probably too much complexity?
-    #     def __lt__(self, other):
-    #         return Expression(op.lt, self, other)
-
-    #     def __gt__(self, other):
-    #         return Expression(op.gt, self, other)
-
-    #     def __ge__(self, other):
-    #         return Expression(op.ge, self, other)
-
-    #     def __le__(self, other):
-    #         return Expression(op.le, self, other)
+        return Expression(operator.pow, self, power)
 
     @abstractmethod
     def __eq__(self, other):
@@ -58,51 +51,31 @@ class Function(ABC):
 
 class Expression(Function):
     op_str = {
-        op.mul: '*',
-        op.truediv: '/',
-        op.add: '+',
-        op.sub: '-',
-        op.pow: '^'
+        operator.mul: "*",
+        operator.truediv: "/",
+        operator.add: "+",
+        operator.sub: "-",
+        operator.pow: "^",
     }
 
-    def __init__(self, op: callable, left: Function, right: Function, power=1):
+    def __init__(self, op: callable, *terms):
         # how should we handle expressions taken to powers?
         self.op = op
-        self.left = left
-        self.right = right
-        self.pow = power
+        self.terms = list(terms)
+        assert (
+            len(self.terms) == 2
+            if self.op in [operator.truediv, operator.pow]
+            else len(self.terms) >= 2
+        )
 
     def evaluate(self, state: State):
-        l_val = self.left.evaluate(state)
-        r_val = self.right.evaluate(state)
-
-        #TODO: Fix this once we've implemented simplification of expressions with variables
-        if isinstance(l_val, str) or isinstance(r_val, str):
-            return str(l_val) + Expression.op_str[self.op] + str(r_val)
-
-        if self.op == op.pow:
-            power = r_val
-            if isinstance(power, RealNumber):
-                if power == 1:
-                    return self
-                    # why this?
-                    # else:
-                    #     return self * Expression(op.mul, self, r - 1)
-                if power == 0:
-                    return RealNumber(1)
-                if power < 0:
-                    return RealNumber(1) / Expression(op.pow, l_val, abs(power))
-
-            return self.op(l_val, power)
-
-        return self.op(l_val, r_val)
+        return reduce(self.op, [term.evaluate(state) for term in self.terms])
 
     def __eq__(self, other):
         return (
             isinstance(other, Expression)
-            and other.left == self.left
-            and other.right == self.right
             and other.op == self.op
+            and Counter(other.terms) == Counter(self.terms)
         )
 
     def __ne__(self, other):
@@ -110,20 +83,28 @@ class Expression(Function):
 
     def derivative(self):
         # if addition or subtraction then we just add or subtract the derivatives
-        if self.op in [op.add, op.sub]:
-            return self.op(self.left.derivative(), self.right.derivative())
-        # product rule
-        elif self.op == op.mul:
-            return (
-                self.left.derivative() * self.right
-                + self.left * self.right.derivative()
-            )
+        if self.op in [operator.add, operator.sub]:
+            return Expression(self.op, *[term.derivative() for term in self.terms])
+        # recursive product rule for n terms
+        elif self.op == operator.mul:
+            # base case for standard product rule
+            if len(self.terms) == 2:
+                return (
+                    self.terms[1] * self.terms[0].derivative()
+                    + self.terms[0] * self.terms[1].derivative()
+                )
+            else:
+                remaining_terms = Expression(self.op, *self.terms[1:])
+                return (
+                    self.terms[0].derivative() * remaining_terms
+                    + self.terms[0] * remaining_terms.derivative()
+                )
         # quotient rule
-        elif self.op == op.truediv:
-            return (
-                self.left.derivative() * self.right
-                - self.right.derivative() * self.left
-            ) / (self.right ** 2)
+        elif self.op == operator.truediv:
+            left, right = self.terms[0], self.terms[1]
+            return (left.derivative() * right - right.derivative() * left) / (
+                right ** 2
+            )
         else:
             raise ValueError
 
@@ -132,7 +113,7 @@ class Expression(Function):
         pass
 
     def __repr__(self):
-        return str(self.left) + Expression.op_str[self.op] + str(self.right)
+        return Expression.op_str[self.op].join([str(term) for term in self.terms])
 
 
 class Variable(Function):
@@ -141,17 +122,17 @@ class Variable(Function):
         self.name = base_var
         self.subscript = subscript
         if subscript is not None:
-            self.name += '_{' + str(subscript.evaluate(state)) + '}'
+            self.name += "_{" + str(subscript.evaluate(state)) + "}"
 
     def evaluate(self, state: State):
-        #reevaluate subscript with current state
+        # reevaluate subscript with current state
         if self.subscript is not None:
-            new_name = self.base_var + '_{' + str(self.subscript.evaluate(state)) + '}'
+            new_name = self.base_var + "_{" + str(self.subscript.evaluate(state)) + "}"
         else:
             new_name = self.name
 
         if self.name in state or new_name in state:
-            #replace this variable's key in state with new variable name
+            # replace this variable's key in state with new variable name
             if new_name != self.name and self.name in state:
                 state.replace(self.name, new_name)
                 self.name = new_name
@@ -170,13 +151,13 @@ class Variable(Function):
         return 1
 
     def integral(self):
-        return Polynomial(coeff=1, var=self, power=2) / 2
+        return Monomial(coeff=1, var=self, power=2) / 2
 
     def __repr__(self) -> str:
         return self.name
 
 
-class Polynomial(Function):
+class Monomial(Function):
     def __init__(self, coeff, var: Variable, power):
         self.coeff = coeff
         self.var = var
@@ -184,36 +165,36 @@ class Polynomial(Function):
 
     def __add__(self, other):
         if (
-            isinstance(other, Polynomial)
+            isinstance(other, Monomial)
             and other.var == self.var
             and other.power == self.power
         ):
-            return Polynomial(self.coeff + other.coeff, self.var, self.power)
+            return Monomial(self.coeff + other.coeff, self.var, self.power)
         else:
             return super().__add__(other)
 
     def __sub__(self, other):
         if (
-            isinstance(other, Polynomial)
+            isinstance(other, Monomial)
             and other.var == self.var
             and other.power == self.power
         ):
-            return Polynomial(self.coeff - other.coeff, self.var, self.power)
+            return Monomial(self.coeff - other.coeff, self.var, self.power)
         else:
             return super().__sub__(other)
 
     def __mul__(self, other):
-        if isinstance(other, Polynomial) and other.var == self.var:
-            return Polynomial(
+        if isinstance(other, Monomial) and other.var == self.var:
+            return Monomial(
                 self.coeff * other.coeff, self.var, other.power + self.power
             )
         else:
             return super().__mul__(other)
 
     def __truediv__(self, other):
-        if isinstance(other, Polynomial) and other.var == self.var:
+        if isinstance(other, Monomial) and other.var == self.var:
             return (
-                Polynomial(self.coeff, self.var, self.power - other.power) / other.coeff
+                Monomial(self.coeff, self.var, self.power - other.power) / other.coeff
             )
         else:
             return super().__truediv__(other)
@@ -232,14 +213,28 @@ class Polynomial(Function):
         return not self.__eq__(other)
 
     def derivative(self):
-        return Polynomial(
+        return Monomial(
             coeff=self.coeff * self.power, var=self.var, power=self.power - 1
         )
 
     def integral(self):
-        return Polynomial(coeff=self.coeff, var=self.var, power=self.power + 1) / (
+        return Monomial(coeff=self.coeff, var=self.var, power=self.power + 1) / (
             self.power + 1
         )
+
+    def __repr__(self):
+        if self.power == 0:
+            return f"{self.coeff}"
+        elif self.power == 1:
+            return f"{self.coeff if self.coeff != 1 else ''}{self.var}"
+        else:
+            return f"{self.coeff}{self.var}^{{{self.power}}}"
+
+
+class Polynomial(Expression):
+    def __init__(self, *terms):
+        super().__init__(op=operator.add, *terms)
+        assert all(isinstance(term, Monomial) for term in self.terms)
 
 
 class Number(Function, ABC):
@@ -341,14 +336,58 @@ class RealNumber(Number):
         pass
 
     def __repr__(self):
-        #if it's an integer, print as an integer
-        if self.value == float('inf'):
-            return '\\infty'
-        if self.value == float('-inf'):
-            return '-\\infty'
+        # if it's an integer, print as an integer
+        if self.value == float("inf"):
+            return "\\infty"
+        if self.value == float("-inf"):
+            return "-\\infty"
         if int(self.value) == self.value:
             return str(int(self.value))
         return str(self.value)
+
+
+def numberGCD(a: int, b: int) -> int:
+    if b == 0:
+        return a
+    else:
+        return numberGCD(b, a % b)
+
+
+def listGCD(values, gcd=numberGCD):
+    """
+    recursively apply a GCD function to a list of values
+
+    Parameters:
+    ----------
+        values: the list of items over which we want to find the gcd
+        gcd: the gcd function
+
+    Returns:
+    -------
+        the gcd of all values in "values"
+    """
+    result = values.pop()
+    while values:
+        result = gcd(result, values.pop())
+    return result
+
+
+def monomialGCD(a, b) -> Function:
+    if isinstance(a, Monomial) and isinstance(b, Monomial) and a.var != b.var:
+        return 1
+    if isinstance(a, (Number, int)) or isinstance(b, (Number, int)):
+        get_value = (
+            lambda v: v.coeff
+            if isinstance(v, Monomial)
+            else (v.value if isinstance(v, Number) else v)
+        )
+        a = get_value(a)
+        b = get_value(b)
+        return numberGCD(a, b)
+
+    return Monomial(
+        coeff=numberGCD(a.coeff, b.coeff), var=a.var, power=min(a.power, b.power)
+    )
 
 
 class Cases(Function):
@@ -361,8 +400,8 @@ class Cases(Function):
                 raise Exception(f"Improper Cases: {row[1]} is not a relation")
             if row[1].evaluate(state):
                 return row[0].evaluate(state)
-            
-        #no conditions were satisfied
+
+        # no conditions were satisfied
         raise Exception("Improper Cases: No case satisfied!")
 
     def __eq__(self, other):
@@ -378,10 +417,10 @@ class Cases(Function):
         pass
 
     def __repr__(self):
-        rep = '\\begin{cases}\n'
+        rep = "\\begin{cases}\n"
         for row in self.cases_list:
-            rep += str(row[0]) + '&' + str(row[1]) + '\\\\'
-        rep += '\n\\end{cases}'
+            rep += str(row[0]) + "&" + str(row[1]) + "\\\\"
+        rep += "\n\\end{cases}"
         return rep
 
 
@@ -391,15 +430,13 @@ class Matrix(Function):
         self.type = type
 
     def evaluate(self, state: State):
-        return np.vectorize(lambda entry: entry.evaluate(state))(
-            self.mat
-        )
+        return np.vectorize(lambda entry: entry.evaluate(state))(self.mat)
 
     def __eq__(self, other):
         if not isinstance(other, Matrix) or self.mat.shape != other.mat.shape:
             return False
         return (self.mat == other.mat).all()
-        
+
     def __ne__(self, other):
         return not self.__eq__(other)
 
@@ -410,29 +447,29 @@ class Matrix(Function):
         pass
 
     def __repr__(self):
-        mat_string = ''
+        mat_string = ""
         for row in self.mat:
             for entry in row[:-1]:
-                mat_string += str(entry) + '&'
-            mat_string += str(row[-1]) + '\\\\'
+                mat_string += str(entry) + "&"
+            mat_string += str(row[-1]) + "\\\\"
 
-        return f'\\begin{{{self.type}}}{mat_string}\\end{{{self.type}}}'
+        return f"\\begin{{{self.type}}}{mat_string}\\end{{{self.type}}}"
 
 
-class Relation():
+class Relation:
     def __init__(self, rel_chain):
         self.rel_chain = rel_chain
 
     def evaluate(self, state):
-        for i in range(1,len(self.rel_chain)-1,2):
+        for i in range(1, len(self.rel_chain) - 1, 2):
             rel = self.rel_chain[i]
-            left = self.rel_chain[i-1].evaluate(state)
-            right = self.rel_chain[i+1].evaluate(state)
+            left = self.rel_chain[i - 1].evaluate(state)
+            right = self.rel_chain[i + 1].evaluate(state)
             if isinstance(right, (float, int)) and isinstance(left, (float, int)):
                 if not rel(left, right):
                     return False
             else:
-                raise ValueError(f'Cannot compute relation {rel} on {left} and {right}')
+                raise ValueError(f"Cannot compute relation {rel} on {left} and {right}")
         return True
 
     def __repr__(self):
@@ -442,7 +479,7 @@ class Relation():
         return output
 
 
-class UserDefinedFunc():
+class UserDefinedFunc:
     def __init__(self, args: list, func_body: Expression):
         self.args = args
         self.func_body = func_body
@@ -451,7 +488,8 @@ class UserDefinedFunc():
         return None
 
     def __repr__(self):
-        return str(tuple(self.args)) + '\\to' + str(self.func_body)
+        return str(tuple(self.args)) + "\\to" + str(self.func_body)
+
 
 class FunctionCall():
     def __init__(self, function_name, passed_args: list):
@@ -476,21 +514,22 @@ class FunctionCall():
                 result = function.func_body.evaluate(state)
             return result
 
-class SumFunc():
+
+class SumFunc:
     def __init__(self, var: Variable, lower_bound_expr, upper_bound_expr, sum_expr):
         self.var = var
         self.sum_expr = sum_expr
         self.upper_bound_expr = upper_bound_expr
         self.lower_bound_expr = lower_bound_expr
-    
+
     def evaluate(self, state: State):
         lower_bound = self.lower_bound_expr.evaluate(state)
         if not isinstance(lower_bound, int):
             raise Exception("Sum lower bound must evaluate to integer")
         upper_bound = self.upper_bound_expr.evaluate(state)
-        if upper_bound == float('inf'):
-            #TODO
-            pass 
+        if upper_bound == float("inf"):
+            # TODO
+            pass
         if not isinstance(upper_bound, int):
             raise Exception("Sum upper bound must evaluate to integer")
 
@@ -505,23 +544,24 @@ class SumFunc():
         return sum_val
 
     def __repr__(self):
-        return f'\\sum_{{{self.var.name} = {self.lower_bound_expr}}}^{{{self.upper_bound_expr}}}{{{self.sum_expr}}}'
+        return f"\\sum_{{{self.var.name} = {self.lower_bound_expr}}}^{{{self.upper_bound_expr}}}{{{self.sum_expr}}}"
 
-class ProdFunc():
+
+class ProdFunc:
     def __init__(self, var: Variable, lower_bound_expr, upper_bound_expr, prod_expr):
         self.var = var
         self.prod_expr = prod_expr
         self.upper_bound_expr = upper_bound_expr
         self.lower_bound_expr = lower_bound_expr
-    
+
     def evaluate(self, state: State):
         lower_bound = self.lower_bound_expr.evaluate(state)
         if not isinstance(lower_bound, int):
             raise Exception("Prod lower bound must evaluate to integer")
         upper_bound = self.upper_bound_expr.evaluate(state)
-        if upper_bound == float('inf'):
-            #TODO
-            pass 
+        if upper_bound == float("inf"):
+            # TODO
+            pass
         if not isinstance(upper_bound, int):
             raise Exception("Prod upper bound must evaluate to integer")
 
@@ -536,22 +576,24 @@ class ProdFunc():
         return prod_val
 
     def __repr__(self):
-        return f'\\prod_{{{self.var.name} = {self.lower_bound_expr}}}^{{{self.upper_bound_expr}}}{{{self.prod_expr}}}'
+        return f"\\prod_{{{self.var.name} = {self.lower_bound_expr}}}^{{{self.upper_bound_expr}}}{{{self.prod_expr}}}"
 
-class Limit():
+
+class Limit:
     def __init__(self, var: Variable, lim_to, expr):
         self.var = var
         self.lim_to = lim_to
         self.expr = expr
 
     def evaluate(self, state: State):
-        #TODO
+        # TODO
         pass
 
     def __repr__(self):
-        return f'\\lim_{{{self.var} \\to {self.lim_to}}}{{{self.expr}}}'
+        return f"\\lim_{{{self.var} \\to {self.lim_to}}}{{{self.expr}}}"
 
-class Integral():
+
+class Integral:
     def __init__(self, lower, upper, expr, var):
         self.lower = lower
         self.upper = upper
@@ -559,13 +601,14 @@ class Integral():
         self.var = var
 
     def evaluate(self, state: State):
-        #TODO
+        # TODO
         pass
 
     def __repr__(self):
-        return f'\\int_{{{self.lower}}}^{{{self.upper}}}{{{self.expr}\\dd {self.var}}}'
+        return f"\\int_{{{self.lower}}}^{{{self.upper}}}{{{self.expr}\\dd {self.var}}}"
 
-class Floor():
+
+class Floor:
     def __init__(self, expr):
         self.expr = expr
 
@@ -573,9 +616,10 @@ class Floor():
         return math.floor(self.expr.evaluate(state))
 
     def __repr__(self):
-        return f'\\lfloor {self.expr} \\rfloor'
+        return f"\\lfloor {self.expr} \\rfloor"
 
-class Ceiling():
+
+class Ceiling:
     def __init__(self, expr):
         self.expr = expr
 
@@ -583,7 +627,8 @@ class Ceiling():
         return math.ceil(self.expr.evaluate(state))
 
     def __repr__(self):
-        return f'\\lceil {self.expr} \\rceil'
+        return f"\\lceil {self.expr} \\rceil"
+
 
 class Derivative():
     def __init__(self, cmd: str, order: RealNumber, expr, var):
@@ -593,12 +638,12 @@ class Derivative():
         self.var = var
 
     def evaluate(self, state: State):
-        #TODO
+        # TODO
         pass
 
     def __repr__(self):
         if self.order:
-            return f'{self.cmd}[{self.order}]{{{self.expr}}}{{{self.var}}}'
+            return f"{self.cmd}[{self.order}]{{{self.expr}}}{{{self.var}}}"
         else:
             return f'{self.cmd}{{{self.expr}}}{{{self.var}}}'
 

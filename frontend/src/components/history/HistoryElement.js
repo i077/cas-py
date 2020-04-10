@@ -1,6 +1,9 @@
 import React from 'react';
 import TeX from '@matejmazur/react-katex';
 import './HistoryElement.css';
+import { KatexSettings } from "../KatexSettings";
+
+const assign_string = ':=';
 
 export class HistoryElement extends React.Component {
     constructor(props) {
@@ -15,10 +18,10 @@ export class HistoryElement extends React.Component {
 
     getHistoryItemOutput() {
         const item = this.props.historyItem;
-        if (item.output !== "") {
-            return item.input + ' = ' + item.output;
-        } else {
+        if (item.input.includes(assign_string)) {
             return item.input;
+        } else {
+            return item.input + ' = ' + item.output;
         }
     }
 
@@ -32,7 +35,7 @@ export class HistoryElement extends React.Component {
                     <TeX
                         math={this.getHistoryItemOutput()}
                         errorColor={'#cc0000'}
-                        settings={{ macros: { '\\dd': '\\mathrm{d}' } }}
+                        settings={KatexSettings}
                     />
                 </div>
             </div>

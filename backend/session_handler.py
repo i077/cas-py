@@ -2,6 +2,7 @@ import os
 import json
 import pickle
 from glob import glob
+from backend.lang.State import State
 
 root_path = "/".join(os.path.abspath(__file__).split("/")[:-2])
 sessions_path = os.path.join(root_path, "sessions")
@@ -29,7 +30,7 @@ def create_session():
 
         # Create new boost instance
         # state = create_state()
-        state = {}
+        state = State()
         history = []
 
         # Save new state and history

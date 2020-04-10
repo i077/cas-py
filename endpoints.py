@@ -3,7 +3,8 @@ import json
 from flask import Flask, request, jsonify, abort
 from flask.logging import create_logger
 
-from session_handler import create_session, load_session_file, save_session_file
+from backend.session_handler import create_session, load_session_file, save_session_file
+from backend.lang.CastleVisitor import evaluate_expression
 
 APP = Flask(__name__)
 LOG = create_logger(APP)
@@ -68,12 +69,11 @@ def run():
         id = data["id"]
         cas_input = data["input"]
 
-        # TODO: Impliement CAS
         state = load_session_file(id, "state.pkl")
-        cas_output = cas_input
-        error = False
+        output, new_state = evaluate_expression(state, cas_input)
+        save_session_file(id, new_state, "state.pkl")
 
-        response = jsonify({"output": cas_output, "error": error})
+        response = jsonify({"output": output, "error": False})
         response.headers.add("Access-Control-Allow-Origin", "*")
 
         return response

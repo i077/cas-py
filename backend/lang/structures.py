@@ -333,29 +333,23 @@ class RealNumber(Number):
     def __add__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value + other.value)
-        elif isinstance(other, Fraction):
-            #addition is commutative and we already implemented Fraction + RealNumber in Fraction
+        else: 
+            #addition is commutative and we assume we've implemented other + RealNumber in other's class
             return other + self
-        else:
-            return other.__add__(self)
 
     def __sub__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value - other.value)
-        elif isinstance(other, Fraction):
-            #subtraction is (almost) commutative and we already implemented Fraction + RealNumber in Fraction
-            return RealNumber(-1) * other + self
         else:
-            return other.__sub__(self)
+            #subtraction is (almost) commutative and we assume we've already implemented other + RealNumber
+            return RealNumber(-1) * other + self
 
     def __mul__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value * other.value)
         elif isinstance(other, Fraction):
-            #multiplication is commutative and we already implemented Fraction * RealNumber in Fraction
+            # multiplication is commutative and we assume we've implemented other * RealNumber in other's class
             return other * self
-        else:
-            return other.__mul__(self)
 
     def __truediv__(self, other):
         if isinstance(other, RealNumber):
@@ -364,7 +358,8 @@ class RealNumber(Number):
             #divide real number by fraction: a/(b/c) = (ac)/b
             return Fraction.create(self * other.den, other.num)
         else:
-            return other.__truediv__(self)
+            # as of now we can't divide RealNumber by anything else
+            raise ValueError(f"can't divide RealNumber {self} by {other}")
 
     def evaluate(self, state=None):
         return self
@@ -420,7 +415,7 @@ class Fraction(Number):
     \\frac{x}{2} is an Expression"""
     @staticmethod
     def create(num, den):
-        """return a fraction if num and den are both integers and a RealNumber otherwise"""
+        """return a fraction if num and den are both 'rational' and a RealNumber otherwise"""
         assert isinstance(num, Number) and isinstance(den, Number)
 
         if isinstance(num, RealNumber) and isinstance(num.value, float):
@@ -487,7 +482,8 @@ class Fraction(Number):
                 self.den * other.den
             ).simplify()
         else:
-            raise ValueError(f"can't multiply fraction {self} by value {other}")
+            #use other's addition method, which we assume is defined for fraction
+            return other + self
 
     def __sub__(self, other):
         return RealNumber(-1)*other + self
@@ -500,7 +496,7 @@ class Fraction(Number):
             #multiply fraction by fraction: (a/b)(c/d) = (ac)/(bd)
             return Fraction.create(self.num * other.num, self.den * other.den).simplify()
         else:
-            raise ValueError(f"can't multiply fraction {self} by value {other}")
+            return other * self
 
     def __truediv__(self, other):
         if isinstance(other, RealNumber):
@@ -510,7 +506,7 @@ class Fraction(Number):
             #divide fraction by fraction: (a/b)/(c/d) = (ad)/(bc)
             return Fraction.create(self.num * other.den, self.den * other.num).simplify()
         else:
-            raise ValueError(f"can't divide fraction {self} by value {other}")
+            return (RealNumber(1) / other) * self
 
     def evaluate(self, state=None):
         return self.simplify()

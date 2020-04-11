@@ -63,7 +63,9 @@ class CastleVisitor(LaTeXVisitor):
 
     def visitIme_left(self, ctx: parse.Ime_leftContext):
         """implicit_mult_expr_left
-        left_implicit_mult_expr implicit_mult_expr"""
+        left_implicit_pow_expr (implicit_mult_expr)?"""
+        if not ctx.implicit_mult_expr():
+            return self.visit(ctx.left_implicit_pow_expr())
         return Expression(
             op.mul, 
             self.visit(ctx.left_implicit_pow_expr()),
@@ -96,9 +98,18 @@ class CastleVisitor(LaTeXVisitor):
             right_expr
         )
 
+    def visitIme_paren_var(self, ctx: parse.Ime_paren_varContext):
+        """ime_paren_var
+        paren_pow_expr var_pow_expr"""
+        return Expression(
+            op.mul, 
+            self.visit(ctx.paren_pow_expr()),
+            self.visit(ctx.var_pow_expr())
+        )
+
     def visitIme_var_var(self, ctx: parse.Ime_var_varContext):
         """ime_var_var
-        var var"""
+        var_pow_expr var_pow_expr"""
         return Expression(
             op.mul, 
             self.visit(ctx.var_pow_expr(0)),
@@ -106,8 +117,8 @@ class CastleVisitor(LaTeXVisitor):
         )
 
     def visitIme_paren_paren(self, ctx: parse.Ime_paren_parenContext):
-        """ime_unit_unit
-        unit_paren unit_paren"""
+        """ime_paren_paren
+        paren_pow_expr paren_pow_expr"""
         return Expression(
             op.mul, 
             self.visit(ctx.paren_pow_expr(0)),

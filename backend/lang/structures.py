@@ -347,7 +347,7 @@ class RealNumber(Number):
     def __mul__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value * other.value)
-        elif isinstance(other, Fraction):
+        else:
             # multiplication is commutative and we assume we've implemented other * RealNumber in other's class
             return other * self
 
@@ -652,7 +652,33 @@ class Matrix(Function):
         self.type = type
 
     def evaluate(self, state: State):
-        return np.vectorize(lambda entry: entry.evaluate(state))(self.mat)
+        return Matrix(
+            np.vectorize(lambda entry: entry.evaluate(state))(self.mat),
+            self.type
+        )
+
+    def __add__(self, other):
+        if not isinstance(other, Matrix):
+            raise ValueError(f"Operation __add__ not supported between Matrix and {type(other)}")
+        if not other.mat.shape == self.mat.shape:
+            raise ValueError(f"Operation __add__ not supported for matrices with shape {self.mat.shape} and {other.mat.shape}")
+        # take this matrix's type by default
+        return Matrix(
+            self.mat + other.mat,
+            self.type
+        )
+
+    def __sub__(self, other):
+        return self + RealNumber(-1) * other
+        
+    def __mul__(self, other):
+        # scalar multiplication
+        if isinstance(other, Number):
+            return Matrix(
+                self.mat * other,
+                self.type
+            )
+        return None
 
     def __eq__(self, other):
         if not isinstance(other, Matrix) or self.mat.shape != other.mat.shape:

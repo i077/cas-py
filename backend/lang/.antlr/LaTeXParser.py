@@ -1,13 +1,9 @@
-# Generated from LaTeX.g4 by ANTLR 4.8
+# Generated from /home/ben/Documents/cwru/eecs395/castle/backend/lang/LaTeX.g4 by ANTLR 4.7.1
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
+from typing.io import TextIO
 import sys
-if sys.version_info[1] > 5:
-	from typing import TextIO
-else:
-	from typing.io import TextIO
-
 
 def serializedATN():
     with StringIO() as buf:
@@ -467,10 +463,9 @@ class LaTeXParser ( Parser ):
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
-        self.checkVersion("4.8")
+        self.checkVersion("4.7.1")
         self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
         self._predicates = None
-
 
 
 
@@ -502,20 +497,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.NnintContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterHist_index" ):
-                listener.enterHist_index(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitHist_index" ):
-                listener.exitHist_index(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitHist_index" ):
-                return visitor.visitHist_index(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Hist_ansContext(Hist_entryContext):
 
@@ -525,20 +506,6 @@ class LaTeXParser ( Parser ):
 
         def DOLLAR(self):
             return self.getToken(LaTeXParser.DOLLAR, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterHist_ans" ):
-                listener.enterHist_ans(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitHist_ans" ):
-                listener.exitHist_ans(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitHist_ans" ):
-                return visitor.visitHist_ans(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -577,7 +544,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class NumberContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -598,20 +564,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_number
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterNumber" ):
-                listener.enterNumber(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitNumber" ):
-                listener.exitNumber(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitNumber" ):
-                return visitor.visitNumber(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -672,7 +624,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class NnintContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -687,20 +638,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_nnint
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterNnint" ):
-                listener.enterNnint(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitNnint" ):
-                listener.exitNnint(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitNnint" ):
-                return visitor.visitNnint(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -733,7 +670,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Multichar_varContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -760,20 +696,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_multichar_var
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMultichar_var" ):
-                listener.enterMultichar_var(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMultichar_var" ):
-                listener.exitMultichar_var(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitMultichar_var" ):
-                return visitor.visitMultichar_var(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -810,7 +732,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Var_nameContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -843,20 +764,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Multichar_varContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVar_name_multichar" ):
-                listener.enterVar_name_multichar(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVar_name_multichar" ):
-                listener.exitVar_name_multichar(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitVar_name_multichar" ):
-                return visitor.visitVar_name_multichar(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Var_name_letterContext(Var_nameContext):
 
@@ -866,20 +773,6 @@ class LaTeXParser ( Parser ):
 
         def NON_E_LETTER(self):
             return self.getToken(LaTeXParser.NON_E_LETTER, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVar_name_letter" ):
-                listener.enterVar_name_letter(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVar_name_letter" ):
-                listener.exitVar_name_letter(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitVar_name_letter" ):
-                return visitor.visitVar_name_letter(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -918,7 +811,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class VarContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -938,20 +830,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_var
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVar" ):
-                listener.enterVar(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVar" ):
-                listener.exitVar(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitVar" ):
-                return visitor.visitVar(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -982,7 +860,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Tex_symbContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -1012,20 +889,6 @@ class LaTeXParser ( Parser ):
         def DIGIT(self):
             return self.getToken(LaTeXParser.DIGIT, 0)
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterTex_symb_single" ):
-                listener.enterTex_symb_single(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitTex_symb_single" ):
-                listener.exitTex_symb_single(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitTex_symb_single" ):
-                return visitor.visitTex_symb_single(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Tex_symb_recurseContext(Tex_symbContext):
 
@@ -1041,20 +904,6 @@ class LaTeXParser ( Parser ):
         def RCURLY(self):
             return self.getToken(LaTeXParser.RCURLY, 0)
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterTex_symb_recurse" ):
-                listener.enterTex_symb_recurse(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitTex_symb_recurse" ):
-                listener.exitTex_symb_recurse(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitTex_symb_recurse" ):
-                return visitor.visitTex_symb_recurse(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Tex_symb_multiContext(Tex_symbContext):
 
@@ -1069,20 +918,6 @@ class LaTeXParser ( Parser ):
 
         def RCURLY(self):
             return self.getToken(LaTeXParser.RCURLY, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterTex_symb_multi" ):
-                listener.enterTex_symb_multi(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitTex_symb_multi" ):
-                listener.exitTex_symb_multi(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitTex_symb_multi" ):
-                return visitor.visitTex_symb_multi(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -1137,7 +972,6 @@ class LaTeXParser ( Parser ):
         finally:
             self.exitRule()
         return localctx
-
 
     class Func_builtinContext(ParserRuleContext):
 
@@ -1194,20 +1028,6 @@ class LaTeXParser ( Parser ):
         def getRuleIndex(self):
             return LaTeXParser.RULE_func_builtin
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFunc_builtin" ):
-                listener.enterFunc_builtin(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFunc_builtin" ):
-                listener.exitFunc_builtin(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFunc_builtin" ):
-                return visitor.visitFunc_builtin(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -1233,7 +1053,6 @@ class LaTeXParser ( Parser ):
         finally:
             self.exitRule()
         return localctx
-
 
     class Func_callContext(ParserRuleContext):
 
@@ -1280,20 +1099,6 @@ class LaTeXParser ( Parser ):
             else:
                 return self.getToken(LaTeXParser.COMMA, i)
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFunc_call_builtin" ):
-                listener.enterFunc_call_builtin(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFunc_call_builtin" ):
-                listener.exitFunc_call_builtin(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFunc_call_builtin" ):
-                return visitor.visitFunc_call_builtin(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Func_limContext(Func_callContext):
 
@@ -1329,20 +1134,6 @@ class LaTeXParser ( Parser ):
         def CMD_RIGHTARROW(self):
             return self.getToken(LaTeXParser.CMD_RIGHTARROW, 0)
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFunc_lim" ):
-                listener.enterFunc_lim(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFunc_lim" ):
-                listener.exitFunc_lim(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFunc_lim" ):
-                return visitor.visitFunc_lim(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Func_intContext(Func_callContext):
 
@@ -1374,20 +1165,6 @@ class LaTeXParser ( Parser ):
 
         def CARET(self):
             return self.getToken(LaTeXParser.CARET, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFunc_int" ):
-                listener.enterFunc_int(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFunc_int" ):
-                listener.exitFunc_int(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFunc_int" ):
-                return visitor.visitFunc_int(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class Func_derivContext(Func_callContext):
@@ -1425,20 +1202,6 @@ class LaTeXParser ( Parser ):
         def RBRACK(self):
             return self.getToken(LaTeXParser.RBRACK, 0)
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFunc_deriv" ):
-                listener.enterFunc_deriv(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFunc_deriv" ):
-                listener.exitFunc_deriv(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFunc_deriv" ):
-                return visitor.visitFunc_deriv(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Func_sumContext(Func_callContext):
 
@@ -1472,20 +1235,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.ExprContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFunc_sum" ):
-                listener.enterFunc_sum(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFunc_sum" ):
-                listener.exitFunc_sum(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFunc_sum" ):
-                return visitor.visitFunc_sum(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Func_rootContext(Func_callContext):
 
@@ -1509,20 +1258,6 @@ class LaTeXParser ( Parser ):
             return self.getToken(LaTeXParser.LBRACK, 0)
         def RBRACK(self):
             return self.getToken(LaTeXParser.RBRACK, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFunc_root" ):
-                listener.enterFunc_root(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFunc_root" ):
-                listener.exitFunc_root(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFunc_root" ):
-                return visitor.visitFunc_root(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class Func_prodContext(Func_callContext):
@@ -1557,20 +1292,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.ExprContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFunc_prod" ):
-                listener.enterFunc_prod(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFunc_prod" ):
-                listener.exitFunc_prod(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFunc_prod" ):
-                return visitor.visitFunc_prod(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Func_floorceilContext(Func_callContext):
 
@@ -1591,20 +1312,6 @@ class LaTeXParser ( Parser ):
             return self.getToken(LaTeXParser.CMD_RFLOOR, 0)
         def CMD_RCEIL(self):
             return self.getToken(LaTeXParser.CMD_RCEIL, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFunc_floorceil" ):
-                listener.enterFunc_floorceil(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFunc_floorceil" ):
-                listener.exitFunc_floorceil(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFunc_floorceil" ):
-                return visitor.visitFunc_floorceil(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class Func_chooseContext(Func_callContext):
@@ -1632,20 +1339,6 @@ class LaTeXParser ( Parser ):
             else:
                 return self.getToken(LaTeXParser.RCURLY, i)
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFunc_choose" ):
-                listener.enterFunc_choose(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFunc_choose" ):
-                listener.exitFunc_choose(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFunc_choose" ):
-                return visitor.visitFunc_choose(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Func_customContext(Func_callContext):
 
@@ -1671,20 +1364,6 @@ class LaTeXParser ( Parser ):
                 return self.getTokens(LaTeXParser.COMMA)
             else:
                 return self.getToken(LaTeXParser.COMMA, i)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFunc_custom" ):
-                listener.enterFunc_custom(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFunc_custom" ):
-                listener.exitFunc_custom(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFunc_custom" ):
-                return visitor.visitFunc_custom(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -2142,7 +1821,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class EntryContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -2158,20 +1836,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_entry
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterEntry" ):
-                listener.enterEntry(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitEntry" ):
-                listener.exitEntry(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitEntry" ):
-                return visitor.visitEntry(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -2193,7 +1857,6 @@ class LaTeXParser ( Parser ):
         finally:
             self.exitRule()
         return localctx
-
 
     class Castle_inputContext(ParserRuleContext):
 
@@ -2221,20 +1884,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.ExprContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCastle_input_expr" ):
-                listener.enterCastle_input_expr(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCastle_input_expr" ):
-                listener.exitCastle_input_expr(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitCastle_input_expr" ):
-                return visitor.visitCastle_input_expr(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Castle_input_assignmentContext(Castle_inputContext):
 
@@ -2246,20 +1895,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.AssignmentContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCastle_input_assignment" ):
-                listener.enterCastle_input_assignment(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCastle_input_assignment" ):
-                listener.exitCastle_input_assignment(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitCastle_input_assignment" ):
-                return visitor.visitCastle_input_assignment(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Castle_input_relationContext(Castle_inputContext):
 
@@ -2270,20 +1905,6 @@ class LaTeXParser ( Parser ):
         def relation(self):
             return self.getTypedRuleContext(LaTeXParser.RelationContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCastle_input_relation" ):
-                listener.enterCastle_input_relation(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCastle_input_relation" ):
-                listener.exitCastle_input_relation(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitCastle_input_relation" ):
-                return visitor.visitCastle_input_relation(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -2325,7 +1946,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class RelationContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -2348,20 +1968,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_relation
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterRelation" ):
-                listener.enterRelation(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitRelation" ):
-                listener.exitRelation(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitRelation" ):
-                return visitor.visitRelation(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -2398,7 +2004,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class RelopContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -2427,20 +2032,6 @@ class LaTeXParser ( Parser ):
         def getRuleIndex(self):
             return LaTeXParser.RULE_relop
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterRelop" ):
-                listener.enterRelop(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitRelop" ):
-                listener.exitRelop(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitRelop" ):
-                return visitor.visitRelop(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -2467,7 +2058,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class ExprContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -2480,20 +2070,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_expr
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterExpr" ):
-                listener.enterExpr(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitExpr" ):
-                listener.exitExpr(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitExpr" ):
-                return visitor.visitExpr(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -2513,7 +2089,6 @@ class LaTeXParser ( Parser ):
         finally:
             self.exitRule()
         return localctx
-
 
     class Add_exprContext(ParserRuleContext):
 
@@ -2540,20 +2115,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Mult_exprContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterAdd_expr_mult" ):
-                listener.enterAdd_expr_mult(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitAdd_expr_mult" ):
-                listener.exitAdd_expr_mult(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitAdd_expr_mult" ):
-                return visitor.visitAdd_expr_mult(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Add_expr_recurseContext(Add_exprContext):
 
@@ -2572,20 +2133,6 @@ class LaTeXParser ( Parser ):
             return self.getToken(LaTeXParser.PLUS, 0)
         def MINUS(self):
             return self.getToken(LaTeXParser.MINUS, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterAdd_expr_recurse" ):
-                listener.enterAdd_expr_recurse(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitAdd_expr_recurse" ):
-                listener.exitAdd_expr_recurse(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitAdd_expr_recurse" ):
-                return visitor.visitAdd_expr_recurse(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -2642,7 +2189,6 @@ class LaTeXParser ( Parser ):
             self.unrollRecursionContexts(_parentctx)
         return localctx
 
-
     class Mult_exprContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -2668,20 +2214,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Implicit_mult_exprContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMult_implicit" ):
-                listener.enterMult_implicit(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMult_implicit" ):
-                listener.exitMult_implicit(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitMult_implicit" ):
-                return visitor.visitMult_implicit(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Mult_expr_powContext(Mult_exprContext):
 
@@ -2692,20 +2224,6 @@ class LaTeXParser ( Parser ):
         def pow_expr(self):
             return self.getTypedRuleContext(LaTeXParser.Pow_exprContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMult_expr_pow" ):
-                listener.enterMult_expr_pow(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMult_expr_pow" ):
-                listener.exitMult_expr_pow(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitMult_expr_pow" ):
-                return visitor.visitMult_expr_pow(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class Mult_signContext(Mult_exprContext):
@@ -2722,20 +2240,6 @@ class LaTeXParser ( Parser ):
             return self.getToken(LaTeXParser.PLUS, 0)
         def MINUS(self):
             return self.getToken(LaTeXParser.MINUS, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMult_sign" ):
-                listener.enterMult_sign(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMult_sign" ):
-                listener.exitMult_sign(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitMult_sign" ):
-                return visitor.visitMult_sign(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class Mult_expr_recurseContext(Mult_exprContext):
@@ -2761,20 +2265,6 @@ class LaTeXParser ( Parser ):
             return self.getToken(LaTeXParser.DIV, 0)
         def CMD_DIV(self):
             return self.getToken(LaTeXParser.CMD_DIV, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMult_expr_recurse" ):
-                listener.enterMult_expr_recurse(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMult_expr_recurse" ):
-                listener.exitMult_expr_recurse(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitMult_expr_recurse" ):
-                return visitor.visitMult_expr_recurse(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -2862,7 +2352,6 @@ class LaTeXParser ( Parser ):
             self.unrollRecursionContexts(_parentctx)
         return localctx
 
-
     class Implicit_mult_exprContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -2888,20 +2377,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Implicit_pow_exprContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterIme_pow" ):
-                listener.enterIme_pow(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitIme_pow" ):
-                listener.exitIme_pow(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitIme_pow" ):
-                return visitor.visitIme_pow(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Ime_var_parensContext(Implicit_mult_exprContext):
 
@@ -2912,20 +2387,6 @@ class LaTeXParser ( Parser ):
         def var_parens(self):
             return self.getTypedRuleContext(LaTeXParser.Var_parensContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterIme_var_parens" ):
-                listener.enterIme_var_parens(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitIme_var_parens" ):
-                listener.exitIme_var_parens(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitIme_var_parens" ):
-                return visitor.visitIme_var_parens(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class Ime_var_unit_paren_leftContext(Implicit_mult_exprContext):
@@ -2944,20 +2405,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Paren_pow_exprContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterIme_var_unit_paren_left" ):
-                listener.enterIme_var_unit_paren_left(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitIme_var_unit_paren_left" ):
-                listener.exitIme_var_unit_paren_left(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitIme_var_unit_paren_left" ):
-                return visitor.visitIme_var_unit_paren_left(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Ime_multContext(Implicit_mult_exprContext):
 
@@ -2972,20 +2419,6 @@ class LaTeXParser ( Parser ):
                 return self.getTypedRuleContext(LaTeXParser.Implicit_mult_exprContext,i)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterIme_mult" ):
-                listener.enterIme_mult(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitIme_mult" ):
-                listener.exitIme_mult(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitIme_mult" ):
-                return visitor.visitIme_mult(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Ime_paren_parenContext(Implicit_mult_exprContext):
 
@@ -2999,20 +2432,6 @@ class LaTeXParser ( Parser ):
             else:
                 return self.getTypedRuleContext(LaTeXParser.Paren_pow_exprContext,i)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterIme_paren_paren" ):
-                listener.enterIme_paren_paren(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitIme_paren_paren" ):
-                listener.exitIme_paren_paren(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitIme_paren_paren" ):
-                return visitor.visitIme_paren_paren(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class Ime_var_unit_paren_rightContext(Implicit_mult_exprContext):
@@ -3031,20 +2450,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Paren_pow_exprContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterIme_var_unit_paren_right" ):
-                listener.enterIme_var_unit_paren_right(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitIme_var_unit_paren_right" ):
-                listener.exitIme_var_unit_paren_right(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitIme_var_unit_paren_right" ):
-                return visitor.visitIme_var_unit_paren_right(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Ime_var_varContext(Implicit_mult_exprContext):
 
@@ -3058,20 +2463,6 @@ class LaTeXParser ( Parser ):
             else:
                 return self.getTypedRuleContext(LaTeXParser.Var_pow_exprContext,i)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterIme_var_var" ):
-                listener.enterIme_var_var(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitIme_var_var" ):
-                listener.exitIme_var_var(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitIme_var_var" ):
-                return visitor.visitIme_var_var(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class Ime_leftContext(Implicit_mult_exprContext):
@@ -3087,20 +2478,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Implicit_mult_exprContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterIme_left" ):
-                listener.enterIme_left(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitIme_left" ):
-                listener.exitIme_left(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitIme_left" ):
-                return visitor.visitIme_left(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Ime_paren_varContext(Implicit_mult_exprContext):
 
@@ -3114,20 +2491,6 @@ class LaTeXParser ( Parser ):
         def var_pow_expr(self):
             return self.getTypedRuleContext(LaTeXParser.Var_pow_exprContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterIme_paren_var" ):
-                listener.enterIme_paren_var(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitIme_paren_var" ):
-                listener.exitIme_paren_var(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitIme_paren_var" ):
-                return visitor.visitIme_paren_var(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -3288,7 +2651,6 @@ class LaTeXParser ( Parser ):
             self.unrollRecursionContexts(_parentctx)
         return localctx
 
-
     class Var_pow_exprContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -3308,20 +2670,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_var_pow_expr
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVar_pow_expr" ):
-                listener.enterVar_pow_expr(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVar_pow_expr" ):
-                listener.exitVar_pow_expr(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitVar_pow_expr" ):
-                return visitor.visitVar_pow_expr(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -3352,7 +2700,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Paren_pow_exprContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -3372,20 +2719,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_paren_pow_expr
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterParen_pow_expr" ):
-                listener.enterParen_pow_expr(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitParen_pow_expr" ):
-                listener.exitParen_pow_expr(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitParen_pow_expr" ):
-                return visitor.visitParen_pow_expr(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -3416,7 +2749,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Implicit_pow_exprContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -3442,20 +2774,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Implicit_mult_unitContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterImplicit_pow_expr_unit" ):
-                listener.enterImplicit_pow_expr_unit(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitImplicit_pow_expr_unit" ):
-                listener.exitImplicit_pow_expr_unit(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitImplicit_pow_expr_unit" ):
-                return visitor.visitImplicit_pow_expr_unit(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Implicit_pow_expr_recurseContext(Implicit_pow_exprContext):
 
@@ -3471,20 +2789,6 @@ class LaTeXParser ( Parser ):
         def tex_symb(self):
             return self.getTypedRuleContext(LaTeXParser.Tex_symbContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterImplicit_pow_expr_recurse" ):
-                listener.enterImplicit_pow_expr_recurse(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitImplicit_pow_expr_recurse" ):
-                listener.exitImplicit_pow_expr_recurse(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitImplicit_pow_expr_recurse" ):
-                return visitor.visitImplicit_pow_expr_recurse(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -3534,7 +2838,6 @@ class LaTeXParser ( Parser ):
             self.unrollRecursionContexts(_parentctx)
         return localctx
 
-
     class Left_implicit_pow_exprContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -3560,20 +2863,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Left_implicit_mult_unitContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLeft_implicit_pow_expr_unit" ):
-                listener.enterLeft_implicit_pow_expr_unit(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLeft_implicit_pow_expr_unit" ):
-                listener.exitLeft_implicit_pow_expr_unit(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitLeft_implicit_pow_expr_unit" ):
-                return visitor.visitLeft_implicit_pow_expr_unit(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Left_implicit_pow_expr_recurseContext(Left_implicit_pow_exprContext):
 
@@ -3589,20 +2878,6 @@ class LaTeXParser ( Parser ):
         def tex_symb(self):
             return self.getTypedRuleContext(LaTeXParser.Tex_symbContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLeft_implicit_pow_expr_recurse" ):
-                listener.enterLeft_implicit_pow_expr_recurse(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLeft_implicit_pow_expr_recurse" ):
-                listener.exitLeft_implicit_pow_expr_recurse(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitLeft_implicit_pow_expr_recurse" ):
-                return visitor.visitLeft_implicit_pow_expr_recurse(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -3652,7 +2927,6 @@ class LaTeXParser ( Parser ):
             self.unrollRecursionContexts(_parentctx)
         return localctx
 
-
     class Pow_exprContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -3683,20 +2957,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Tex_symbContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterPow_expr_recurse" ):
-                listener.enterPow_expr_recurse(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitPow_expr_recurse" ):
-                listener.exitPow_expr_recurse(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitPow_expr_recurse" ):
-                return visitor.visitPow_expr_recurse(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Pow_expr_unitContext(Pow_exprContext):
 
@@ -3707,20 +2967,6 @@ class LaTeXParser ( Parser ):
         def unit(self):
             return self.getTypedRuleContext(LaTeXParser.UnitContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterPow_expr_unit" ):
-                listener.enterPow_expr_unit(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitPow_expr_unit" ):
-                listener.exitPow_expr_unit(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitPow_expr_unit" ):
-                return visitor.visitPow_expr_unit(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -3770,7 +3016,6 @@ class LaTeXParser ( Parser ):
             self.unrollRecursionContexts(_parentctx)
         return localctx
 
-
     class Var_parensContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -3800,20 +3045,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_var_parens
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVar_parens" ):
-                listener.enterVar_parens(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVar_parens" ):
-                listener.exitVar_parens(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitVar_parens" ):
-                return visitor.visitVar_parens(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -3850,7 +3081,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class UnitContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -3879,20 +3109,6 @@ class LaTeXParser ( Parser ):
         def NEG_INFINITY(self):
             return self.getToken(LaTeXParser.NEG_INFINITY, 0)
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnit_infinity" ):
-                listener.enterUnit_infinity(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnit_infinity" ):
-                listener.exitUnit_infinity(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnit_infinity" ):
-                return visitor.visitUnit_infinity(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Unit_unit_parenContext(UnitContext):
 
@@ -3903,20 +3119,6 @@ class LaTeXParser ( Parser ):
         def unit_paren(self):
             return self.getTypedRuleContext(LaTeXParser.Unit_parenContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnit_unit_paren" ):
-                listener.enterUnit_unit_paren(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnit_unit_paren" ):
-                listener.exitUnit_unit_paren(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnit_unit_paren" ):
-                return visitor.visitUnit_unit_paren(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class Unit_implicitContext(UnitContext):
@@ -3929,20 +3131,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Implicit_mult_unitContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnit_implicit" ):
-                listener.enterUnit_implicit(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnit_implicit" ):
-                listener.exitUnit_implicit(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnit_implicit" ):
-                return visitor.visitUnit_implicit(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Unit_left_implicitContext(UnitContext):
 
@@ -3954,20 +3142,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Left_implicit_mult_unitContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnit_left_implicit" ):
-                listener.enterUnit_left_implicit(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnit_left_implicit" ):
-                listener.exitUnit_left_implicit(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnit_left_implicit" ):
-                return visitor.visitUnit_left_implicit(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Unit_varContext(UnitContext):
 
@@ -3978,20 +3152,6 @@ class LaTeXParser ( Parser ):
         def var(self):
             return self.getTypedRuleContext(LaTeXParser.VarContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnit_var" ):
-                listener.enterUnit_var(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnit_var" ):
-                listener.exitUnit_var(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnit_var" ):
-                return visitor.visitUnit_var(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -4054,7 +3214,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Unit_parenContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -4073,20 +3232,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_unit_paren
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnit_paren" ):
-                listener.enterUnit_paren(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnit_paren" ):
-                listener.exitUnit_paren(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnit_paren" ):
-                return visitor.visitUnit_paren(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -4110,7 +3255,6 @@ class LaTeXParser ( Parser ):
         finally:
             self.exitRule()
         return localctx
-
 
     class Implicit_mult_unitContext(ParserRuleContext):
 
@@ -4138,20 +3282,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.FractionContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnit_fraction" ):
-                listener.enterUnit_fraction(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnit_fraction" ):
-                listener.exitUnit_fraction(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnit_fraction" ):
-                return visitor.visitUnit_fraction(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Unit_matrixContext(Implicit_mult_unitContext):
 
@@ -4162,20 +3292,6 @@ class LaTeXParser ( Parser ):
         def matrix_env(self):
             return self.getTypedRuleContext(LaTeXParser.Matrix_envContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnit_matrix" ):
-                listener.enterUnit_matrix(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnit_matrix" ):
-                listener.exitUnit_matrix(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnit_matrix" ):
-                return visitor.visitUnit_matrix(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class Unit_histContext(Implicit_mult_unitContext):
@@ -4188,20 +3304,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Hist_entryContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnit_hist" ):
-                listener.enterUnit_hist(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnit_hist" ):
-                listener.exitUnit_hist(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnit_hist" ):
-                return visitor.visitUnit_hist(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Unit_casesContext(Implicit_mult_unitContext):
 
@@ -4212,20 +3314,6 @@ class LaTeXParser ( Parser ):
         def cases_env(self):
             return self.getTypedRuleContext(LaTeXParser.Cases_envContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnit_cases" ):
-                listener.enterUnit_cases(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnit_cases" ):
-                listener.exitUnit_cases(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnit_cases" ):
-                return visitor.visitUnit_cases(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class Unit_funcContext(Implicit_mult_unitContext):
@@ -4238,20 +3326,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Func_callContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnit_func" ):
-                listener.enterUnit_func(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnit_func" ):
-                listener.exitUnit_func(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnit_func" ):
-                return visitor.visitUnit_func(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Unit_eContext(Implicit_mult_unitContext):
 
@@ -4262,20 +3336,6 @@ class LaTeXParser ( Parser ):
         def E(self):
             return self.getToken(LaTeXParser.E, 0)
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnit_e" ):
-                listener.enterUnit_e(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnit_e" ):
-                listener.exitUnit_e(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnit_e" ):
-                return visitor.visitUnit_e(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Unit_piContext(Implicit_mult_unitContext):
 
@@ -4285,20 +3345,6 @@ class LaTeXParser ( Parser ):
 
         def PI(self):
             return self.getToken(LaTeXParser.PI, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnit_pi" ):
-                listener.enterUnit_pi(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnit_pi" ):
-                listener.exitUnit_pi(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnit_pi" ):
-                return visitor.visitUnit_pi(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -4368,7 +3414,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Left_implicit_mult_unitContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -4395,20 +3440,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.NumberContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnit_number" ):
-                listener.enterUnit_number(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnit_number" ):
-                listener.exitUnit_number(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnit_number" ):
-                return visitor.visitUnit_number(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
     def left_implicit_mult_unit(self):
@@ -4427,7 +3458,6 @@ class LaTeXParser ( Parser ):
         finally:
             self.exitRule()
         return localctx
-
 
     class Var_defContext(ParserRuleContext):
 
@@ -4448,20 +3478,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_var_def
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVar_def" ):
-                listener.enterVar_def(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVar_def" ):
-                listener.exitVar_def(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitVar_def" ):
-                return visitor.visitVar_def(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -4493,7 +3509,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Arg_listContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -4521,20 +3536,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_arg_list
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterArg_list" ):
-                listener.enterArg_list(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitArg_list" ):
-                listener.exitArg_list(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitArg_list" ):
-                return visitor.visitArg_list(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -4578,7 +3579,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Func_defContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -4601,20 +3601,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_func_def
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFunc_def" ):
-                listener.enterFunc_def(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFunc_def" ):
-                listener.exitFunc_def(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFunc_def" ):
-                return visitor.visitFunc_def(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -4644,7 +3630,6 @@ class LaTeXParser ( Parser ):
         finally:
             self.exitRule()
         return localctx
-
 
     class AssignmentContext(ParserRuleContext):
 
@@ -4677,20 +3662,6 @@ class LaTeXParser ( Parser ):
             return self.getTypedRuleContext(LaTeXParser.Func_defContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFunc_assign" ):
-                listener.enterFunc_assign(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFunc_assign" ):
-                listener.exitFunc_assign(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFunc_assign" ):
-                return visitor.visitFunc_assign(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class Var_assignContext(AssignmentContext):
 
@@ -4706,20 +3677,6 @@ class LaTeXParser ( Parser ):
         def expr(self):
             return self.getTypedRuleContext(LaTeXParser.ExprContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVar_assign" ):
-                listener.enterVar_assign(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVar_assign" ):
-                listener.exitVar_assign(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitVar_assign" ):
-                return visitor.visitVar_assign(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -4762,7 +3719,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class FractionContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -4793,20 +3749,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_fraction
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFraction" ):
-                listener.enterFraction(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFraction" ):
-                listener.exitFraction(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFraction" ):
-                return visitor.visitFraction(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -4839,7 +3781,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Cases_last_rowContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -4865,20 +3806,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_cases_last_row
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCases_last_row" ):
-                listener.enterCases_last_row(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCases_last_row" ):
-                listener.exitCases_last_row(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitCases_last_row" ):
-                return visitor.visitCases_last_row(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -4914,7 +3841,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Cases_rowContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -4940,20 +3866,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_cases_row
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCases_row" ):
-                listener.enterCases_row(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCases_row" ):
-                listener.exitCases_row(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitCases_row" ):
-                return visitor.visitCases_row(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -4982,7 +3894,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Cases_expContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -5002,20 +3913,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_cases_exp
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCases_exp" ):
-                listener.enterCases_exp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCases_exp" ):
-                listener.exitCases_exp(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitCases_exp" ):
-                return visitor.visitCases_exp(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -5046,7 +3943,6 @@ class LaTeXParser ( Parser ):
         finally:
             self.exitRule()
         return localctx
-
 
     class Cases_envContext(ParserRuleContext):
 
@@ -5085,20 +3981,6 @@ class LaTeXParser ( Parser ):
         def getRuleIndex(self):
             return LaTeXParser.RULE_cases_env
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCases_env" ):
-                listener.enterCases_env(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCases_env" ):
-                listener.exitCases_env(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitCases_env" ):
-                return visitor.visitCases_env(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -5134,7 +4016,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Matrix_last_rowContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -5162,20 +4043,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_matrix_last_row
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMatrix_last_row" ):
-                listener.enterMatrix_last_row(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMatrix_last_row" ):
-                listener.exitMatrix_last_row(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitMatrix_last_row" ):
-                return visitor.visitMatrix_last_row(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -5220,7 +4087,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Matrix_rowContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -5248,20 +4114,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_matrix_row
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMatrix_row" ):
-                listener.enterMatrix_row(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMatrix_row" ):
-                listener.exitMatrix_row(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitMatrix_row" ):
-                return visitor.visitMatrix_row(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -5299,7 +4151,6 @@ class LaTeXParser ( Parser ):
             self.exitRule()
         return localctx
 
-
     class Matrix_expContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -5319,20 +4170,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_matrix_exp
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMatrix_exp" ):
-                listener.enterMatrix_exp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMatrix_exp" ):
-                listener.exitMatrix_exp(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitMatrix_exp" ):
-                return visitor.visitMatrix_exp(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -5363,7 +4200,6 @@ class LaTeXParser ( Parser ):
         finally:
             self.exitRule()
         return localctx
-
 
     class Matrix_envContext(ParserRuleContext):
 
@@ -5421,20 +4257,6 @@ class LaTeXParser ( Parser ):
 
         def getRuleIndex(self):
             return LaTeXParser.RULE_matrix_env
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMatrix_env" ):
-                listener.enterMatrix_env(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMatrix_env" ):
-                listener.exitMatrix_env(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitMatrix_env" ):
-                return visitor.visitMatrix_env(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 

@@ -1,24 +1,9 @@
-\frac{5}{2} + \frac{3}{4}
-\frac{3}{3.24}
-\frac{3.24}{3}
-3.24 / 3
-\frac{3.234623462346}{4}
-\frac{15}{5}
-\frac{4}{3} + 3
-2\frac{4}{3}
-\frac{\frac{5}{4}}{2}
-\frac{5}{4}/2
-\frac{5}{4}/2.5
-f := (x,y) \to \frac{x}{y}
-f(1,2) - \frac{1}{3}
-\frac{\frac{3}{7}}{\frac{7}{3}}
-\frac{\frac{3}{7}}{\frac{3}{7}}
-\frac{3}{7} < \frac{3}{8}
-\frac{4}{3} > 1
-1 \leq \frac{4}{4}
-\frac{8}{3} \geq 3
-3 \neq \frac{3.3}{1.1}
-3 < \frac{3}{3}
-3 - \frac{10}{3} \leq \frac{2}{3}
-\frac{14}{2} = 7
-\frac{18}{3} = \frac{6.6}{1.1}
+a := \begin{bmatrix} 1 & 2 \\ 3 & \frac{1}{2} \end{bmatrix}
+b := \begin{bmatrix} 5 & 7 \\ 3 & \frac{17}{2} \end{bmatrix}
+a + b
+a * 2
+a(\frac{1}{3} + \frac{1}{6})
+3(2+3)
+2a
+(\frac{1}{3} + \frac{1}{6})a
+(\frac{1}{3} + \frac{1}{6})(2a)

@@ -361,6 +361,12 @@ class RealNumber(Number):
             # as of now we can't divide RealNumber by anything else
             raise ValueError(f"can't divide RealNumber {self} by {other}")
 
+    def __pow__(self, other):
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value ** other.value)
+        if isinstance(other, Fraction):
+            return RealNumber(self ** (other.num / other.den))
+
     def evaluate(self, state=None):
         return self
 
@@ -506,8 +512,15 @@ class Fraction(Number):
             #divide fraction by fraction: (a/b)/(c/d) = (ad)/(bc)
             return Fraction.create(self.num * other.den, self.den * other.num).simplify()
         else:
-            return (RealNumber(1) / other) * self
+            return Fraction.create(RealNumber(1) , other) * self
 
+    def __pow__(self, other):
+        # (a/b)^c = (a^c)/(b^c). We have implemented RealNumber ** Fraction and RealNumber ** RealNumber above
+        return Fraction.create(
+            self.num ** other,
+            self.den ** other
+        )
+        
     def evaluate(self, state=None):
         return self.simplify()
 
@@ -647,8 +660,8 @@ class Cases(Function):
 
 
 class Matrix(Function):
-    def __init__(self, mat: list, type: str):
-        self.mat = np.array(mat)
+    def __init__(self, mat, type: str):
+        self.mat = mat if isinstance(mat, np.ndarray) else np.array(mat)
         self.type = type
 
     def evaluate(self, state: State):
@@ -678,7 +691,47 @@ class Matrix(Function):
                 self.mat * other,
                 self.type
             )
-        return None
+
+        # matrix multiplication
+        if isinstance(other, Matrix):
+            #make sure matrices have correct shape (a,b), (b,a)
+            if self.mat.shape[1] != other.mat.shape[0]:
+                raise ValueError(f"Can't multiply matrices with dimensions {self.mat.shape} and {other.mat.shape}")
+            if self.mat.shape[0] == 1 and other.mat.shape[1] == 1:
+                #row vector times a column vector, so a dot product
+                return RealNumber(np.dot(self.mat, other.mat)[0][0])
+            return Matrix(np.matmul(self.mat, other.mat), self.type)
+
+        raise ValueError(f"Operation __mul__ not supported between Matrix and {type(other)}")
+
+    def __truediv__(self, other):
+        #can only do scalar division
+        if isinstance(other, Number):
+            return self * Fraction.create(RealNumber(1), other)
+        else:
+            raise ValueError(f"Operation __div__ not supported between Matrix and {type(other)}")
+
+    def __pow__(self, other):
+        # can only raise square matrices to powers
+        if self.mat.shape[0] != self.mat.shape[1]:
+            raise ValueError(f"Can't raise matrix with dimension {self.mat.shape} to power (matrix must be square)")
+        # can only take integer powers
+        if not isinstance(other, RealNumber) or int(other.value) != other.value:
+            raise ValueError(f"Can't raise matrix to power {other}. Power must be an integer")
+        if other.value == 0:
+            # return identity matrix
+            return Matrix(np.identity(self.mat.shape[0]), self.type)
+        if other.value > 0:
+            # multiply by itself other.value times
+            return reduce(operator.mul, [self] * int(other.value))
+        if other.value < 0:
+            # first take inverse, then multiply by itself |other.value| times
+            # try:
+            #     inverse = Matrix(np.linalg.inv(self.mat), self.type)
+            # except np.linalg.LinAlgError:
+            #     raise ValueError("Matrix is singular")
+            # return reduce(operator.mul, [inverse] * int(other.value))
+            return None
 
     def __eq__(self, other):
         if not isinstance(other, Matrix) or self.mat.shape != other.mat.shape:

@@ -40,7 +40,7 @@ class CastleVisitor(LaTeXVisitor):
     def visitEntry(self, ctx: parse.EntryContext):
         """entry
         castle_input EOF """
-        return self.visit(ctx.castle_input()).evaluate(self.state)
+        return str(self.visit(ctx.castle_input()).evaluate(self.state))
 
     # 5-function Arithmetic ====================================================
     def visitAdd_expr_recurse(self, ctx: parse.Add_expr_recurseContext):

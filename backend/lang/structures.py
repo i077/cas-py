@@ -1,5 +1,6 @@
 import math
 import operator
+import decimal
 from abc import ABC, abstractmethod
 from collections import Counter
 from functools import reduce
@@ -55,8 +56,8 @@ class Function(ABC):
 class Expression(Function):
     op_str = {
         operator.mul: "*",
-        operator.truediv: "/",
-        operator.floordiv: "//",
+        operator.truediv: "/", # divisions entered using '/'
+        operator.floordiv: "//", # divisions entered using '\frac'
         operator.add: "+",
         operator.sub: "-",
         operator.pow: "^",
@@ -76,8 +77,14 @@ class Expression(Function):
         if self.op != operator.floordiv:
             return reduce(self.op, [term.evaluate(state) for term in self.terms])
         else:
-            # floordiv indicates that this is a rational expression that should be stored as a fraction
-            if 
+            # floordiv indicates that this division was entered using \frac. If each side is a number make a fraction
+            left_eval = self.terms[0].evaluate(state)
+            right_eval = self.terms[1].evaluate(state)
+            if isinstance(left_eval, Number) and isinstance(right_eval, Number):
+                return Fraction.create(left_eval, right_eval).evaluate()
+            else:
+                # TODO: This is where we'd implement rational simplification - ie \frac{x}{2x} = \frac{1}{2}
+                raise Exception("Fractions of things that aren't numbers not yet implemented")
 
     def __eq__(self, other):
         return (
@@ -121,7 +128,10 @@ class Expression(Function):
         pass
 
     def __repr__(self):
+        if self.op == operator.floordiv:
+            return f"\\frac{{{self.terms[0]}}}{{{self.terms[1]}}}"
         return Expression.op_str[self.op].join([str(term) for term in self.terms])
+        
 
 
 class Variable(Function):
@@ -252,7 +262,6 @@ class Number(Function, ABC):
             return RealNumber(value)
         return None
 
-
     @abstractmethod
     def __add__(self, other):
         pass
@@ -282,6 +291,22 @@ class Number(Function, ABC):
         pass
 
     @abstractmethod
+    def __lt__(self, other):
+        pass
+
+    @abstractmethod
+    def __gt__(self, other):
+        pass
+
+    @abstractmethod
+    def __le__(self, other):
+        pass
+
+    @abstractmethod
+    def __ge__(self, other):
+        pass
+
+    @abstractmethod
     def derivative(self):
         pass
 
@@ -291,13 +316,19 @@ class Number(Function, ABC):
 
 
 class RealNumber(Number):
-    def __init__(self, value):
-        if isinstance(value, RealNumber):
-            self.value = value.value
-        elif isinstance(value, (float, int)):
-            self.value = value
+    def __init__(self, val):
+        if isinstance(val, RealNumber):
+            value = val.value
+        elif isinstance(val, (int, float)):
+            value = val
         else:
             raise ValueError("Improper instantiation of real number")
+            
+        if int(value) == value:
+            # cast floats like 4.0 as ints
+            self.value = int(value)
+        else:
+            self.value = value
 
     def __add__(self, other):
         if isinstance(other, RealNumber):
@@ -331,23 +362,41 @@ class RealNumber(Number):
             return RealNumber(self.value / other.value)
         elif isinstance(other, Fraction):
             #divide real number by fraction: a/(b/c) = (ac)/b
-            return Fraction.create(self.value * other.den, other.num)
+            return Fraction.create(self * other.den, other.num)
         else:
             return other.__truediv__(self)
 
     def evaluate(self, state=None):
-        if int(self.value) == self.value:
-            return int(self.value)
-        return self.value
+        return self
 
     def __eq__(self, other):
         if isinstance(other, RealNumber):
             return self.value == other.value
+        elif isinstance(other, (int, float)):
+            return self.value == other
         else:
             return other.__eq__(self)
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __lt__(self, other):
+        if isinstance(other, RealNumber):
+            return self.value < other.value
+        else:
+            return other.__gt__(self)
+
+    def __gt__(self, other):
+        if isinstance(other, RealNumber):
+            return self.value > other.value
+        else:
+            return other.__lt__(self)
+
+    def __le__(self, other):
+        return self < other or self == other
+        
+    def __ge__(self, other):
+        return self > other or self == other
 
     def derivative(self):
         return 0
@@ -365,80 +414,153 @@ class RealNumber(Number):
             return str(int(self.value))
         return str(self.value)
 
-def Fraction(Number):
+class Fraction(Number):
     """This class represents a numerical fraction at evaluation time, not a rational function, which would be stored
     as Expression with op.truediv/floordiv. For example, this class would hold \\frac{1}{2} but 
     \\frac{x}{2} is an Expression"""
     @staticmethod
-    def create(num, den)
+    def create(num, den):
         """return a fraction if num and den are both integers and a RealNumber otherwise"""
-        assert num is Number and den is Number
-        if (isinstance(num, RealNumber) and isinstance(num.value, float)) or
-           (isinstance(den, RealNumber) and isinstance(den.value, float)):
-                #don't make fractions from floats - just divide them
-                return RealNumber(num / den)
-        else:
-            return Fraction(num, den)
+        assert isinstance(num, Number) and isinstance(den, Number)
+
+        if isinstance(num, RealNumber) and isinstance(num.value, float):
+            # convert any float with less than 10 decimal places into a fraction.
+            # Otherwise assume it's irrational and return a RealNumber
+            str_value = str(num.value)
+            dot_loc = str_value.find('.')
+            num_decimal_places = len(str_value) - dot_loc - 1
+            if num_decimal_places > 10:
+                return num / den
+
+            num = RealNumber(int(str_value[:dot_loc])) + \
+                  Fraction(
+                       RealNumber(int(str_value[dot_loc+1:])),
+                       RealNumber(10 ** num_decimal_places)
+                  )
+
+        if isinstance(den, RealNumber) and isinstance(den.value, float):
+            # convert any float with less than 10 decimal places into a fraction.
+            # Otherwise assume it's irrational and return a RealNumber
+            str_value = str(den.value)
+            dot_loc = str_value.find('.')
+            num_decimal_places = len(str_value) - dot_loc - 1
+            if num_decimal_places > 10:
+                return num / den
+
+            den = RealNumber(int(str_value[:dot_loc])) + \
+                  Fraction(
+                       RealNumber(int(str_value[dot_loc+1:])),
+                       RealNumber(10 ** num_decimal_places)
+                  )
+
+        return Fraction(num, den)
 
     def __init__(self, top, bottom):
         """don't initialize with Fraction() - use Fraction.create() factory instead"""
-        assert top is Number and bottom is Number
+        assert isinstance(top, Number) and isinstance(bottom, Number)
         if isinstance(top, RealNumber) and isinstance(bottom, RealNumber):
-            self.top = top
-            self.bottom = bottom
+            self.num = top
+            self.den = bottom
         else:
-            # quotient will be a fraction since either top or bottom is a fraction
+            # quotient will usually be a fraction since either top or bottom is a fraction
+            # but quotient can also be an integer (\frac{\frac{3}{7}}{\frac{3}{7}}).
+            # In this case since we're already in __init__ just do a/1
             quotient = top / bottom
-            self.num = quotient.top
-            self.den = quotient.den
-        else:
-            raise ValueError("Improper instantiation of fraction")
+            if isinstance(quotient, RealNumber):
+                self.num = quotient
+                self.den = RealNumber(1)
+            else:
+                self.num = quotient.num
+                self.den = quotient.den
 
     def __add__(self, other):
         if isinstance(other, RealNumber):
-            return RealNumber(self.value + other.value)
+            # a + (b/c) = (ac+b)/c
+            return Fraction.create(
+                self.den * other + self.num, 
+                self.den
+            ).simplify()
+        elif isinstance(other, Fraction):
+            # (a/b) + (c/d) = (ad+bc)/(bd)
+            return Fraction.create(
+                self.num * other.den + self.den * other.num,
+                self.den * other.den
+            ).simplify()
         else:
-            return other.__add__(self)
+            raise ValueError(f"can't multiply fraction {self} by value {other}")
 
     def __sub__(self, other):
-        if isinstance(other, RealNumber):
-            return RealNumber(self.value - other.value)
-        else:
-            return other.__sub__(self)
+        return RealNumber(-1)*other + self
 
     def __mul__(self, other):
         if isinstance(other, RealNumber):
             #multiply fraction by real number: (a/b)*c = (ac)/b
-            return Fraction.create(self.num * other, self.den)
+            return Fraction.create(self.num * other, self.den).simplify()
         elif isinstance(other, Fraction):
             #multiply fraction by fraction: (a/b)(c/d) = (ac)/(bd)
-            return Fraction.create(self.num * other.num, self.den * other.den)
+            return Fraction.create(self.num * other.num, self.den * other.den).simplify()
         else:
-            return other.__mul__(self)
+            raise ValueError(f"can't multiply fraction {self} by value {other}")
 
     def __truediv__(self, other):
         if isinstance(other, RealNumber):
             #divide fraction by real number: (a/b)/c = a/(bc)
-            return Fraction.create(self.num, other * self.den)
+            return Fraction.create(self.num, other * self.den).simplify()
         if isinstance(other, Fraction):
             #divide fraction by fraction: (a/b)/(c/d) = (ad)/(bc)
-            return Fraction.create(self.num * other.den, self.den * other.num)
+            return Fraction.create(self.num * other.den, self.den * other.num).simplify()
         else:
-            return other.__truediv__(self)
+            raise ValueError(f"can't divide fraction {self} by value {other}")
 
     def evaluate(self, state=None):
-        if int(self.value) == self.value:
-            return int(self.value)
-        return self.value
+        return self.simplify()
+
+    def simplify(self):
+        """reduce to lowest terms"""
+        if self.num == 0:
+            return RealNumber(0)
+        if self.den == 0:
+            raise ValueError("Fraction division by 0")
+        gcd = RealNumber(numberGCD(self.num.value, self.den.value))
+        if gcd == self.den:
+            # reduces to an integer
+            return RealNumber(self.num / gcd)
+        return Fraction.create(self.num / gcd, self.den / gcd)
 
     def __eq__(self, other):
-        if isinstance(other, RealNumber):
-            return self.value == other.value
+        if isinstance(other, Fraction):
+            self_simplify = self.simplify()
+            other_simplify = other.simplify()
+            return (self_simplify.num, self_simplify.den) == (other_simplify.num, other_simplify.den)
+        elif isinstance(other, RealNumber):
+            return self.num / self.den == other
         else:
             return other.__eq__(self)
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __lt__(self, other):
+        if isinstance(other, Fraction):
+            return self.num / self.den < other.num / other.den
+        elif isinstance(other, RealNumber):
+            return self.num / self.den < other
+        else:
+            return other.__gt__(self)
+
+    def __gt__(self, other):
+        if isinstance(other, Fraction):
+            return self.num / self.den > other.num / other.den
+        elif isinstance(other, RealNumber):
+            return self.num / self.den > other
+        else:
+            return other.__lt__(self)
+        
+    def __le__(self, other):
+        return self < other or self == other
+        
+    def __ge__(self, other):
+        return self > other or self == other
 
     def derivative(self):
         return 0
@@ -447,14 +569,7 @@ def Fraction(Number):
         pass
 
     def __repr__(self):
-        # if it's an integer, print as an integer
-        if self.value == float("inf"):
-            return "\\infty"
-        if self.value == float("-inf"):
-            return "-\\infty"
-        if int(self.value) == self.value:
-            return str(int(self.value))
-        return str(self.value)
+        return f"\\frac{{{self.num}}}{{{self.den}}}"
 
 
 def numberGCD(a: int, b: int) -> int:
@@ -576,7 +691,7 @@ class Relation:
             rel = self.rel_chain[i]
             left = self.rel_chain[i - 1].evaluate(state)
             right = self.rel_chain[i + 1].evaluate(state)
-            if isinstance(right, (float, int)) and isinstance(left, (float, int)):
+            if isinstance(right, Number) and isinstance(left, Number):
                 if not rel(left, right):
                     return False
             else:

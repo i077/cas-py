@@ -5,11 +5,12 @@ import sys
 import sympy
 from antlr4 import CommonTokenStream, FileStream, InputStream
 
-from backend.lang.LaTeXLexer import LaTeXLexer
-from backend.lang.LaTeXParser import LaTeXParser as parse
-from backend.lang.LaTeXVisitor import LaTeXVisitor
-from backend.lang.State import State
-from backend.lang.structures import (
+from Dicts import matrix_type_dict, rel_dict
+from LaTeXLexer import LaTeXLexer
+from LaTeXParser import LaTeXParser as parse
+from LaTeXVisitor import LaTeXVisitor
+from State import State
+from structures import (
     Cases,
     Ceiling,
     Derivative,
@@ -21,11 +22,14 @@ from backend.lang.structures import (
     Matrix,
     Monomial,
     Number,
+    RealNumber,
     ProdFunc,
     Relation,
     SumFunc,
     UserDefinedFunc,
     Variable,
+    Root,
+    Choose
 )
 
 
@@ -38,7 +42,7 @@ class CastleVisitor(LaTeXVisitor):
         castle_input EOF """
         return self.visit(ctx.castle_input()).evaluate(self.state)
 
-    # Basic arithmetic and expr ===================================================
+    # 5-function Arithmetic ====================================================
     def visitAdd_expr_recurse(self, ctx: parse.Add_expr_recurseContext):
         """add_expr_recurse
         add_expr op=(PLUS | MINUS) add_expr"""
@@ -46,6 +50,92 @@ class CastleVisitor(LaTeXVisitor):
             op.add if ctx.op.type == parse.PLUS else op.sub,
             self.visit(ctx.add_expr(0)),
             self.visit(ctx.add_expr(1)),
+        )
+
+    def visitIme_mult(self, ctx: parse.Ime_multContext):
+        """implicit_mult_expr_mult
+        implicit_mult_expr implicit_mult_expr"""
+        return Expression(
+            op.mul, 
+            self.visit(ctx.implicit_mult_expr(0)),
+            self.visit(ctx.implicit_mult_expr(1))
+        )
+
+    def visitIme_left(self, ctx: parse.Ime_leftContext):
+        """implicit_mult_expr_left
+        left_implicit_mult_expr implicit_mult_expr"""
+        return Expression(
+            op.mul, 
+            self.visit(ctx.left_implicit_pow_expr()),
+            self.visit(ctx.implicit_mult_expr())
+        )
+
+    def visitIme_var_unit_paren_left(self, ctx: parse.Ime_var_unit_paren_leftContext):
+        """ime_var_unit_paren_left
+        (var_pow_expr | paren_pow_expr) implicit_mult_expr"""
+        if ctx.var_pow_expr():
+            left_expr = self.visit(ctx.var_pow_expr())
+        elif ctx.paren_pow_expr():
+            left_expr = self.visit(ctx.paren_pow_expr())
+        return Expression(
+            op.mul, 
+            left_expr,
+            self.visit(ctx.implicit_mult_expr())
+        )
+
+    def visitIme_var_unit_paren_right(self, ctx: parse.Ime_var_unit_paren_rightContext):
+        """ime_var_unit_paren_right
+        implicit_mult_expr (var_pow_expr | paren_pow_expr)"""
+        if ctx.var_pow_expr():
+            right_expr = self.visit(ctx.var_pow_expr())
+        elif ctx.paren_pow_expr():
+            right_expr = self.visit(ctx.paren_pow_expr())
+        return Expression(
+            op.mul, 
+            self.visit(ctx.implicit_mult_expr()),
+            right_expr
+        )
+
+    def visitIme_var_var(self, ctx: parse.Ime_var_varContext):
+        """ime_var_var
+        var var"""
+        return Expression(
+            op.mul, 
+            self.visit(ctx.var_pow_expr(0)),
+            self.visit(ctx.var_pow_expr(1))
+        )
+
+    def visitIme_paren_paren(self, ctx: parse.Ime_paren_parenContext):
+        """ime_unit_unit
+        unit_paren unit_paren"""
+        return Expression(
+            op.mul, 
+            self.visit(ctx.paren_pow_expr(0)),
+            self.visit(ctx.paren_pow_expr(1))
+        )
+
+    def visitVar_pow_expr(self, ctx: parse.Var_pow_exprContext):
+        """var_pow_expr
+        var (CARET tex_symb)?"""
+        exponent = ctx.tex_symb()
+        if exponent is None:
+            return self.visit(ctx.var())
+        return Expression(
+            op.pow,
+            self.visit(ctx.var()),
+            self.visit(exponent)
+        )
+
+    def visitParen_pow_expr(self, ctx: parse.Paren_pow_exprContext):
+        """paren_pow_expr
+        paren (CARET tex_symb)?"""
+        exponent = ctx.tex_symb()
+        if exponent is None:
+            return self.visit(ctx.unit_paren())
+        return Expression(
+            op.pow,
+            self.visit(ctx.unit_paren()),
+            self.visit(exponent)
         )
 
     def visitMult_expr_recurse(self, ctx: parse.Mult_expr_recurseContext):
@@ -57,6 +147,32 @@ class CastleVisitor(LaTeXVisitor):
             self.visit(ctx.mult_expr(1)),
         )
 
+    def visitMult_sign(self, ctx: parse.Mult_signContext):
+        """mult_sign
+        sign=(PLUS | MINUS) mult_expr """
+        if ctx.sign.type == parse.MINUS:
+            return Expression(op.mul, RealNumber(-1), self.visit(ctx.mult_expr()))
+        else:
+            return self.visit(ctx.mult_expr())
+
+    def visitImplicit_pow_expr_recurse(self, ctx: parse.Implicit_pow_expr_recurseContext):
+        """implicit_pow_expr_recurse
+        implicit_pow_expr CARET tex_symb """
+        return Expression(
+            op.pow,
+            self.visit(ctx.implicit_pow_expr()),
+            self.visit(ctx.tex_symb()),
+        )
+
+    def visitLeft_implicit_pow_expr_recurse(self, ctx: parse.Left_implicit_pow_expr_recurseContext):
+        """left_implicit_pow_expr_recurse
+        left_implicit_pow_expr CARET tex_symb """
+        return Expression(
+            op.pow,
+            self.visit(ctx.left_implicit_pow_expr()),
+            self.visit(ctx.tex_symb()),
+        )
+
     def visitPow_expr_recurse(self, ctx: parse.Pow_expr_recurseContext):
         """pow_expr_recurse
         pow_expr CARET tex_symb """
@@ -64,39 +180,46 @@ class CastleVisitor(LaTeXVisitor):
             op.pow, self.visit(ctx.pow_expr()), self.visit(ctx.tex_symb())
         )
 
-    def visitUnit_recurse(self, ctx: parse.Unit_recurseContext):
-        """unit_recurse
-        sign=(PLUS | MINUS) unit """
-        if ctx.sign.type == parse.MINUS:
-            return Expression(op.mul, Number(-1), self.visit(ctx.unit()))
-        else:
-            return self.visit(ctx.unit())
-
+    # Units =====================================================================
     def visitUnit_paren(self, ctx: parse.Unit_parenContext):
         """unit_paren
-        MINUS? LPAREN expr RPAREN """
-        if ctx.MINUS():
-            return Expression(op.mul, Number(-1), self.visit(ctx.expr()))
-        else:
-            return self.visit(ctx.expr())
+        LPAREN expr RPAREN """
+        return self.visit(ctx.expr())
 
     def visitUnit_infinity(self, ctx: parse.Unit_infinityContext):
         """unit_infinity
         inf=(INFINITY | NEG_INFINITY)"""
         if ctx.inf.type == parse.INFINITY:
-            return Number(float("inf"))
+            return RealNumber(float('inf'))
         else:
-            return Number(float("-inf"))
+            return RealNumber(float('-inf'))
+
+    def visitUnit_pi(self, ctx: parse.Unit_piContext):
+        return RealNumber(math.pi)
+
+    def visitUnit_e(self, ctx: parse.Unit_eContext):
+        return RealNumber(math.e)
 
     def visitNumber(self, ctx: parse.NumberContext):
         """number
         MINUS? DIGIT+ (POINT DIGIT*)? """
-        return Number(float(ctx.getText()))
+        return RealNumber(float(ctx.getText()))
 
     def visitNnint(self, ctx: parse.NnintContext):
         """nnint
         DIGIT+ """
-        return Number(int(ctx.getText()))
+        return RealNumber(int(ctx.getText()))
+
+    def visitFraction(self, ctx: parse.FractionContext):
+        """fraction
+        CMD_FRAC LCURLY expr RCURLY LCURLY expr RCURLY"""
+        #use the floordiv // operator to represent a fraction
+        return Expression(
+            op.floordiv, 
+            self.visit(ctx.expr(0)),
+            self.visit(ctx.expr(1))
+        )
+
 
     # Variable names and TeX symbols ===============================================
     def visitVar_name_letter(self, ctx: parse.Var_name_letterContext):
@@ -112,14 +235,14 @@ class CastleVisitor(LaTeXVisitor):
     def visitVar_name_multichar(self, ctx: parse.Var_name_multicharContext):
         """var_name_multichar
         BACKTICK name=multichar_var BACKTICK """
-        return self.visit(ctx.name())
+        return self.visit(ctx.name)
 
     def visitTex_symb_single(self, ctx: parse.Tex_symb_singleContext):
         """tex_symb_single
         (LETTER | DIGIT) """
         text = ctx.getText()
         if ctx.DIGIT():
-            return Number(int(text))
+            return RealNumber(int(text))
         else:
             return Variable(self.state, text)
 
@@ -180,12 +303,12 @@ class CastleVisitor(LaTeXVisitor):
         func_body = self.visit(ctx.expr())
         return UserDefinedFunc(args, func_body)
 
-    def visitFunc_builtin(self, ctx: parse.Func_builtinContext):
-        return CastleVisitor.builtin_func_dict[ctx.name.type]
 
     # Function calls ============================================================
-    def visitFunc_call_var(self, ctx: parse.Func_call_varContext):
-        function = self.visit(ctx.func_name())
+    def visitFunc_custom(self, ctx: parse.Func_customContext):
+        """func_custom (user-defined function call)
+        var LPAREN (expr (COMMA expr)+)? RPAREN"""
+        function_name = self.visit(ctx.var()).name
         args = ctx.expr()
         if not args:
             args = []
@@ -193,9 +316,22 @@ class CastleVisitor(LaTeXVisitor):
             args = [self.visit(args)]
         else:
             args = [self.visit(arg) for arg in args]
-        if isinstance(function, Variable):
-            return FunctionCall(self.state[function.name], args)
-        return FunctionCall(function, args)
+        
+        return FunctionCall(function_name, args)
+
+    def visitFunc_call_builtin(self, ctx: parse.Func_call_builtinContext):
+        """func_call_builtin
+        func_builtin (LCURLY and/or LPAREN) expr ((COMMA expr)+)*)? (RCURLY and/or RPAREN)"""
+        function_name = self.visit(ctx.var())
+        args = ctx.expr()
+        if not args:
+            args = []
+        elif not isinstance(args, (list, tuple)):
+            args = [self.visit(args)]
+        else:
+            args = [self.visit(arg) for arg in args]
+        
+        return FunctionCall(function_name, args)
 
     def visitFunc_sum(self, ctx: parse.Func_sumContext):
         lower = self.visit(ctx.relation())
@@ -205,7 +341,7 @@ class CastleVisitor(LaTeXVisitor):
         if not (
             isinstance(lower, Relation)
             and len(lower.rel_chain) == 3
-            and lower.rel_chain[1] == CastleVisitor.rel_dict[parse.EQ]
+            and lower.rel_chain[1] == rel_dict[parse.EQ]
             and isinstance(lower.rel_chain[0], Variable)
         ):
             raise Exception(
@@ -222,7 +358,7 @@ class CastleVisitor(LaTeXVisitor):
         if not (
             isinstance(lower, Relation)
             and len(lower.rel_chain) == 3
-            and lower.rel_chain[1] == CastleVisitor.rel_dict[parse.EQ]
+            and lower.rel_chain[1] == rel_dict[parse.EQ]
             and isinstance(lower.rel_chain[0], Variable)
         ):
             raise Exception(
@@ -267,6 +403,55 @@ class CastleVisitor(LaTeXVisitor):
             self.visit(ctx.var()),
         )
 
+    def visitFunc_root(self, ctx: parse.Func_rootContext):
+        exprs = ctx.expr()
+        if isinstance(exprs, (list, tuple)):
+            # n-th root instead of default square root
+            return Root(self.visit(exprs[1]), n=self.visit(exprs[0]))
+        return Root(self.visit(exprs))
+
+    def visitFunc_choose(self, ctx: parse.Func_chooseContext):
+        return Choose(
+            self.visit(ctx.expr(0)),
+            self.visit(ctx.expr(1)),
+        )
+
+    def visitFunc_builtin(self, ctx: parse.Func_builtinContext):
+        return ctx.name.type
+
+    def visitVar_parens(self, ctx: parse.Var_parensContext):
+        """var_parens (the ambiguous y(x+1) structure)
+        var LPAREN expr RPAREN (CARET tex_symb)?"""
+        # tex_symb is present if the var_parens structure is raised to a power:
+        # for example y(x+1)^2
+        var = self.visit(ctx.var())
+        var_val = self.state.get(var.name)
+        expr = self.visit(ctx.expr())
+        exponent = ctx.tex_symb()
+        if var_val is None:
+            raise Exception(f"Variable {var.name} not found")
+        if isinstance(var_val, UserDefinedFunc):
+            # the variable is a function, so call it
+            if exponent is not None:
+                return Expression(
+                    op.pow,
+                    FunctionCall(var.name, [expr]),
+                    self.visit(exponent)
+                )
+            else:
+                return FunctionCall(var.name, [expr])
+
+        else: #otherwise this is a multiplication
+            if exponent is not None:
+                # x((y+1)^z)
+                return Expression(
+                    op.mul,
+                    var,
+                    Expression(op.pow, expr, self.visit(exponent))
+                )
+            else:
+                return Expression(op.mul, var, expr)
+
     # Relations =================================================================
     def visitRelop(self, ctx: parse.RelopContext):
         return ctx.op.type
@@ -277,7 +462,7 @@ class CastleVisitor(LaTeXVisitor):
         exprs = [self.visit(expr) for expr in ctx.expr()]
         for i in range(len(ctx.relop())):
             rep.append(exprs[i])
-            rep.append(CastleVisitor.rel_dict[ops[i]])
+            rep.append(rel_dict[ops[i]])
         rep.append(exprs[-1])
         return Relation(rep)
 
@@ -305,7 +490,8 @@ class CastleVisitor(LaTeXVisitor):
             raise Exception("Matrix \\begin and \\end types much match")
 
         return Matrix(
-            self.visit(ctx.matrix_exp()), CastleVisitor.matrix_type_dict[begin_type]
+            self.visit(ctx.matrix_exp()),
+            matrix_type_dict[begin_type]
         )
 
     def visitMatrix_exp(self, ctx: parse.Matrix_expContext):
@@ -325,39 +511,6 @@ class CastleVisitor(LaTeXVisitor):
             return self.visit(entries)
         return [self.visit(entry) for entry in entries]
 
-    builtin_func_dict = {
-        parse.FUNC_SIN: math.sin,
-        parse.FUNC_COS: math.cos,
-        parse.FUNC_TAN: math.tan,
-        parse.FUNC_SEC: sympy.sec,
-        parse.FUNC_CSC: sympy.csc,
-        parse.FUNC_COT: sympy.cot,
-        parse.FUNC_ASIN: sympy.asin,
-        parse.FUNC_ACOS: sympy.acos,
-        parse.FUNC_ATAN: sympy.atan,
-        parse.FUNC_ASEC: sympy.asec,
-        parse.FUNC_ACSC: sympy.acsc,
-        parse.FUNC_ACOT: sympy.acot,
-        parse.FUNC_EXP: math.exp,
-        parse.FUNC_LN: math.log,
-        parse.FUNC_LOG: math.log,
-    }
-
-    rel_dict = {
-        parse.LT: op.lt,
-        parse.GT: op.gt,
-        parse.LTE: op.le,
-        parse.GTE: op.ge,
-        parse.EQ: op.eq,
-        parse.NEQ: op.ne,
-    }
-
-    matrix_type_dict = {
-        parse.MATRIX: "matrix",
-        parse.P_MATRIX: "pmatrix",
-        parse.B_MATRIX: "bmatrix",
-        parse.V_MATRIX: "vmatrix",
-    }
 
 
 def evaluate_expression(state: State, expr: str):
@@ -372,9 +525,9 @@ def evaluate_expression(state: State, expr: str):
 
 def main(argv):
     state = State()
-    FILEPATH = "lang/input.txt"
-    for line in open(FILEPATH, "r").readlines():
-        evaluate_expression(state, line)
+    FILEPATH = 'input.txt'
+    for line in open(FILEPATH, 'r').readlines():
+        print(evaluate_expression(state, line)[0])
 
 
 if __name__ == "__main__":

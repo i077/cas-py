@@ -47,7 +47,10 @@ V_MATRIX: 'vmatrix';
 UNDERSCORE : '_';
 COMMA      : ',';
 
-LETTER  : [a-zA-Z];
+PI : '\\pi';
+E  : 'e';
+
+NON_E_LETTER  : [a-df-zA-Z];
 DIGIT   : [0-9];
 
 CMD_CDOT        : '\\cdot';
@@ -66,6 +69,8 @@ FUNC_SUM        : '\\sum';
 FUNC_PROD       : '\\prod';
 FUNC_DV         : '\\dv';
 FUNC_PDV        : '\\pdv';
+FUNC_SQRT       : '\\sqrt';
+FUNC_CHOOSE     : '\\binom';
 
 FUNC_LOG        : '\\log';
 FUNC_LN         : '\\ln';
@@ -103,11 +108,11 @@ hist_entry
 number  : MINUS? DIGIT+ (POINT DIGIT*)?;
 nnint   : DIGIT+;
 
-multichar_var : (LETTER | DIGIT)+;
+multichar_var : (NON_E_LETTER | E | DIGIT)+;
 
 // Variable names
 var_name
-    : LETTER                               #var_name_letter
+    : NON_E_LETTER                               #var_name_letter
     | BACKTICK name=multichar_var BACKTICK #var_name_multichar
     ;
 
@@ -115,15 +120,9 @@ var
     : var_name (UNDERSCORE tex_symb)?;
 
 tex_symb
-    : (LETTER | DIGIT)   #tex_symb_single
+    : (NON_E_LETTER | E | DIGIT)   #tex_symb_single
     | LCURLY expr RCURLY #tex_symb_multi
     | LCURLY var RCURLY  #tex_symb_recurse
-    ;
-
-// Function names can either be builtin LaTeX commands or var names
-func_name
-    : func_builtin #func_name_builtin
-    | var          #func_name_var
     ;
 
 func_builtin
@@ -135,8 +134,12 @@ func_builtin
     ;
 
 func_call
-    // Function calls with normal syntax
-    : func_name LPAREN (expr ((COMMA expr)+)*)? RPAREN                                                         #func_call_var
+    // Custom function call with a number of arguments other than 1
+    : var LPAREN (expr (COMMA expr)+)? RPAREN                                                                  #func_custom
+    // Function builtin function call
+    | func_builtin (LPAREN (expr ((COMMA expr)+)*)? RPAREN | 
+                    LCURLY LPAREN (expr ((COMMA expr)+)*)? RPAREN RCURLY |
+                    LCURLY (expr ((COMMA expr)+)*)? RCURLY)                                                    #func_call_builtin
     // Sums
     | FUNC_SUM UNDERSCORE (LCURLY relation RCURLY CARET tex_symb | CARET tex_symb LCURLY relation RCURLY)
                           (expr | LCURLY expr RCURLY)                                                          #func_sum
@@ -151,6 +154,10 @@ func_call
     | lop=(CMD_LFLOOR | CMD_LCEIL) expr rop=(CMD_RFLOOR | CMD_RCEIL)                                           #func_floorceil
     // (Partial) derivatives
     | op=(FUNC_DV | FUNC_PDV) (LBRACK nnint RBRACK)? LCURLY expr RCURLY LCURLY var RCURLY                      #func_deriv
+    // n-th rootssqrt
+    | FUNC_SQRT (LBRACK expr RBRACK)? LCURLY expr RCURLY                                                       #func_root
+    // choose function
+    | FUNC_CHOOSE LCURLY expr RCURLY LCURLY expr RCURLY                                                        #func_choose
     ;
 
 // Rules
@@ -177,7 +184,39 @@ add_expr
 
 mult_expr
     : mult_expr op=(MULT | CMD_TIMES | CMD_CDOT | DIV | CMD_DIV) mult_expr #mult_expr_recurse
+    | implicit_mult_expr                                                   #mult_implicit
+    | sign=(PLUS | MINUS) mult_expr                                        #mult_sign
     | pow_expr                                                             #mult_expr_pow
+    ;
+
+implicit_mult_expr
+    : implicit_mult_expr implicit_mult_expr                   #ime_mult
+    | left_implicit_pow_expr implicit_mult_expr               #ime_left
+    | implicit_pow_expr                                       #ime_pow
+    | var_parens                                              #ime_var_parens
+    //basically everything that isn't 'var unit_paren' because we want that to be only handled by var_parens
+    | (var_pow_expr | paren_pow_expr) implicit_mult_expr      #ime_var_unit_paren_left
+    | implicit_mult_expr (var_pow_expr | paren_pow_expr)      #ime_var_unit_paren_right
+    | var_pow_expr var_pow_expr                               #ime_var_var
+    | paren_pow_expr paren_pow_expr                           #ime_paren_paren
+    ;
+
+var_pow_expr
+    : var (CARET tex_symb)?
+    ;
+
+paren_pow_expr
+    : unit_paren (CARET tex_symb)?
+    ;
+
+implicit_pow_expr
+    : implicit_pow_expr CARET tex_symb  #implicit_pow_expr_recurse
+    | implicit_mult_unit                #implicit_pow_expr_unit
+    ;
+
+left_implicit_pow_expr
+    : left_implicit_pow_expr CARET tex_symb  #left_implicit_pow_expr_recurse
+    | left_implicit_mult_unit                #left_implicit_pow_expr_unit
     ;
 
 pow_expr
@@ -185,17 +224,43 @@ pow_expr
     | unit                    #pow_expr_unit
     ;
 
+// this structure (for example y(x+1)) is completely ambiguous between a multiplication
+// and a function call. So we need to use state context to figure out what it is
+// we also have to consider exponentiation here because y(x+1)^z is interpreted
+// as (y(x+1))^z if y is a function and y((x+1)^z) if y is a number
+var_parens
+    : var LPAREN expr RPAREN (CARET tex_symb)?
+    ;
+
 unit
-    : sign=(PLUS | MINUS) unit      #unit_recurse      // Signed unit expressions
-    | MINUS? LPAREN expr RPAREN     #unit_paren        // Parentheticals, optionally signed
-    | func_call                     #unit_func         // Function calls
+    : inf=(INFINITY | NEG_INFINITY) #unit_infinity     // Infinity
+    | implicit_mult_unit            #unit_implicit
+    | left_implicit_mult_unit       #unit_left_implicit
+    //these two are really implicit_mult_units but they need to be
+    //considered separately because of the var_parens ambiguity
     | var                           #unit_var          // Variable identifiers
-    | number                        #unit_number       // Number literals
-    | inf=(INFINITY | NEG_INFINITY) #unit_infinity     // Infinity
+    | unit_paren                    #unit_unit_paren
+    ;
+
+unit_paren
+    : LPAREN expr RPAREN
+    ;
+    
+//units that can be multiplied together without * or \cdot on both sides:
+//for example x\sqrt{x}
+implicit_mult_unit
+    : func_call                     #unit_func         // Function calls
     | fraction                      #unit_fraction     // Fraction expressions
     | matrix_env                    #unit_matrix       // Matrices
     | cases_env                     #unit_cases        // Branching (cases)
     | hist_entry                    #unit_hist         // History reference
+    | PI                            #unit_pi           // 3.14159...
+    | E                             #unit_e            // 2.71828...
+    ;
+    
+//units that can only be explicitly multiplied on the left
+left_implicit_mult_unit
+    : number                        #unit_number       // Number literals
     ;
 
 var_def

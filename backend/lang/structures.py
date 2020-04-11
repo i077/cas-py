@@ -6,8 +6,10 @@ from functools import reduce
 from typing import List
 
 import numpy as np
+from scipy.special import comb
 
-from backend.lang.State import State
+from State import State
+from Dicts import builtin_func_dict, inv_rel_dict
 
 
 class Function(ABC):
@@ -26,6 +28,9 @@ class Function(ABC):
 
     def __truediv__(self, other):
         return Expression(operator.truediv, self, other)
+
+    def __floordiv__(self, other):
+        return Expression(operator.floordiv, self, other)
 
     def __pow__(self, power, modulo=None):
         return Expression(operator.pow, self, power)
@@ -51,6 +56,7 @@ class Expression(Function):
     op_str = {
         operator.mul: "*",
         operator.truediv: "/",
+        operator.floordiv: "//",
         operator.add: "+",
         operator.sub: "-",
         operator.pow: "^",
@@ -62,12 +68,16 @@ class Expression(Function):
         self.terms = list(terms)
         assert (
             len(self.terms) == 2
-            if self.op in [operator.truediv, operator.pow]
+            if self.op in [operator.truediv, operator.floordiv, operator.pow]
             else len(self.terms) >= 2
         )
 
     def evaluate(self, state: State):
-        return reduce(self.op, [term.evaluate(state) for term in self.terms])
+        if self.op != operator.floordiv:
+            return reduce(self.op, [term.evaluate(state) for term in self.terms])
+        else:
+            # floordiv indicates that this is a rational expression that should be stored as a fraction
+            if 
 
     def __eq__(self, other):
         return (
@@ -98,7 +108,7 @@ class Expression(Function):
                     + self.terms[0] * remaining_terms.derivative()
                 )
         # quotient rule
-        elif self.op == operator.truediv:
+        elif self.op in [operator.truediv, operator.floordiv]:
             left, right = self.terms[0], self.terms[1]
             return (left.derivative() * right - right.derivative() * left) / (
                 right ** 2
@@ -235,24 +245,95 @@ class Polynomial(Expression):
         assert all(isinstance(term, Monomial) for term in self.terms)
 
 
-class Number(Function):
+class Number(Function, ABC):
+    @staticmethod
+    def number_init(value):
+        if isinstance(value, (RealNumber, float, int)):
+            return RealNumber(value)
+        return None
+
+
+    @abstractmethod
+    def __add__(self, other):
+        pass
+
+    @abstractmethod
+    def __sub__(self, other):
+        pass
+
+    @abstractmethod
+    def __mul__(self, other):
+        pass
+
+    @abstractmethod
+    def __truediv__(self, other):
+        pass
+
+    @abstractmethod
+    def evaluate(self, state=None):
+        pass
+
+    @abstractmethod
+    def __eq__(self, other):
+        pass
+
+    @abstractmethod
+    def __ne__(self, other):
+        pass
+
+    @abstractmethod
+    def derivative(self):
+        pass
+
+    @abstractmethod
+    def __repr__(self):
+        pass
+
+
+class RealNumber(Number):
     def __init__(self, value):
-        if isinstance(value, Number):
+        if isinstance(value, RealNumber):
             self.value = value.value
-        else:
+        elif isinstance(value, (float, int)):
             self.value = value
+        else:
+            raise ValueError("Improper instantiation of real number")
 
     def __add__(self, other):
-        if isinstance(other, Number):
-            return Number(self.value + other.value)
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value + other.value)
+        elif isinstance(other, Fraction):
+            #addition is commutative and we already implemented Fraction + RealNumber in Fraction
+            return other + self
         else:
-            super().__add__(other)
+            return other.__add__(self)
 
     def __sub__(self, other):
-        if isinstance(other, Number):
-            return Number(self.value - other.value)
-        elif isinstance(other, int, float):
-            return Number(self.value - other)
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value - other.value)
+        elif isinstance(other, Fraction):
+            #subtraction is (almost) commutative and we already implemented Fraction + RealNumber in Fraction
+            return RealNumber(-1) * other + self
+        else:
+            return other.__sub__(self)
+
+    def __mul__(self, other):
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value * other.value)
+        elif isinstance(other, Fraction):
+            #multiplication is commutative and we already implemented Fraction * RealNumber in Fraction
+            return other * self
+        else:
+            return other.__mul__(self)
+
+    def __truediv__(self, other):
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value / other.value)
+        elif isinstance(other, Fraction):
+            #divide real number by fraction: a/(b/c) = (ac)/b
+            return Fraction.create(self.value * other.den, other.num)
+        else:
+            return other.__truediv__(self)
 
     def evaluate(self, state=None):
         if int(self.value) == self.value:
@@ -260,10 +341,101 @@ class Number(Function):
         return self.value
 
     def __eq__(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, RealNumber):
             return self.value == other.value
         else:
-            return False
+            return other.__eq__(self)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def derivative(self):
+        return 0
+
+    def integral(self):
+        pass
+
+    def __repr__(self):
+        # if it's an integer, print as an integer
+        if self.value == float("inf"):
+            return "\\infty"
+        if self.value == float("-inf"):
+            return "-\\infty"
+        if int(self.value) == self.value:
+            return str(int(self.value))
+        return str(self.value)
+
+def Fraction(Number):
+    """This class represents a numerical fraction at evaluation time, not a rational function, which would be stored
+    as Expression with op.truediv/floordiv. For example, this class would hold \\frac{1}{2} but 
+    \\frac{x}{2} is an Expression"""
+    @staticmethod
+    def create(num, den)
+        """return a fraction if num and den are both integers and a RealNumber otherwise"""
+        assert num is Number and den is Number
+        if (isinstance(num, RealNumber) and isinstance(num.value, float)) or
+           (isinstance(den, RealNumber) and isinstance(den.value, float)):
+                #don't make fractions from floats - just divide them
+                return RealNumber(num / den)
+        else:
+            return Fraction(num, den)
+
+    def __init__(self, top, bottom):
+        """don't initialize with Fraction() - use Fraction.create() factory instead"""
+        assert top is Number and bottom is Number
+        if isinstance(top, RealNumber) and isinstance(bottom, RealNumber):
+            self.top = top
+            self.bottom = bottom
+        else:
+            # quotient will be a fraction since either top or bottom is a fraction
+            quotient = top / bottom
+            self.num = quotient.top
+            self.den = quotient.den
+        else:
+            raise ValueError("Improper instantiation of fraction")
+
+    def __add__(self, other):
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value + other.value)
+        else:
+            return other.__add__(self)
+
+    def __sub__(self, other):
+        if isinstance(other, RealNumber):
+            return RealNumber(self.value - other.value)
+        else:
+            return other.__sub__(self)
+
+    def __mul__(self, other):
+        if isinstance(other, RealNumber):
+            #multiply fraction by real number: (a/b)*c = (ac)/b
+            return Fraction.create(self.num * other, self.den)
+        elif isinstance(other, Fraction):
+            #multiply fraction by fraction: (a/b)(c/d) = (ac)/(bd)
+            return Fraction.create(self.num * other.num, self.den * other.den)
+        else:
+            return other.__mul__(self)
+
+    def __truediv__(self, other):
+        if isinstance(other, RealNumber):
+            #divide fraction by real number: (a/b)/c = a/(bc)
+            return Fraction.create(self.num, other * self.den)
+        if isinstance(other, Fraction):
+            #divide fraction by fraction: (a/b)/(c/d) = (ad)/(bc)
+            return Fraction.create(self.num * other.den, self.den * other.num)
+        else:
+            return other.__truediv__(self)
+
+    def evaluate(self, state=None):
+        if int(self.value) == self.value:
+            return int(self.value)
+        return self.value
+
+    def __eq__(self, other):
+        if isinstance(other, RealNumber):
+            return self.value == other.value
+        else:
+            return other.__eq__(self)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -411,6 +583,12 @@ class Relation:
                 raise ValueError(f"Cannot compute relation {rel} on {left} and {right}")
         return True
 
+    def __repr__(self):
+        output = ''
+        for ex in self.rel_chain:
+            output += str(inv_rel_dict.get(ex, ex))
+        return output
+
 
 class UserDefinedFunc:
     def __init__(self, args: list, func_body: Expression):
@@ -424,25 +602,28 @@ class UserDefinedFunc:
         return str(tuple(self.args)) + "\\to" + str(self.func_body)
 
 
-class FunctionCall:
-    def __init__(self, function, passed_args: list):
-        self.function = function
+class FunctionCall():
+    def __init__(self, function_name, passed_args: list):
+        self.function_name = function_name
         self.passed_args = passed_args
 
     def evaluate(self, state: State):
-        if isinstance(self.function, UserDefinedFunc):
+        if self.function_name in builtin_func_dict:
+            eval_args = [float(arg.evaluate(state)) for arg in self.passed_args]
+            return builtin_func_dict[self.function_name](*eval_args)
+        else:
+            function = state[self.function_name]
             if self.passed_args:
                 state.push_layer()
-                for arg, value in zip(self.function.args, self.passed_args):
+                for arg, value in zip(function.args, self.passed_args):
+                    # evaluate args here to avoid bugs where passed variable has same name as function arg
+                    value = Number.number_init(value.evaluate(state))
                     state[arg.name] = value
-                result = self.function.func_body.evaluate(state)
+                result = function.func_body.evaluate(state)
                 state.pop_layer()
             else:
-                result = self.function.func_body.evaluate(state)
+                result = function.func_body.evaluate(state)
             return result
-        else:
-            eval_args = [float(arg.evaluate(state)) for arg in self.passed_args]
-            return self.function(*eval_args)
 
 
 class SumFunc:
@@ -467,8 +648,8 @@ class SumFunc:
         max_bound = max(upper_bound, lower_bound)
         min_bound = min(upper_bound, lower_bound)
         sum_val = 0
-        for i in range(min_bound, max_bound + 1):
-            state[self.var.name] = Number(i)
+        for i in range(min_bound, max_bound+1):
+            state[self.var.name] = RealNumber(i)
             sum_val += float(self.sum_expr.evaluate(state))
         state.pop_layer()
         return sum_val
@@ -499,8 +680,8 @@ class ProdFunc:
         max_bound = max(upper_bound, lower_bound)
         min_bound = min(upper_bound, lower_bound)
         prod_val = 1
-        for i in range(min_bound, max_bound + 1):
-            state[self.var.name] = Number(i)
+        for i in range(min_bound, max_bound+1):
+            state[self.var.name] = RealNumber(i)
             prod_val *= float(self.prod_expr.evaluate(state))
         state.pop_layer()
         return prod_val
@@ -560,8 +741,8 @@ class Ceiling:
         return f"\\lceil {self.expr} \\rceil"
 
 
-class Derivative:
-    def __init__(self, cmd: str, order: Number, expr, var):
+class Derivative():
+    def __init__(self, cmd: str, order: RealNumber, expr, var):
         self.cmd = cmd
         self.order = order
         self.expr = expr
@@ -575,4 +756,35 @@ class Derivative:
         if self.order:
             return f"{self.cmd}[{self.order}]{{{self.expr}}}{{{self.var}}}"
         else:
-            return f"{self.cmd}{{{self.expr}}}{{{self.var}}}"
+            return f'{self.cmd}{{{self.expr}}}{{{self.var}}}'
+
+class Root():
+    def __init__(self, expr, n=None):
+        self.expr = expr
+        self.n = n
+    
+    def evaluate(self, state: State):
+        if self.n is None:
+            return math.sqrt(self.expr.evaluate(state))
+        n = self.n.evaluate()
+        if n == 0:
+            raise ValueError(f"Can't take 0th root of {self.expr}")
+        return math.pow(self.expr.evaluate(state), 1/n)
+
+    def __repr__(self):
+        if self.n is None:
+            return f'\\sqrt{{{self.expr}}}'
+        return f'\\sqrt[{self.n}]{{{self.expr}}}'
+
+class Choose():
+    def __init__(self, n, k):
+        self.n = n
+        self.k = k
+    
+    def evaluate(self, state: State):
+        n = self.n.evaluate(state)
+        k = self.k.evaluate(state)
+        return comb(n, k)
+
+    def __repr__(self):
+        return f'\\binom{{{self.n}}}{{{self.k}}}'

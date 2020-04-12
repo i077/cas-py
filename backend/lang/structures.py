@@ -293,6 +293,10 @@ class Number(Function, ABC):
         pass
 
     @abstractmethod
+    def true_value(self):
+        pass
+
+    @abstractmethod
     def __eq__(self, other):
         pass
 
@@ -385,10 +389,14 @@ class RealNumber(Number):
         if isinstance(other, RealNumber):
             return RealNumber(self.value ** other.value)
         if isinstance(other, Fraction):
-            return RealNumber(self ** (other.num / other.den))
+            return RealNumber(self ** other.true_value())
 
     def evaluate(self, state=None):
         return self
+
+    def true_value(self):
+        """ Get the numerical value of this Number, not the object like evaluate()"""
+        return self.value
 
     def __eq__(self, other):
         if isinstance(other, RealNumber):
@@ -550,6 +558,10 @@ class Fraction(Number):
         
     def evaluate(self, state=None):
         return self.simplify()
+
+    def true_value(self):
+        """ Get the float value of this Fraction, not the object like evaluate()"""
+        return self.num / self.den
 
     def simplify(self):
         """reduce to lowest terms"""
@@ -922,8 +934,8 @@ class FunctionCall():
 
     def evaluate(self, state: State):
         if self.function_name in builtin_func_dict:
-            eval_args = [float(arg.evaluate(state)) for arg in self.passed_args]
-            return builtin_func_dict[self.function_name](*eval_args)
+            eval_args = [arg.evaluate(state).true_value() for arg in self.passed_args]
+            return RealNumber(float(builtin_func_dict[self.function_name](*eval_args)))
         else:
             function = state[self.function_name]
             if self.passed_args:
@@ -1037,7 +1049,7 @@ class Floor:
         self.expr = expr
 
     def evaluate(self, state: State):
-        return math.floor(self.expr.evaluate(state))
+        return RealNumber(float(math.floor(self.expr.evaluate(state).true_value())))
 
     def __repr__(self):
         return f"\\lfloor {self.expr} \\rfloor"
@@ -1048,7 +1060,7 @@ class Ceiling:
         self.expr = expr
 
     def evaluate(self, state: State):
-        return math.ceil(self.expr.evaluate(state))
+        return RealNumber(float(math.ceil(self.expr.evaluate(state).true_value())))
 
     def __repr__(self):
         return f"\\lceil {self.expr} \\rceil"
@@ -1078,11 +1090,11 @@ class Root():
     
     def evaluate(self, state: State):
         if self.n is None:
-            return math.sqrt(self.expr.evaluate(state))
-        n = self.n.evaluate()
+            return RealNumber(float(math.sqrt(self.expr.evaluate(state).true_value())))
+        n = self.n.evaluate(state).true_value()
         if n == 0:
             raise ValueError(f"Can't take 0th root of {self.expr}")
-        return math.pow(self.expr.evaluate(state), 1/n)
+        return RealNumber(float(math.pow(self.expr.evaluate(state).true_value(), 1/n)))
 
     def __repr__(self):
         if self.n is None:
@@ -1095,9 +1107,11 @@ class Choose():
         self.k = k
     
     def evaluate(self, state: State):
-        n = self.n.evaluate(state)
-        k = self.k.evaluate(state)
-        return comb(n, k)
+        n = self.n.evaluate(state).true_value()
+        k = self.k.evaluate(state).true_value()
+        if int(n) != n or int(k) != k:
+            raise ValueError(f"Inputs {self.n} and {self.k} to binom must be integers")
+        return RealNumber(int(comb(int(n), int(k))))
 
     def __repr__(self):
         return f'\\binom{{{self.n}}}{{{self.k}}}'

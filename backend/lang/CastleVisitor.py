@@ -334,7 +334,7 @@ class CastleVisitor(LaTeXVisitor):
     def visitFunc_call_builtin(self, ctx: parse.Func_call_builtinContext):
         """func_call_builtin
         func_builtin (LCURLY and/or LPAREN) expr ((COMMA expr)+)*)? (RCURLY and/or RPAREN)"""
-        function_name = self.visit(ctx.var())
+        function_name = self.visit(ctx.func_builtin())
         args = ctx.expr()
         if not args:
             args = []
@@ -417,10 +417,10 @@ class CastleVisitor(LaTeXVisitor):
 
     def visitFunc_root(self, ctx: parse.Func_rootContext):
         exprs = ctx.expr()
-        if isinstance(exprs, (list, tuple)):
+        if len(exprs) > 1:
             # n-th root instead of default square root
             return Root(self.visit(exprs[1]), n=self.visit(exprs[0]))
-        return Root(self.visit(exprs))
+        return Root(self.visit(exprs[0]))
 
     def visitFunc_choose(self, ctx: parse.Func_chooseContext):
         return Choose(
@@ -528,7 +528,6 @@ class CastleVisitor(LaTeXVisitor):
         if not isinstance(entries, list):
             return self.visit(entries)
         return [self.visit(entry) for entry in entries]
-
 
 
 def evaluate_expression(state: State, expr: str):

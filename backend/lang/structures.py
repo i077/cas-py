@@ -75,13 +75,13 @@ class Expression(Function):
 
     def evaluate(self, state: State):
         if self.op != operator.floordiv:
-            return reduce(self.op, [term.evaluate(state) for term in self.terms])
+            return reduce(self.op, [term.evaluate(state) for term in self.terms]).evaluate(state)
         else:
             # floordiv indicates that this division was entered using \frac. If each side is a number make a fraction
             left_eval = self.terms[0].evaluate(state)
             right_eval = self.terms[1].evaluate(state)
             if isinstance(left_eval, Number) and isinstance(right_eval, Number):
-                return Fraction.create(left_eval, right_eval).evaluate()
+                return Fraction.create(left_eval, right_eval).evaluate(state)
             else:
                 # TODO: This is where we'd implement rational simplification - ie \frac{x}{2x} = \frac{1}{2}
                 raise Exception("Fractions of things that aren't numbers not yet implemented")
@@ -361,6 +361,16 @@ class RealNumber(Number):
             # as of now we can't divide RealNumber by anything else
             raise ValueError(f"can't divide RealNumber {self} by {other}")
 
+    def __floordiv__(self, other):
+        """ Only for internal use to create a fraction from a // b """
+        if isinstance(other, RealNumber):
+            return Fraction.create(self, other).simplify()
+        if isinstance(other, Fraction):
+            # __truediv__ already correctly creates a fraction in this case
+            return (self / other).simplify()
+        else:
+            raise ValueError(f"__floordiv__ only supported for types {type(self)} and {type(other)}")
+
     def __pow__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value ** other.value)
@@ -514,6 +524,13 @@ class Fraction(Number):
         else:
             return Fraction.create(RealNumber(1) , other) * self
 
+    def __floordiv__(self, other):
+        """ Only for internal use and only needed because we defined __floordiv__ for RealNumber"""
+        if isinstance(other, Number):
+            return self / other
+        else:
+            raise ValueError(f"__floordiv__ only supported for types {type(self)} and {type(other)}")
+
     def __pow__(self, other):
         # (a/b)^c = (a^c)/(b^c). We have implemented RealNumber ** Fraction and RealNumber ** RealNumber above
         return Fraction.create(
@@ -544,7 +561,7 @@ class Fraction(Number):
         elif isinstance(other, RealNumber):
             return self.num / self.den == other
         else:
-            return other.__eq__(self)
+            raise ValueError(f"Can't evaluate __eq__ on objects of type {type(self)} and {type(other)}")
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -555,7 +572,7 @@ class Fraction(Number):
         elif isinstance(other, RealNumber):
             return self.num / self.den < other
         else:
-            return other.__gt__(self)
+            raise ValueError(f"Can't evaluate __lt__ on objects of type {type(self)} and {type(other)}")
 
     def __gt__(self, other):
         if isinstance(other, Fraction):
@@ -563,7 +580,7 @@ class Fraction(Number):
         elif isinstance(other, RealNumber):
             return self.num / self.den > other
         else:
-            return other.__lt__(self)
+            raise ValueError(f"Can't evaluate __gt__ on objects of type {type(self)} and {type(other)}")
         
     def __le__(self, other):
         return self < other or self == other
@@ -725,13 +742,8 @@ class Matrix(Function):
             # multiply by itself other.value times
             return reduce(operator.mul, [self] * int(other.value))
         if other.value < 0:
-            # first take inverse, then multiply by itself |other.value| times
-            # try:
-            #     inverse = Matrix(np.linalg.inv(self.mat), self.type)
-            # except np.linalg.LinAlgError:
-            #     raise ValueError("Matrix is singular")
-            # return reduce(operator.mul, [inverse] * int(other.value))
-            return None
+            inverse = self.invert()
+            return reduce(operator.mul, [inverse] * (-int(other.value)))
 
     def __eq__(self, other):
         if not isinstance(other, Matrix) or self.mat.shape != other.mat.shape:
@@ -746,6 +758,90 @@ class Matrix(Function):
 
     def integral(self):
         pass
+
+    def invert(self):
+        """Find inverse of matrix using Gauss-Jordan elimination"""
+        # can't take inverse of non-square matrix
+        if self.mat.shape[0] != self.mat.shape[1]:
+            raise ValueError(f"Can't take inverse of matrix with dimensions {self.mat.shape}")
+        # can't take inverse if matrix is singular (determinant is 0)
+        if self.determinant() == RealNumber(0):
+            raise ValueError(f"Can't take inverse: matrix is singular")
+
+        def swap_rows(r1, r2, mat):
+            if r1 != r2:
+                mat[[r1, r2]] = mat[[r2, r1]]
+
+        def leftmost_nonzero(mat, row):
+            """Get index of leftmost nonzero entry in row"""
+            for col in range(len(mat[row, :])):
+                if mat[row][col] != RealNumber(0):
+                    return col
+            return float("inf")
+
+        nrows= self.mat.shape[0]
+        # append identity matrix to the right
+        identity = np.vectorize(lambda v: RealNumber(v))(
+            np.identity(nrows)
+        )
+        gmat = np.append(self.mat, identity, axis=1)
+        all_zero_counter = 0
+        for row in range(nrows//2):
+            # if all columns are 0, move row to bottom
+            if all(gmat[row, :] == RealNumber(0)):
+                swap_rows(row, nrows - all_zero_counter - 1, gmat)
+                all_zero_counter += 1
+
+        # move row by row, repeat three steps:
+        for row in range(nrows):
+            # 1. swap row with leftmost nonzero entry with current row
+            if row != nrows - 1:
+                leftmost_nonzero_row, _ = min(
+                    [(r, leftmost_nonzero(gmat, r)) for r in range(row, nrows)], 
+                    key = lambda t: t[1]
+                )
+                swap_rows(row, leftmost_nonzero_row, gmat)
+
+            # 2. Divide this row by scalar so that its first nonzero entry is 1
+            # still work at index row, although there could be a different actual row here now
+            # use __floordiv__ to create fractions
+            nonzero_index = leftmost_nonzero(gmat, row)
+            gmat[row, :] = gmat[row, :] // gmat[row][nonzero_index]
+
+            # 3. clear out other rows' values in column with this row's first nonzero entry
+            for lrow in range(nrows):
+                if lrow != row and gmat[lrow][nonzero_index] != RealNumber(0):
+                    gmat[lrow, :] = gmat[lrow, :] - gmat[row, :] * gmat[lrow][nonzero_index] 
+
+        # right nrows columns were originally identity, now they're the inverse
+        return Matrix(gmat[:, nrows : 2*nrows], self.type)
+
+
+    def determinant(self):
+        """ Calculate determinant using Laplace's formula:
+        det(A) = \\sum{j=0}{n-1}{(-1)^j a_{0j} M_{0j}}
+        where M_{0j} is the determinant of A without its first row and jth column """
+        # matrix must be square
+        if self.mat.shape[0] != self.mat.shape[1]:
+            raise ValueError(f"Can't take inverse of matrix with dimensions {self.mat.shape}")
+
+        def determinant_recurse(mat):
+            """ takes Matrix as an argument so we can recurse """
+            # base case: dimension 2 determinant is ad - bc
+            if mat.shape[0] == 2:
+                return (mat[0][0] * mat[1][1]) - (mat[1][0] * mat[0][1])
+
+            return reduce(
+                operator.add, 
+                [(RealNumber(-1) ** RealNumber(j)) * mat[0][j] * \
+                determinant_recurse(
+                    np.delete(np.delete(mat, 0, 0), j, 1)
+                )
+                for j in range(mat.shape[0])]
+            )
+        
+        return determinant_recurse(self.mat)
+
 
     def __repr__(self):
         mat_string = ""
@@ -825,22 +921,22 @@ class SumFunc:
 
     def evaluate(self, state: State):
         lower_bound = self.lower_bound_expr.evaluate(state)
-        if not isinstance(lower_bound, int):
+        if not isinstance(lower_bound, RealNumber) or int(lower_bound.value) != lower_bound.value:
             raise Exception("Sum lower bound must evaluate to integer")
         upper_bound = self.upper_bound_expr.evaluate(state)
-        if upper_bound == float("inf"):
+        if upper_bound.value == float("inf"):
             # TODO
             pass
-        if not isinstance(upper_bound, int):
+        if not isinstance(upper_bound, RealNumber) or int(upper_bound.value) != upper_bound.value:
             raise Exception("Sum upper bound must evaluate to integer")
 
         state.push_layer()
-        max_bound = max(upper_bound, lower_bound)
-        min_bound = min(upper_bound, lower_bound)
-        sum_val = 0
+        max_bound = int(max(upper_bound, lower_bound).value)
+        min_bound = int(min(upper_bound, lower_bound).value)
+        sum_val = RealNumber(0)
         for i in range(min_bound, max_bound+1):
             state[self.var.name] = RealNumber(i)
-            sum_val += float(self.sum_expr.evaluate(state))
+            sum_val += self.sum_expr.evaluate(state)
         state.pop_layer()
         return sum_val
 
@@ -857,22 +953,22 @@ class ProdFunc:
 
     def evaluate(self, state: State):
         lower_bound = self.lower_bound_expr.evaluate(state)
-        if not isinstance(lower_bound, int):
+        if not isinstance(lower_bound, RealNumber) or int(lower_bound.value) != lower_bound.value:
             raise Exception("Prod lower bound must evaluate to integer")
         upper_bound = self.upper_bound_expr.evaluate(state)
-        if upper_bound == float("inf"):
+        if upper_bound.value == float("inf"):
             # TODO
             pass
-        if not isinstance(upper_bound, int):
+        if not isinstance(upper_bound, RealNumber) or int(upper_bound.value) != upper_bound.value:
             raise Exception("Prod upper bound must evaluate to integer")
 
         state.push_layer()
-        max_bound = max(upper_bound, lower_bound)
-        min_bound = min(upper_bound, lower_bound)
-        prod_val = 1
+        max_bound = int(max(upper_bound, lower_bound).value)
+        min_bound = int(min(upper_bound, lower_bound).value)
+        prod_val = RealNumber(1)
         for i in range(min_bound, max_bound+1):
             state[self.var.name] = RealNumber(i)
-            prod_val *= float(self.prod_expr.evaluate(state))
+            prod_val *= self.prod_expr.evaluate(state)
         state.pop_layer()
         return prod_val
 

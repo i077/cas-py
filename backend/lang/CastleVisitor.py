@@ -13,6 +13,7 @@ from State import State
 from structures import (
     Cases,
     Ceiling,
+    Choose,
     Derivative,
     Expression,
     Floor,
@@ -23,13 +24,12 @@ from structures import (
     Monomial,
     Number,
     RealNumber,
+    Root,
     ProdFunc,
     Relation,
     SumFunc,
     UserDefinedFunc,
-    Variable,
-    Root,
-    Choose
+    Variable
 )
 
 

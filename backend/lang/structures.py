@@ -74,6 +74,16 @@ class Expression(Function):
         )
 
     def evaluate(self, state: State):
+        if self.op == operator.pow \
+           and len(self.terms) == 2 \
+           and ((isinstance(self.terms[0], Matrix) \
+                    and self.terms[0].type != "vmatrix") \
+                or (isinstance(self.terms[0], Variable) \
+                    and isinstance(self.terms[0].evaluate(state), Matrix))) \
+           and isinstance(self.terms[1], Variable) \
+           and self.terms[1].name == 'T':
+           # transpose
+            return self.terms[0].evaluate(state).transpose()
         if self.op != operator.floordiv:
             return reduce(self.op, [term.evaluate(state) for term in self.terms]).evaluate(state)
         else:
@@ -842,6 +852,11 @@ class Matrix(Function):
         
         return determinant_recurse(self.mat)
 
+    def transpose(self):
+        # matrix must be square
+        if self.mat.shape[0] != self.mat.shape[1]:
+            raise ValueError(f"Can't take transpose of matrix with dimensions {self.mat.shape}")
+        return Matrix(np.transpose(self.mat), self.type)
 
     def __repr__(self):
         mat_string = ""

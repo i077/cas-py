@@ -826,7 +826,7 @@ class Matrix(Function):
             raise ValueError(f"Can't take inverse of matrix with dimensions {self.mat.shape}")
 
         def determinant_recurse(mat):
-            """ takes Matrix as an argument so we can recurse """
+            """ takes numpy array as an argument so we can recurse """
             # base case: dimension 2 determinant is ad - bc
             if mat.shape[0] == 2:
                 return (mat[0][0] * mat[1][1]) - (mat[1][0] * mat[0][1])
@@ -851,6 +851,18 @@ class Matrix(Function):
             mat_string += str(row[-1]) + "\\\\"
 
         return f"\\begin{{{self.type}}}{mat_string}\\end{{{self.type}}}"
+
+class Determinant:
+    """ The determinant of a matrix.
+    Determinants are indicated by a matrix created with the vmatrix environment"""
+    def __init__(self, mat):
+        self.matrix = Matrix(mat, 'vmatrix')
+
+    def evaluate(self, state: State):
+        return self.matrix.evaluate(state).determinant()
+
+    def __repr__(self):
+        return str(self.matrix)
 
 
 class Relation:

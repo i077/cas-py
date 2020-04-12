@@ -15,6 +15,7 @@ from structures import (
     Ceiling,
     Choose,
     Derivative,
+    Determinant,
     Expression,
     Floor,
     FunctionCall,
@@ -500,10 +501,16 @@ class CastleVisitor(LaTeXVisitor):
         if begin_type != end_type:
             raise Exception("Matrix \\begin and \\end types much match")
 
-        return Matrix(
-            self.visit(ctx.matrix_exp()),
-            matrix_type_dict[begin_type]
-        )
+        # 'vmatrix' type signifies a determinant
+        if begin_type == parse.V_MATRIX:
+            return Determinant(
+                self.visit(ctx.matrix_exp())
+            )
+        else:
+            return Matrix(
+                self.visit(ctx.matrix_exp()),
+                matrix_type_dict[begin_type]
+            )
 
     def visitMatrix_exp(self, ctx: parse.Matrix_expContext):
         return [self.visit(row) for row in ctx.matrix_row()] + [

@@ -5,12 +5,12 @@ import sys
 import sympy
 from antlr4 import CommonTokenStream, FileStream, InputStream
 
-from Dicts import matrix_type_dict, rel_dict
-from LaTeXLexer import LaTeXLexer
-from LaTeXParser import LaTeXParser as parse
-from LaTeXVisitor import LaTeXVisitor
-from State import State
-from structures import (
+from backend.lang.Dicts import matrix_type_dict, rel_dict
+from backend.lang.LaTeXLexer import LaTeXLexer
+from backend.lang.LaTeXParser import LaTeXParser as parse
+from backend.lang.LaTeXVisitor import LaTeXVisitor
+from backend.lang.State import State
+from backend.lang.structures import (
     Cases,
     Ceiling,
     Choose,
@@ -30,7 +30,7 @@ from structures import (
     Relation,
     SumFunc,
     UserDefinedFunc,
-    Variable
+    Variable,
 )
 
 
@@ -57,9 +57,9 @@ class CastleVisitor(LaTeXVisitor):
         """implicit_mult_expr_mult
         implicit_mult_expr implicit_mult_expr"""
         return Expression(
-            op.mul, 
+            op.mul,
             self.visit(ctx.implicit_mult_expr(0)),
-            self.visit(ctx.implicit_mult_expr(1))
+            self.visit(ctx.implicit_mult_expr(1)),
         )
 
     def visitIme_left(self, ctx: parse.Ime_leftContext):
@@ -68,9 +68,9 @@ class CastleVisitor(LaTeXVisitor):
         if not ctx.implicit_mult_expr():
             return self.visit(ctx.left_implicit_pow_expr())
         return Expression(
-            op.mul, 
+            op.mul,
             self.visit(ctx.left_implicit_pow_expr()),
-            self.visit(ctx.implicit_mult_expr())
+            self.visit(ctx.implicit_mult_expr()),
         )
 
     def visitIme_var_unit_paren_left(self, ctx: parse.Ime_var_unit_paren_leftContext):
@@ -80,11 +80,7 @@ class CastleVisitor(LaTeXVisitor):
             left_expr = self.visit(ctx.var_pow_expr())
         elif ctx.paren_pow_expr():
             left_expr = self.visit(ctx.paren_pow_expr())
-        return Expression(
-            op.mul, 
-            left_expr,
-            self.visit(ctx.implicit_mult_expr())
-        )
+        return Expression(op.mul, left_expr, self.visit(ctx.implicit_mult_expr()))
 
     def visitIme_var_unit_paren_right(self, ctx: parse.Ime_var_unit_paren_rightContext):
         """ime_var_unit_paren_right
@@ -93,37 +89,27 @@ class CastleVisitor(LaTeXVisitor):
             right_expr = self.visit(ctx.var_pow_expr())
         elif ctx.paren_pow_expr():
             right_expr = self.visit(ctx.paren_pow_expr())
-        return Expression(
-            op.mul, 
-            self.visit(ctx.implicit_mult_expr()),
-            right_expr
-        )
+        return Expression(op.mul, self.visit(ctx.implicit_mult_expr()), right_expr)
 
     def visitIme_paren_var(self, ctx: parse.Ime_paren_varContext):
         """ime_paren_var
         paren_pow_expr var_pow_expr"""
         return Expression(
-            op.mul, 
-            self.visit(ctx.paren_pow_expr()),
-            self.visit(ctx.var_pow_expr())
+            op.mul, self.visit(ctx.paren_pow_expr()), self.visit(ctx.var_pow_expr())
         )
 
     def visitIme_var_var(self, ctx: parse.Ime_var_varContext):
         """ime_var_var
         var_pow_expr var_pow_expr"""
         return Expression(
-            op.mul, 
-            self.visit(ctx.var_pow_expr(0)),
-            self.visit(ctx.var_pow_expr(1))
+            op.mul, self.visit(ctx.var_pow_expr(0)), self.visit(ctx.var_pow_expr(1))
         )
 
     def visitIme_paren_paren(self, ctx: parse.Ime_paren_parenContext):
         """ime_paren_paren
         paren_pow_expr paren_pow_expr"""
         return Expression(
-            op.mul, 
-            self.visit(ctx.paren_pow_expr(0)),
-            self.visit(ctx.paren_pow_expr(1))
+            op.mul, self.visit(ctx.paren_pow_expr(0)), self.visit(ctx.paren_pow_expr(1))
         )
 
     def visitVar_pow_expr(self, ctx: parse.Var_pow_exprContext):
@@ -132,11 +118,7 @@ class CastleVisitor(LaTeXVisitor):
         exponent = ctx.tex_symb()
         if exponent is None:
             return self.visit(ctx.var())
-        return Expression(
-            op.pow,
-            self.visit(ctx.var()),
-            self.visit(exponent)
-        )
+        return Expression(op.pow, self.visit(ctx.var()), self.visit(exponent))
 
     def visitParen_pow_expr(self, ctx: parse.Paren_pow_exprContext):
         """paren_pow_expr
@@ -144,11 +126,7 @@ class CastleVisitor(LaTeXVisitor):
         exponent = ctx.tex_symb()
         if exponent is None:
             return self.visit(ctx.unit_paren())
-        return Expression(
-            op.pow,
-            self.visit(ctx.unit_paren()),
-            self.visit(exponent)
-        )
+        return Expression(op.pow, self.visit(ctx.unit_paren()), self.visit(exponent))
 
     def visitMult_expr_recurse(self, ctx: parse.Mult_expr_recurseContext):
         """mult_expr_recurse
@@ -167,16 +145,18 @@ class CastleVisitor(LaTeXVisitor):
         else:
             return self.visit(ctx.mult_expr())
 
-    def visitImplicit_pow_expr_recurse(self, ctx: parse.Implicit_pow_expr_recurseContext):
+    def visitImplicit_pow_expr_recurse(
+        self, ctx: parse.Implicit_pow_expr_recurseContext
+    ):
         """implicit_pow_expr_recurse
         implicit_pow_expr CARET tex_symb """
         return Expression(
-            op.pow,
-            self.visit(ctx.implicit_pow_expr()),
-            self.visit(ctx.tex_symb()),
+            op.pow, self.visit(ctx.implicit_pow_expr()), self.visit(ctx.tex_symb()),
         )
 
-    def visitLeft_implicit_pow_expr_recurse(self, ctx: parse.Left_implicit_pow_expr_recurseContext):
+    def visitLeft_implicit_pow_expr_recurse(
+        self, ctx: parse.Left_implicit_pow_expr_recurseContext
+    ):
         """left_implicit_pow_expr_recurse
         left_implicit_pow_expr CARET tex_symb """
         return Expression(
@@ -202,9 +182,9 @@ class CastleVisitor(LaTeXVisitor):
         """unit_infinity
         inf=(INFINITY | NEG_INFINITY)"""
         if ctx.inf.type == parse.INFINITY:
-            return RealNumber(float('inf'))
+            return RealNumber(float("inf"))
         else:
-            return RealNumber(float('-inf'))
+            return RealNumber(float("-inf"))
 
     def visitUnit_pi(self, ctx: parse.Unit_piContext):
         return RealNumber(math.pi)
@@ -225,13 +205,8 @@ class CastleVisitor(LaTeXVisitor):
     def visitFraction(self, ctx: parse.FractionContext):
         """fraction
         CMD_FRAC LCURLY expr RCURLY LCURLY expr RCURLY"""
-        #use the floordiv // operator to represent a fraction
-        return Expression(
-            op.floordiv, 
-            self.visit(ctx.expr(0)),
-            self.visit(ctx.expr(1))
-        )
-
+        # use the floordiv // operator to represent a fraction
+        return Expression(op.floordiv, self.visit(ctx.expr(0)), self.visit(ctx.expr(1)))
 
     # Variable names and TeX symbols ===============================================
     def visitVar_name_letter(self, ctx: parse.Var_name_letterContext):
@@ -315,7 +290,6 @@ class CastleVisitor(LaTeXVisitor):
         func_body = self.visit(ctx.expr())
         return UserDefinedFunc(args, func_body)
 
-
     # Function calls ============================================================
     def visitFunc_custom(self, ctx: parse.Func_customContext):
         """func_custom (user-defined function call)
@@ -328,7 +302,7 @@ class CastleVisitor(LaTeXVisitor):
             args = [self.visit(args)]
         else:
             args = [self.visit(arg) for arg in args]
-        
+
         return FunctionCall(function_name, args)
 
     def visitFunc_call_builtin(self, ctx: parse.Func_call_builtinContext):
@@ -342,7 +316,7 @@ class CastleVisitor(LaTeXVisitor):
             args = [self.visit(args)]
         else:
             args = [self.visit(arg) for arg in args]
-        
+
         return FunctionCall(function_name, args)
 
     def visitFunc_sum(self, ctx: parse.Func_sumContext):
@@ -423,10 +397,7 @@ class CastleVisitor(LaTeXVisitor):
         return Root(self.visit(exprs[0]))
 
     def visitFunc_choose(self, ctx: parse.Func_chooseContext):
-        return Choose(
-            self.visit(ctx.expr(0)),
-            self.visit(ctx.expr(1)),
-        )
+        return Choose(self.visit(ctx.expr(0)), self.visit(ctx.expr(1)),)
 
     def visitFunc_builtin(self, ctx: parse.Func_builtinContext):
         return ctx.name.type
@@ -446,20 +417,16 @@ class CastleVisitor(LaTeXVisitor):
             # the variable is a function, so call it
             if exponent is not None:
                 return Expression(
-                    op.pow,
-                    FunctionCall(var.name, [expr]),
-                    self.visit(exponent)
+                    op.pow, FunctionCall(var.name, [expr]), self.visit(exponent)
                 )
             else:
                 return FunctionCall(var.name, [expr])
 
-        else: #otherwise this is a multiplication
+        else:  # otherwise this is a multiplication
             if exponent is not None:
                 # x((y+1)^z)
                 return Expression(
-                    op.mul,
-                    var,
-                    Expression(op.pow, expr, self.visit(exponent))
+                    op.mul, var, Expression(op.pow, expr, self.visit(exponent))
                 )
             else:
                 return Expression(op.mul, var, expr)
@@ -503,14 +470,9 @@ class CastleVisitor(LaTeXVisitor):
 
         # 'vmatrix' type signifies a determinant
         if begin_type == parse.V_MATRIX:
-            return Determinant(
-                self.visit(ctx.matrix_exp())
-            )
+            return Determinant(self.visit(ctx.matrix_exp()))
         else:
-            return Matrix(
-                self.visit(ctx.matrix_exp()),
-                matrix_type_dict[begin_type]
-            )
+            return Matrix(self.visit(ctx.matrix_exp()), matrix_type_dict[begin_type])
 
     def visitMatrix_exp(self, ctx: parse.Matrix_expContext):
         return [self.visit(row) for row in ctx.matrix_row()] + [
@@ -542,8 +504,8 @@ def evaluate_expression(state: State, expr: str):
 
 def main(argv):
     state = State()
-    FILEPATH = 'input.txt'
-    for line in open(FILEPATH, 'r').readlines():
+    FILEPATH = "input.txt"
+    for line in open(FILEPATH, "r").readlines():
         print(evaluate_expression(state, line)[0])
 
 

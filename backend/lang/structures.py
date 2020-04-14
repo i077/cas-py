@@ -9,8 +9,8 @@ from typing import List
 import numpy as np
 from scipy.special import comb
 
-from State import State
-from Dicts import builtin_func_dict, inv_rel_dict
+from backend.lang.State import State
+from backend.lang.Dicts import builtin_func_dict, inv_rel_dict
 
 
 class Function(ABC):
@@ -56,8 +56,8 @@ class Function(ABC):
 class Expression(Function):
     op_str = {
         operator.mul: "*",
-        operator.truediv: "/", # divisions entered using '/'
-        operator.floordiv: "//", # divisions entered using '\frac'
+        operator.truediv: "/",  # divisions entered using '/'
+        operator.floordiv: "//",  # divisions entered using '\frac'
         operator.add: "+",
         operator.sub: "-",
         operator.pow: "^",
@@ -74,18 +74,25 @@ class Expression(Function):
         )
 
     def evaluate(self, state: State):
-        if self.op == operator.pow \
-           and len(self.terms) == 2 \
-           and ((isinstance(self.terms[0], Matrix) \
-                    and self.terms[0].type != "vmatrix") \
-                or (isinstance(self.terms[0], Variable) \
-                    and isinstance(self.terms[0].evaluate(state), Matrix))) \
-           and isinstance(self.terms[1], Variable) \
-           and self.terms[1].name == 'T':
-           # transpose
+        if (
+            self.op == operator.pow
+            and len(self.terms) == 2
+            and (
+                (isinstance(self.terms[0], Matrix) and self.terms[0].type != "vmatrix")
+                or (
+                    isinstance(self.terms[0], Variable)
+                    and isinstance(self.terms[0].evaluate(state), Matrix)
+                )
+            )
+            and isinstance(self.terms[1], Variable)
+            and self.terms[1].name == "T"
+        ):
+            # transpose
             return self.terms[0].evaluate(state).transpose()
         if self.op != operator.floordiv:
-            return reduce(self.op, [term.evaluate(state) for term in self.terms]).evaluate(state)
+            return reduce(
+                self.op, [term.evaluate(state) for term in self.terms]
+            ).evaluate(state)
         else:
             # floordiv indicates that this division was entered using \frac. If each side is a number make a fraction
             left_eval = self.terms[0].evaluate(state)
@@ -94,7 +101,9 @@ class Expression(Function):
                 return Fraction.create(left_eval, right_eval).evaluate(state)
             else:
                 # TODO: This is where we'd implement rational simplification - ie \frac{x}{2x} = \frac{1}{2}
-                raise Exception("Fractions of things that aren't numbers not yet implemented")
+                raise Exception(
+                    "Fractions of things that aren't numbers not yet implemented"
+                )
 
     def __eq__(self, other):
         return (
@@ -141,7 +150,6 @@ class Expression(Function):
         if self.op == operator.floordiv:
             return f"\\frac{{{self.terms[0]}}}{{{self.terms[1]}}}"
         return Expression.op_str[self.op].join([str(term) for term in self.terms])
-        
 
 
 class Variable(Function):
@@ -337,7 +345,7 @@ class RealNumber(Number):
             value = val
         else:
             raise ValueError("Improper instantiation of real number")
-            
+
         if int(value) == value:
             # cast floats like 4.0 as ints
             self.value = int(value)
@@ -347,15 +355,15 @@ class RealNumber(Number):
     def __add__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value + other.value)
-        else: 
-            #addition is commutative and we assume we've implemented other + RealNumber in other's class
+        else:
+            # addition is commutative and we assume we've implemented other + RealNumber in other's class
             return other + self
 
     def __sub__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value - other.value)
         else:
-            #subtraction is (almost) commutative and we assume we've already implemented other + RealNumber
+            # subtraction is (almost) commutative and we assume we've already implemented other + RealNumber
             return RealNumber(-1) * other + self
 
     def __mul__(self, other):
@@ -369,7 +377,7 @@ class RealNumber(Number):
         if isinstance(other, RealNumber):
             return RealNumber(self.value / other.value)
         elif isinstance(other, Fraction):
-            #divide real number by fraction: a/(b/c) = (ac)/b
+            # divide real number by fraction: a/(b/c) = (ac)/b
             return Fraction.create(self * other.den, other.num)
         else:
             # as of now we can't divide RealNumber by anything else
@@ -383,7 +391,9 @@ class RealNumber(Number):
             # __truediv__ already correctly creates a fraction in this case
             return (self / other).simplify()
         else:
-            raise ValueError(f"__floordiv__ only supported for types {type(self)} and {type(other)}")
+            raise ValueError(
+                f"__floordiv__ only supported for types {type(self)} and {type(other)}"
+            )
 
     def __pow__(self, other):
         if isinstance(other, RealNumber):
@@ -423,7 +433,7 @@ class RealNumber(Number):
 
     def __le__(self, other):
         return self < other or self == other
-        
+
     def __ge__(self, other):
         return self > other or self == other
 
@@ -443,10 +453,12 @@ class RealNumber(Number):
             return str(int(self.value))
         return str(self.value)
 
+
 class Fraction(Number):
     """This class represents a numerical fraction at evaluation time, not a rational function, which would be stored
-    as Expression with op.truediv/floordiv. For example, this class would hold \\frac{1}{2} but 
+    as Expression with op.truediv/floordiv. For example, this class would hold \\frac{1}{2} but
     \\frac{x}{2} is an Expression"""
+
     @staticmethod
     def create(num, den):
         """return a fraction if num and den are both 'rational' and a RealNumber otherwise"""
@@ -456,31 +468,29 @@ class Fraction(Number):
             # convert any float with less than 10 decimal places into a fraction.
             # Otherwise assume it's irrational and return a RealNumber
             str_value = str(num.value)
-            dot_loc = str_value.find('.')
+            dot_loc = str_value.find(".")
             num_decimal_places = len(str_value) - dot_loc - 1
             if num_decimal_places > 10:
                 return num / den
 
-            num = RealNumber(int(str_value[:dot_loc])) + \
-                  Fraction(
-                       RealNumber(int(str_value[dot_loc+1:])),
-                       RealNumber(10 ** num_decimal_places)
-                  )
+            num = RealNumber(int(str_value[:dot_loc])) + Fraction(
+                RealNumber(int(str_value[dot_loc + 1 :])),
+                RealNumber(10 ** num_decimal_places),
+            )
 
         if isinstance(den, RealNumber) and isinstance(den.value, float):
             # convert any float with less than 10 decimal places into a fraction.
             # Otherwise assume it's irrational and return a RealNumber
             str_value = str(den.value)
-            dot_loc = str_value.find('.')
+            dot_loc = str_value.find(".")
             num_decimal_places = len(str_value) - dot_loc - 1
             if num_decimal_places > 10:
                 return num / den
 
-            den = RealNumber(int(str_value[:dot_loc])) + \
-                  Fraction(
-                       RealNumber(int(str_value[dot_loc+1:])),
-                       RealNumber(10 ** num_decimal_places)
-                  )
+            den = RealNumber(int(str_value[:dot_loc])) + Fraction(
+                RealNumber(int(str_value[dot_loc + 1 :])),
+                RealNumber(10 ** num_decimal_places),
+            )
 
         return Fraction(num, den)
 
@@ -505,57 +515,56 @@ class Fraction(Number):
     def __add__(self, other):
         if isinstance(other, RealNumber):
             # a + (b/c) = (ac+b)/c
-            return Fraction.create(
-                self.den * other + self.num, 
-                self.den
-            ).simplify()
+            return Fraction.create(self.den * other + self.num, self.den).simplify()
         elif isinstance(other, Fraction):
             # (a/b) + (c/d) = (ad+bc)/(bd)
             return Fraction.create(
-                self.num * other.den + self.den * other.num,
-                self.den * other.den
+                self.num * other.den + self.den * other.num, self.den * other.den
             ).simplify()
         else:
-            #use other's addition method, which we assume is defined for fraction
+            # use other's addition method, which we assume is defined for fraction
             return other + self
 
     def __sub__(self, other):
-        return RealNumber(-1)*other + self
+        return RealNumber(-1) * other + self
 
     def __mul__(self, other):
         if isinstance(other, RealNumber):
-            #multiply fraction by real number: (a/b)*c = (ac)/b
+            # multiply fraction by real number: (a/b)*c = (ac)/b
             return Fraction.create(self.num * other, self.den).simplify()
         elif isinstance(other, Fraction):
-            #multiply fraction by fraction: (a/b)(c/d) = (ac)/(bd)
-            return Fraction.create(self.num * other.num, self.den * other.den).simplify()
+            # multiply fraction by fraction: (a/b)(c/d) = (ac)/(bd)
+            return Fraction.create(
+                self.num * other.num, self.den * other.den
+            ).simplify()
         else:
             return other * self
 
     def __truediv__(self, other):
         if isinstance(other, RealNumber):
-            #divide fraction by real number: (a/b)/c = a/(bc)
+            # divide fraction by real number: (a/b)/c = a/(bc)
             return Fraction.create(self.num, other * self.den).simplify()
         if isinstance(other, Fraction):
-            #divide fraction by fraction: (a/b)/(c/d) = (ad)/(bc)
-            return Fraction.create(self.num * other.den, self.den * other.num).simplify()
+            # divide fraction by fraction: (a/b)/(c/d) = (ad)/(bc)
+            return Fraction.create(
+                self.num * other.den, self.den * other.num
+            ).simplify()
         else:
-            return Fraction.create(RealNumber(1) , other) * self
+            return Fraction.create(RealNumber(1), other) * self
 
     def __floordiv__(self, other):
         """ Only for internal use and only needed because we defined __floordiv__ for RealNumber"""
         if isinstance(other, Number):
             return self / other
         else:
-            raise ValueError(f"__floordiv__ only supported for types {type(self)} and {type(other)}")
+            raise ValueError(
+                f"__floordiv__ only supported for types {type(self)} and {type(other)}"
+            )
 
     def __pow__(self, other):
         # (a/b)^c = (a^c)/(b^c). We have implemented RealNumber ** Fraction and RealNumber ** RealNumber above
-        return Fraction.create(
-            self.num ** other,
-            self.den ** other
-        )
-        
+        return Fraction.create(self.num ** other, self.den ** other)
+
     def evaluate(self, state=None):
         return self.simplify()
 
@@ -579,11 +588,16 @@ class Fraction(Number):
         if isinstance(other, Fraction):
             self_simplify = self.simplify()
             other_simplify = other.simplify()
-            return (self_simplify.num, self_simplify.den) == (other_simplify.num, other_simplify.den)
+            return (self_simplify.num, self_simplify.den) == (
+                other_simplify.num,
+                other_simplify.den,
+            )
         elif isinstance(other, RealNumber):
             return self.num / self.den == other
         else:
-            raise ValueError(f"Can't evaluate __eq__ on objects of type {type(self)} and {type(other)}")
+            raise ValueError(
+                f"Can't evaluate __eq__ on objects of type {type(self)} and {type(other)}"
+            )
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -594,7 +608,9 @@ class Fraction(Number):
         elif isinstance(other, RealNumber):
             return self.num / self.den < other
         else:
-            raise ValueError(f"Can't evaluate __lt__ on objects of type {type(self)} and {type(other)}")
+            raise ValueError(
+                f"Can't evaluate __lt__ on objects of type {type(self)} and {type(other)}"
+            )
 
     def __gt__(self, other):
         if isinstance(other, Fraction):
@@ -602,11 +618,13 @@ class Fraction(Number):
         elif isinstance(other, RealNumber):
             return self.num / self.den > other
         else:
-            raise ValueError(f"Can't evaluate __gt__ on objects of type {type(self)} and {type(other)}")
-        
+            raise ValueError(
+                f"Can't evaluate __gt__ on objects of type {type(self)} and {type(other)}"
+            )
+
     def __le__(self, other):
         return self < other or self == other
-        
+
     def __ge__(self, other):
         return self > other or self == other
 
@@ -705,58 +723,65 @@ class Matrix(Function):
 
     def evaluate(self, state: State):
         return Matrix(
-            np.vectorize(lambda entry: entry.evaluate(state))(self.mat),
-            self.type
+            np.vectorize(lambda entry: entry.evaluate(state))(self.mat), self.type
         )
 
     def __add__(self, other):
         if not isinstance(other, Matrix):
-            raise ValueError(f"Operation __add__ not supported between Matrix and {type(other)}")
+            raise ValueError(
+                f"Operation __add__ not supported between Matrix and {type(other)}"
+            )
         if not other.mat.shape == self.mat.shape:
-            raise ValueError(f"Operation __add__ not supported for matrices with shape {self.mat.shape} and {other.mat.shape}")
+            raise ValueError(
+                f"Operation __add__ not supported for matrices with shape {self.mat.shape} and {other.mat.shape}"
+            )
         # take this matrix's type by default
-        return Matrix(
-            self.mat + other.mat,
-            self.type
-        )
+        return Matrix(self.mat + other.mat, self.type)
 
     def __sub__(self, other):
         return self + RealNumber(-1) * other
-        
+
     def __mul__(self, other):
         # scalar multiplication
         if isinstance(other, Number):
-            return Matrix(
-                self.mat * other,
-                self.type
-            )
+            return Matrix(self.mat * other, self.type)
 
         # matrix multiplication
         if isinstance(other, Matrix):
-            #make sure matrices have correct shape (a,b), (b,a)
+            # make sure matrices have correct shape (a,b), (b,a)
             if self.mat.shape[1] != other.mat.shape[0]:
-                raise ValueError(f"Can't multiply matrices with dimensions {self.mat.shape} and {other.mat.shape}")
+                raise ValueError(
+                    f"Can't multiply matrices with dimensions {self.mat.shape} and {other.mat.shape}"
+                )
             if self.mat.shape[0] == 1 and other.mat.shape[1] == 1:
-                #row vector times a column vector, so a dot product
+                # row vector times a column vector, so a dot product
                 return RealNumber(np.dot(self.mat, other.mat)[0][0])
             return Matrix(np.matmul(self.mat, other.mat), self.type)
 
-        raise ValueError(f"Operation __mul__ not supported between Matrix and {type(other)}")
+        raise ValueError(
+            f"Operation __mul__ not supported between Matrix and {type(other)}"
+        )
 
     def __truediv__(self, other):
-        #can only do scalar division
+        # can only do scalar division
         if isinstance(other, Number):
             return self * Fraction.create(RealNumber(1), other)
         else:
-            raise ValueError(f"Operation __div__ not supported between Matrix and {type(other)}")
+            raise ValueError(
+                f"Operation __div__ not supported between Matrix and {type(other)}"
+            )
 
     def __pow__(self, other):
         # can only raise square matrices to powers
         if self.mat.shape[0] != self.mat.shape[1]:
-            raise ValueError(f"Can't raise matrix with dimension {self.mat.shape} to power (matrix must be square)")
+            raise ValueError(
+                f"Can't raise matrix with dimension {self.mat.shape} to power (matrix must be square)"
+            )
         # can only take integer powers
         if not isinstance(other, RealNumber) or int(other.value) != other.value:
-            raise ValueError(f"Can't raise matrix to power {other}. Power must be an integer")
+            raise ValueError(
+                f"Can't raise matrix to power {other}. Power must be an integer"
+            )
         if other.value == 0:
             # return identity matrix
             return Matrix(np.identity(self.mat.shape[0]), self.type)
@@ -785,7 +810,9 @@ class Matrix(Function):
         """Find inverse of matrix using Gauss-Jordan elimination"""
         # can't take inverse of non-square matrix
         if self.mat.shape[0] != self.mat.shape[1]:
-            raise ValueError(f"Can't take inverse of matrix with dimensions {self.mat.shape}")
+            raise ValueError(
+                f"Can't take inverse of matrix with dimensions {self.mat.shape}"
+            )
         # can't take inverse if matrix is singular (determinant is 0)
         if self.determinant() == RealNumber(0):
             raise ValueError(f"Can't take inverse: matrix is singular")
@@ -801,14 +828,12 @@ class Matrix(Function):
                     return col
             return float("inf")
 
-        nrows= self.mat.shape[0]
+        nrows = self.mat.shape[0]
         # append identity matrix to the right
-        identity = np.vectorize(lambda v: RealNumber(v))(
-            np.identity(nrows)
-        )
+        identity = np.vectorize(lambda v: RealNumber(v))(np.identity(nrows))
         gmat = np.append(self.mat, identity, axis=1)
         all_zero_counter = 0
-        for row in range(nrows//2):
+        for row in range(nrows // 2):
             # if all columns are 0, move row to bottom
             if all(gmat[row, :] == RealNumber(0)):
                 swap_rows(row, nrows - all_zero_counter - 1, gmat)
@@ -819,8 +844,8 @@ class Matrix(Function):
             # 1. swap row with leftmost nonzero entry with current row
             if row != nrows - 1:
                 leftmost_nonzero_row, _ = min(
-                    [(r, leftmost_nonzero(gmat, r)) for r in range(row, nrows)], 
-                    key = lambda t: t[1]
+                    [(r, leftmost_nonzero(gmat, r)) for r in range(row, nrows)],
+                    key=lambda t: t[1],
                 )
                 swap_rows(row, leftmost_nonzero_row, gmat)
 
@@ -833,11 +858,12 @@ class Matrix(Function):
             # 3. clear out other rows' values in column with this row's first nonzero entry
             for lrow in range(nrows):
                 if lrow != row and gmat[lrow][nonzero_index] != RealNumber(0):
-                    gmat[lrow, :] = gmat[lrow, :] - gmat[row, :] * gmat[lrow][nonzero_index] 
+                    gmat[lrow, :] = (
+                        gmat[lrow, :] - gmat[row, :] * gmat[lrow][nonzero_index]
+                    )
 
         # right nrows columns were originally identity, now they're the inverse
-        return Matrix(gmat[:, nrows : 2*nrows], self.type)
-
+        return Matrix(gmat[:, nrows : 2 * nrows], self.type)
 
     def determinant(self):
         """ Calculate determinant using Laplace's formula:
@@ -845,7 +871,9 @@ class Matrix(Function):
         where M_{0j} is the determinant of A without its first row and jth column """
         # matrix must be square
         if self.mat.shape[0] != self.mat.shape[1]:
-            raise ValueError(f"Can't take inverse of matrix with dimensions {self.mat.shape}")
+            raise ValueError(
+                f"Can't take inverse of matrix with dimensions {self.mat.shape}"
+            )
 
         def determinant_recurse(mat):
             """ takes numpy array as an argument so we can recurse """
@@ -854,20 +882,23 @@ class Matrix(Function):
                 return (mat[0][0] * mat[1][1]) - (mat[1][0] * mat[0][1])
 
             return reduce(
-                operator.add, 
-                [(RealNumber(-1) ** RealNumber(j)) * mat[0][j] * \
-                determinant_recurse(
-                    np.delete(np.delete(mat, 0, 0), j, 1)
-                )
-                for j in range(mat.shape[0])]
+                operator.add,
+                [
+                    (RealNumber(-1) ** RealNumber(j))
+                    * mat[0][j]
+                    * determinant_recurse(np.delete(np.delete(mat, 0, 0), j, 1))
+                    for j in range(mat.shape[0])
+                ],
             )
-        
+
         return determinant_recurse(self.mat)
 
     def transpose(self):
         # matrix must be square
         if self.mat.shape[0] != self.mat.shape[1]:
-            raise ValueError(f"Can't take transpose of matrix with dimensions {self.mat.shape}")
+            raise ValueError(
+                f"Can't take transpose of matrix with dimensions {self.mat.shape}"
+            )
         return Matrix(np.transpose(self.mat), self.type)
 
     def __repr__(self):
@@ -879,11 +910,13 @@ class Matrix(Function):
 
         return f"\\begin{{{self.type}}}{mat_string}\\end{{{self.type}}}"
 
+
 class Determinant:
     """ The determinant of a matrix.
     Determinants are indicated by a matrix created with the vmatrix environment"""
+
     def __init__(self, mat):
-        self.matrix = Matrix(mat, 'vmatrix')
+        self.matrix = Matrix(mat, "vmatrix")
 
     def evaluate(self, state: State):
         return self.matrix.evaluate(state).determinant()
@@ -909,7 +942,7 @@ class Relation:
         return True
 
     def __repr__(self):
-        output = ''
+        output = ""
         for ex in self.rel_chain:
             output += str(inv_rel_dict.get(ex, ex))
         return output
@@ -927,7 +960,7 @@ class UserDefinedFunc:
         return str(tuple(self.args)) + "\\to" + str(self.func_body)
 
 
-class FunctionCall():
+class FunctionCall:
     def __init__(self, function_name, passed_args: list):
         self.function_name = function_name
         self.passed_args = passed_args
@@ -960,20 +993,26 @@ class SumFunc:
 
     def evaluate(self, state: State):
         lower_bound = self.lower_bound_expr.evaluate(state)
-        if not isinstance(lower_bound, RealNumber) or int(lower_bound.value) != lower_bound.value:
+        if (
+            not isinstance(lower_bound, RealNumber)
+            or int(lower_bound.value) != lower_bound.value
+        ):
             raise Exception("Sum lower bound must evaluate to integer")
         upper_bound = self.upper_bound_expr.evaluate(state)
         if upper_bound.value == float("inf"):
             # TODO
             pass
-        if not isinstance(upper_bound, RealNumber) or int(upper_bound.value) != upper_bound.value:
+        if (
+            not isinstance(upper_bound, RealNumber)
+            or int(upper_bound.value) != upper_bound.value
+        ):
             raise Exception("Sum upper bound must evaluate to integer")
 
         state.push_layer()
         max_bound = int(max(upper_bound, lower_bound).value)
         min_bound = int(min(upper_bound, lower_bound).value)
         sum_val = RealNumber(0)
-        for i in range(min_bound, max_bound+1):
+        for i in range(min_bound, max_bound + 1):
             state[self.var.name] = RealNumber(i)
             sum_val += self.sum_expr.evaluate(state)
         state.pop_layer()
@@ -992,20 +1031,26 @@ class ProdFunc:
 
     def evaluate(self, state: State):
         lower_bound = self.lower_bound_expr.evaluate(state)
-        if not isinstance(lower_bound, RealNumber) or int(lower_bound.value) != lower_bound.value:
+        if (
+            not isinstance(lower_bound, RealNumber)
+            or int(lower_bound.value) != lower_bound.value
+        ):
             raise Exception("Prod lower bound must evaluate to integer")
         upper_bound = self.upper_bound_expr.evaluate(state)
         if upper_bound.value == float("inf"):
             # TODO
             pass
-        if not isinstance(upper_bound, RealNumber) or int(upper_bound.value) != upper_bound.value:
+        if (
+            not isinstance(upper_bound, RealNumber)
+            or int(upper_bound.value) != upper_bound.value
+        ):
             raise Exception("Prod upper bound must evaluate to integer")
 
         state.push_layer()
         max_bound = int(max(upper_bound, lower_bound).value)
         min_bound = int(min(upper_bound, lower_bound).value)
         prod_val = RealNumber(1)
-        for i in range(min_bound, max_bound+1):
+        for i in range(min_bound, max_bound + 1):
             state[self.var.name] = RealNumber(i)
             prod_val *= self.prod_expr.evaluate(state)
         state.pop_layer()
@@ -1066,7 +1111,7 @@ class Ceiling:
         return f"\\lceil {self.expr} \\rceil"
 
 
-class Derivative():
+class Derivative:
     def __init__(self, cmd: str, order: RealNumber, expr, var):
         self.cmd = cmd
         self.order = order
@@ -1081,31 +1126,35 @@ class Derivative():
         if self.order:
             return f"{self.cmd}[{self.order}]{{{self.expr}}}{{{self.var}}}"
         else:
-            return f'{self.cmd}{{{self.expr}}}{{{self.var}}}'
+            return f"{self.cmd}{{{self.expr}}}{{{self.var}}}"
 
-class Root():
+
+class Root:
     def __init__(self, expr, n=None):
         self.expr = expr
         self.n = n
-    
+
     def evaluate(self, state: State):
         if self.n is None:
             return RealNumber(float(math.sqrt(self.expr.evaluate(state).true_value())))
         n = self.n.evaluate(state).true_value()
         if n == 0:
             raise ValueError(f"Can't take 0th root of {self.expr}")
-        return RealNumber(float(math.pow(self.expr.evaluate(state).true_value(), 1/n)))
+        return RealNumber(
+            float(math.pow(self.expr.evaluate(state).true_value(), 1 / n))
+        )
 
     def __repr__(self):
         if self.n is None:
-            return f'\\sqrt{{{self.expr}}}'
-        return f'\\sqrt[{self.n}]{{{self.expr}}}'
+            return f"\\sqrt{{{self.expr}}}"
+        return f"\\sqrt[{self.n}]{{{self.expr}}}"
 
-class Choose():
+
+class Choose:
     def __init__(self, n, k):
         self.n = n
         self.k = k
-    
+
     def evaluate(self, state: State):
         n = self.n.evaluate(state).true_value()
         k = self.k.evaluate(state).true_value()
@@ -1114,4 +1163,4 @@ class Choose():
         return RealNumber(int(comb(int(n), int(k))))
 
     def __repr__(self):
-        return f'\\binom{{{self.n}}}{{{self.k}}}'
+        return f"\\binom{{{self.n}}}{{{self.k}}}"

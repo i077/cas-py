@@ -16,13 +16,14 @@ export class HistoryElement extends React.Component {
         this.props.handleClick(this.props.historyItem);
     }
 
+    getHistoryItemInput() {
+        const item = this.props.historyItem;
+        return item.input;
+    }
+
     getHistoryItemOutput() {
         const item = this.props.historyItem;
-        if (item.input.includes(assign_string)) {
-            return item.input;
-        } else {
-            return item.input + ' = ' + item.output;
-        }
+        return item.output;
     }
 
     render() {
@@ -31,7 +32,14 @@ export class HistoryElement extends React.Component {
                 <div className="history-item-id-div">
                     [{this.props.historyItem.id}]
                 </div>
-                <div className="history-item-text-div">
+                <div className="history-item-textinput-div">
+                    <TeX
+                        math={this.getHistoryItemInput()}
+                        errorColor={'#cc0000'}
+                        settings={KatexSettings}
+                    />
+                </div>
+                <div className="history-item-textoutput-div">
                     <TeX
                         math={this.getHistoryItemOutput()}
                         errorColor={'#cc0000'}

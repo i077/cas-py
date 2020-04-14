@@ -3,8 +3,6 @@ import TeX from '@matejmazur/react-katex';
 import './HistoryElement.css';
 import { KatexSettings } from "../KatexSettings";
 
-const assign_string = ':=';
-
 export class HistoryElement extends React.Component {
     constructor(props) {
         super(props);
@@ -26,6 +24,11 @@ export class HistoryElement extends React.Component {
         return item.output;
     }
 
+    getHistoryItemError() {
+        const item = this.props.historyItem;
+        return item.error;
+    }
+
     render() {
         return (
             <div className="history-item-div" onClick={this.elementClick}>
@@ -39,12 +42,15 @@ export class HistoryElement extends React.Component {
                         settings={KatexSettings}
                     />
                 </div>
-                <div className="history-item-textoutput-div">
-                    <TeX
-                        math={this.getHistoryItemOutput()}
-                        errorColor={'#cc0000'}
-                        settings={KatexSettings}
-                    />
+                <div className={!this.getHistoryItemError() ? "history-item-textoutput-div" : "history-item-texterror-div"}>
+                    {!this.getHistoryItemError() ?
+                        <TeX
+                            math={this.getHistoryItemOutput()}
+                            errorColor={'#cc0000'}
+                            settings={KatexSettings}
+                        />
+                        : <code>{this.getHistoryItemError()}</code>
+                    }
                 </div>
             </div>
         );

@@ -1,1 +1,10 @@
-\frac{5}{2}
+\sin{\begin{vmatrix} 1 & 2 \\ 3 & 4 \end{vmatrix}}
+2^{\frac{1}{2}}
+a := \frac{\pi}{2}
+\sin{a}
+\sin^{-1}{0.5}
+1 + \cos{a}
+\sqrt{a} + 2
+\sqrt[\lceil a \rceil + 1]{a} + 2
+\sqrt[\lfloor a \rfloor + 1]{a} + 2
+\binom{\frac{6}{2}}{2} + 2

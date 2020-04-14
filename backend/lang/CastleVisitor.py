@@ -13,7 +13,9 @@ from State import State
 from structures import (
     Cases,
     Ceiling,
+    Choose,
     Derivative,
+    Determinant,
     Expression,
     Floor,
     FunctionCall,
@@ -23,13 +25,12 @@ from structures import (
     Monomial,
     Number,
     RealNumber,
+    Root,
     ProdFunc,
     Relation,
     SumFunc,
     UserDefinedFunc,
-    Variable,
-    Root,
-    Choose
+    Variable
 )
 
 
@@ -40,7 +41,7 @@ class CastleVisitor(LaTeXVisitor):
     def visitEntry(self, ctx: parse.EntryContext):
         """entry
         castle_input EOF """
-        return self.visit(ctx.castle_input()).evaluate(self.state)
+        return str(self.visit(ctx.castle_input()).evaluate(self.state))
 
     # 5-function Arithmetic ====================================================
     def visitAdd_expr_recurse(self, ctx: parse.Add_expr_recurseContext):
@@ -63,7 +64,9 @@ class CastleVisitor(LaTeXVisitor):
 
     def visitIme_left(self, ctx: parse.Ime_leftContext):
         """implicit_mult_expr_left
-        left_implicit_mult_expr implicit_mult_expr"""
+        left_implicit_pow_expr (implicit_mult_expr)?"""
+        if not ctx.implicit_mult_expr():
+            return self.visit(ctx.left_implicit_pow_expr())
         return Expression(
             op.mul, 
             self.visit(ctx.left_implicit_pow_expr()),
@@ -96,9 +99,18 @@ class CastleVisitor(LaTeXVisitor):
             right_expr
         )
 
+    def visitIme_paren_var(self, ctx: parse.Ime_paren_varContext):
+        """ime_paren_var
+        paren_pow_expr var_pow_expr"""
+        return Expression(
+            op.mul, 
+            self.visit(ctx.paren_pow_expr()),
+            self.visit(ctx.var_pow_expr())
+        )
+
     def visitIme_var_var(self, ctx: parse.Ime_var_varContext):
         """ime_var_var
-        var var"""
+        var_pow_expr var_pow_expr"""
         return Expression(
             op.mul, 
             self.visit(ctx.var_pow_expr(0)),
@@ -106,8 +118,8 @@ class CastleVisitor(LaTeXVisitor):
         )
 
     def visitIme_paren_paren(self, ctx: parse.Ime_paren_parenContext):
-        """ime_unit_unit
-        unit_paren unit_paren"""
+        """ime_paren_paren
+        paren_pow_expr paren_pow_expr"""
         return Expression(
             op.mul, 
             self.visit(ctx.paren_pow_expr(0)),
@@ -322,7 +334,7 @@ class CastleVisitor(LaTeXVisitor):
     def visitFunc_call_builtin(self, ctx: parse.Func_call_builtinContext):
         """func_call_builtin
         func_builtin (LCURLY and/or LPAREN) expr ((COMMA expr)+)*)? (RCURLY and/or RPAREN)"""
-        function_name = self.visit(ctx.var())
+        function_name = self.visit(ctx.func_builtin())
         args = ctx.expr()
         if not args:
             args = []
@@ -405,10 +417,10 @@ class CastleVisitor(LaTeXVisitor):
 
     def visitFunc_root(self, ctx: parse.Func_rootContext):
         exprs = ctx.expr()
-        if isinstance(exprs, (list, tuple)):
+        if len(exprs) > 1:
             # n-th root instead of default square root
             return Root(self.visit(exprs[1]), n=self.visit(exprs[0]))
-        return Root(self.visit(exprs))
+        return Root(self.visit(exprs[0]))
 
     def visitFunc_choose(self, ctx: parse.Func_chooseContext):
         return Choose(
@@ -489,10 +501,16 @@ class CastleVisitor(LaTeXVisitor):
         if begin_type != end_type:
             raise Exception("Matrix \\begin and \\end types much match")
 
-        return Matrix(
-            self.visit(ctx.matrix_exp()),
-            matrix_type_dict[begin_type]
-        )
+        # 'vmatrix' type signifies a determinant
+        if begin_type == parse.V_MATRIX:
+            return Determinant(
+                self.visit(ctx.matrix_exp())
+            )
+        else:
+            return Matrix(
+                self.visit(ctx.matrix_exp()),
+                matrix_type_dict[begin_type]
+            )
 
     def visitMatrix_exp(self, ctx: parse.Matrix_expContext):
         return [self.visit(row) for row in ctx.matrix_row()] + [
@@ -510,7 +528,6 @@ class CastleVisitor(LaTeXVisitor):
         if not isinstance(entries, list):
             return self.visit(entries)
         return [self.visit(entry) for entry in entries]
-
 
 
 def evaluate_expression(state: State, expr: str):

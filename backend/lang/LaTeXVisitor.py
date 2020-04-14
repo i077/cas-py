@@ -224,6 +224,11 @@ class LaTeXVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by LaTeXParser#ime_paren_var.
+    def visitIme_paren_var(self, ctx:LaTeXParser.Ime_paren_varContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by LaTeXParser#var_pow_expr.
     def visitVar_pow_expr(self, ctx:LaTeXParser.Var_pow_exprContext):
         return self.visitChildren(ctx)

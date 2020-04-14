@@ -191,12 +191,13 @@ mult_expr
 
 implicit_mult_expr
     : implicit_mult_expr implicit_mult_expr                   #ime_mult
-    | left_implicit_pow_expr implicit_mult_expr               #ime_left
+    | left_implicit_pow_expr (implicit_mult_expr)?            #ime_left
     | implicit_pow_expr                                       #ime_pow
     | var_parens                                              #ime_var_parens
     //basically everything that isn't 'var unit_paren' because we want that to be only handled by var_parens
     | (var_pow_expr | paren_pow_expr) implicit_mult_expr      #ime_var_unit_paren_left
     | implicit_mult_expr (var_pow_expr | paren_pow_expr)      #ime_var_unit_paren_right
+    | paren_pow_expr var_pow_expr                             #ime_paren_var
     | var_pow_expr var_pow_expr                               #ime_var_var
     | paren_pow_expr paren_pow_expr                           #ime_paren_paren
     ;

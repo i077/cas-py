@@ -77,7 +77,8 @@ class Expression(Function):
             return reduce(self.op, [term.evaluate(state) for term in self.terms])
         else:
             # floordiv indicates that this is a rational expression that should be stored as a fraction
-            if 
+            # if
+            pass
 
     def __eq__(self, other):
         return (
@@ -367,7 +368,7 @@ class RealNumber(Number):
 
 def Fraction(Number):
     """This class represents a numerical fraction at evaluation time, not a rational function, which would be stored
-    as Expression with op.truediv/floordiv. For example, this class would hold \\frac{1}{2} but 
+    as Expression with op.truediv/floordiv. For example, this class would hold \\frac{1}{2} but
     \\frac{x}{2} is an Expression"""
     @staticmethod
     def create(num, den)
@@ -762,7 +763,7 @@ class Root():
     def __init__(self, expr, n=None):
         self.expr = expr
         self.n = n
-    
+
     def evaluate(self, state: State):
         if self.n is None:
             return math.sqrt(self.expr.evaluate(state))
@@ -780,7 +781,7 @@ class Choose():
     def __init__(self, n, k):
         self.n = n
         self.k = k
-    
+
     def evaluate(self, state: State):
         n = self.n.evaluate(state)
         k = self.k.evaluate(state)

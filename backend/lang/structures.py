@@ -385,6 +385,8 @@ class RealNumber(Number):
 
     def __truediv__(self, other):
         if isinstance(other, RealNumber):
+            if other.value == 0:
+                raise CastleException("Can't divide by zero")
             return RealNumber(self.value / other.value)
         if isinstance(other, (int, float)):
             return RealNumber(self.value / other)
@@ -638,7 +640,7 @@ class Fraction(Number):
         if self.num == 0:
             return RealNumber(0)
         if self.den == 0:
-            raise ValueError("Fraction division by 0")
+            raise CastleException("Can't divide by zero")
         gcd = RealNumber(numberGCD(self.num.value, self.den.value))
         if gcd == self.den:
             # reduces to an integer
@@ -929,12 +931,12 @@ class Cases(Function):
     def evaluate(self, state: State):
         for row in self.cases_list:
             if not isinstance(row[1], Relation):
-                raise Exception(f"Improper Cases: {row[1]} is not a relation")
+                raise CastleException(f"Improper Cases: {row[1]} is not a relation")
             if row[1].evaluate(state):
                 return row[0].evaluate(state)
 
         # no conditions were satisfied
-        raise Exception("Improper Cases: No case satisfied!")
+        raise CastleException("Improper Cases: No case satisfied!")
 
     def __eq__(self, other):
         pass
@@ -968,12 +970,10 @@ class Matrix(Function):
 
     def __add__(self, other):
         if not isinstance(other, Matrix):
-            raise ValueError(
-                f"Operation __add__ not supported between Matrix and {type(other)}"
-            )
+            raise CastleException(f"Cannot add Matrix and {type(other)}")
         if not other.mat.shape == self.mat.shape:
-            raise ValueError(
-                f"Operation __add__ not supported for matrices with shape {self.mat.shape} and {other.mat.shape}"
+            raise CastleException(
+                f"Cannot add Matrices of shapes {self.mat.shape} and {other.mat.shape}"
             )
         # take this matrix's type by default
         return Matrix(self.mat + other.mat, self.type)
@@ -1122,9 +1122,7 @@ class Matrix(Function):
         where M_{0j} is the determinant of A without its first row and jth column """
         # matrix must be square
         if self.mat.shape[0] != self.mat.shape[1]:
-            raise ValueError(
-                f"Can't take inverse of matrix with dimensions {self.mat.shape}"
-            )
+            raise CastleException(f"Matrix of shape {self.mat.shape} is not square")
 
         def determinant_recurse(mat):
             """ takes numpy array as an argument so we can recurse """
@@ -1403,7 +1401,7 @@ class Root:
             return RealNumber(float(math.sqrt(self.expr.evaluate(state).true_value())))
         n = self.n.evaluate(state).true_value()
         if n == 0:
-            raise ValueError(f"Can't take 0th root of {self.expr}")
+            raise CastleException(f"Can't take 0th root of {self.expr}")
         return RealNumber(
             float(math.pow(self.expr.evaluate(state).true_value(), 1 / n))
         )
@@ -1428,3 +1426,7 @@ class Choose:
 
     def __repr__(self):
         return f"\\binom{{{self.n}}}{{{self.k}}}"
+
+
+class CastleException(Exception):
+    pass

@@ -13,6 +13,7 @@ from backend.lang.LaTeXVisitor import LaTeXVisitor
 from backend.lang.State import State
 from backend.lang.structures import (
     Cases,
+    CastleException,
     Ceiling,
     Choose,
     ComplexNumber,
@@ -338,9 +339,7 @@ class CastleVisitor(LaTeXVisitor):
             and lower.rel_chain[1] == rel_dict[parse.EQ]
             and isinstance(lower.rel_chain[0], Variable)
         ):
-            raise Exception(
-                "Sum lower argument should be of form <variable> = <expression>"
-            )
+            raise CastleException("Lower sum term should be var = expr")
 
         return SumFunc(lower.rel_chain[0], lower.rel_chain[2], upper_bound, sum_expr)
 
@@ -355,9 +354,7 @@ class CastleVisitor(LaTeXVisitor):
             and lower.rel_chain[1] == rel_dict[parse.EQ]
             and isinstance(lower.rel_chain[0], Variable)
         ):
-            raise Exception(
-                "Product lower argument should be of form <variable> = <expression>"
-            )
+            raise CastleException("Lower product term should be var = expr")
 
         return ProdFunc(lower.rel_chain[0], lower.rel_chain[2], upper_bound, prod_expr)
 
@@ -378,14 +375,12 @@ class CastleVisitor(LaTeXVisitor):
         left, right = ctx.lop.type, ctx.rop.type
         if left == parse.CMD_LFLOOR:
             if right != parse.CMD_RFLOOR:
-                raise Exception("Left floor operator must have matching right floor")
+                raise CastleException("Unmatched left floor operator")
             return Floor(self.visit(ctx.expr()))
 
         if left == parse.CMD_LCEIL:
             if right != parse.CMD_RCEIL:
-                raise Exception(
-                    "Left ceiling operator must have matching right ceiling"
-                )
+                raise CastleException("Unmatched left ceiling operator")
             return Ceiling(self.visit(ctx.expr()))
 
     def visitFunc_deriv(self, ctx: parse.Func_derivContext):
@@ -474,7 +469,7 @@ class CastleVisitor(LaTeXVisitor):
         begin_type = ctx.open_mat_type.type
         end_type = ctx.close_mat_type.type
         if begin_type != end_type:
-            raise Exception("Matrix \\begin and \\end types much match")
+            raise CastleException("Mismatched matrix environments")
 
         # 'vmatrix' type signifies a determinant
         if begin_type == parse.V_MATRIX:

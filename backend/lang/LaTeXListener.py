@@ -395,6 +395,15 @@ class LaTeXListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by LaTeXParser#ime_paren_var.
+    def enterIme_paren_var(self, ctx:LaTeXParser.Ime_paren_varContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#ime_paren_var.
+    def exitIme_paren_var(self, ctx:LaTeXParser.Ime_paren_varContext):
+        pass
+
+
     # Enter a parse tree produced by LaTeXParser#var_pow_expr.
     def enterVar_pow_expr(self, ctx:LaTeXParser.Var_pow_exprContext):
         pass

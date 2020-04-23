@@ -5,6 +5,7 @@ from flask.logging import create_logger
 
 from backend.session_handler import create_session, load_session_file, save_session_file
 from backend.lang.CastleVisitor import evaluate_expression
+from backend.lang.structures import CastleException
 
 APP = Flask(__name__)
 LOG = create_logger(APP)
@@ -70,10 +71,13 @@ def run():
         cas_input = data["input"]
 
         state = load_session_file(id, "state.pkl")
-        output, new_state = evaluate_expression(state, cas_input)
-        save_session_file(id, new_state, "state.pkl")
+        try:
+            output, new_state = evaluate_expression(state, cas_input)
+            response = jsonify({"output": output, "error": False})
+            save_session_file(id, new_state, "state.pkl")
+        except CastleException as e:
+            response = jsonify({"output": False, "error": str(e)})
 
-        response = jsonify({"output": output, "error": False})
         response.headers.add("Access-Control-Allow-Origin", "*")
 
         return response

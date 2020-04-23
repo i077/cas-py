@@ -7,12 +7,27 @@
 }
 
 .history-item-id-div {
-    width: 10%;
+    width: 5%;
     margin-left: 5px;
 }
 
-.history-item-text-div {
-    width: 90%;
+.history-item-textinput-div {
+    width: 50%;
     font-size: 1.3em;
-    text-align: center;
+    text-align: left;
+}
+
+.history-item-textoutput-div {
+    width: 45%;
+    margin-right: 5px;
+    font-size: 1.3em;
+    text-align: right;
+}
+
+.history-item-texterror-div {
+    width: 45%;
+    margin-right: 5px;
+    font-size: 1.3em;
+    text-align: right;
+    color: #cc0000;
 }

@@ -970,10 +970,10 @@ class Matrix(Function):
 
     def __add__(self, other):
         if not isinstance(other, Matrix):
-            raise CastleException(f"Cannot add Matrix and {type(other)}")
+            raise CastleException(f"Can't add Matrix and {type(other)}")
         if not other.mat.shape == self.mat.shape:
             raise CastleException(
-                f"Cannot add Matrices of shapes {self.mat.shape} and {other.mat.shape}"
+                f"Can't add Matrices of shapes {self.mat.shape} and {other.mat.shape}"
             )
         # take this matrix's type by default
         return Matrix(self.mat + other.mat, self.type)
@@ -990,8 +990,8 @@ class Matrix(Function):
         if isinstance(other, Matrix):
             # make sure matrices have correct shape (a,b), (b,a)
             if self.mat.shape[1] != other.mat.shape[0]:
-                raise ValueError(
-                    f"Can't multiply matrices with dimensions {self.mat.shape} and {other.mat.shape}"
+                raise CastleException(
+                    f"Can't multiply matrices of shapes {self.mat.shape} and {other.mat.shape}"
                 )
             if self.mat.shape[0] == 1 and other.mat.shape[1] == 1:
                 # row vector times a column vector, so a dot product
@@ -1019,9 +1019,7 @@ class Matrix(Function):
             )
         # can only take integer powers
         if not isinstance(other, RealNumber) or int(other.value) != other.value:
-            raise ValueError(
-                f"Can't raise matrix to power {other}. Power must be an integer"
-            )
+            raise CastleException(f"Can't raise matrix to non-integral power {other}")
         if other.value == 0:
             # return identity matrix
             return Matrix(np.identity(self.mat.shape[0]), self.type)
@@ -1122,7 +1120,9 @@ class Matrix(Function):
         where M_{0j} is the determinant of A without its first row and jth column """
         # matrix must be square
         if self.mat.shape[0] != self.mat.shape[1]:
-            raise CastleException(f"Matrix of shape {self.mat.shape} is not square")
+            raise CastleException(
+                f"Can't take determinant: Matrix of shape {self.mat.shape} is not square"
+            )
 
         def determinant_recurse(mat):
             """ takes numpy array as an argument so we can recurse """
@@ -1145,8 +1145,8 @@ class Matrix(Function):
     def transpose(self):
         # matrix must be square
         if self.mat.shape[0] != self.mat.shape[1]:
-            raise ValueError(
-                f"Can't take transpose of matrix with dimensions {self.mat.shape}"
+            raise CastleException(
+                f"Can't take transpose of matrix of shape {self.mat.shape}"
             )
         return Matrix(np.transpose(self.mat), self.type)
 
@@ -1187,7 +1187,9 @@ class Relation:
                 if not rel(left, right):
                     return False
             else:
-                raise ValueError(f"Cannot compute relation {rel} on {left} and {right}")
+                raise CastleException(
+                    f"Cannot compute relation {rel} on {left} and {right}"
+                )
         return True
 
     def __repr__(self):
@@ -1259,7 +1261,7 @@ class SumFunc:
             not isinstance(lower_bound, RealNumber)
             or int(lower_bound.value) != lower_bound.value
         ):
-            raise Exception("Sum lower bound must evaluate to integer")
+            raise CastleException("Sum lower bound must evaluate to integer")
         upper_bound = self.upper_bound_expr.evaluate(state)
         if upper_bound.value == float("inf"):
             # TODO
@@ -1268,7 +1270,7 @@ class SumFunc:
             not isinstance(upper_bound, RealNumber)
             or int(upper_bound.value) != upper_bound.value
         ):
-            raise Exception("Sum upper bound must evaluate to integer")
+            raise CastleException("Sum upper bound must evaluate to integer")
 
         state.push_layer()
         max_bound = int(max(upper_bound, lower_bound).value)
@@ -1297,7 +1299,7 @@ class ProdFunc:
             not isinstance(lower_bound, RealNumber)
             or int(lower_bound.value) != lower_bound.value
         ):
-            raise Exception("Prod lower bound must evaluate to integer")
+            raise CastleException("Prod lower bound must evaluate to integer")
         upper_bound = self.upper_bound_expr.evaluate(state)
         if upper_bound.value == float("inf"):
             # TODO
@@ -1306,7 +1308,7 @@ class ProdFunc:
             not isinstance(upper_bound, RealNumber)
             or int(upper_bound.value) != upper_bound.value
         ):
-            raise Exception("Prod upper bound must evaluate to integer")
+            raise CastleException("Prod upper bound must evaluate to integer")
 
         state.push_layer()
         max_bound = int(max(upper_bound, lower_bound).value)
@@ -1421,7 +1423,9 @@ class Choose:
         n = self.n.evaluate(state).true_value()
         k = self.k.evaluate(state).true_value()
         if int(n) != n or int(k) != k:
-            raise ValueError(f"Inputs {self.n} and {self.k} to binom must be integers")
+            raise CastleException(
+                f"Inputs {self.n} and {self.k} to binom must be integers"
+            )
         return RealNumber(int(comb(int(n), int(k))))
 
     def __repr__(self):

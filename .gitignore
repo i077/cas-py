@@ -24,10 +24,10 @@ frontend/node_modules/*
 .pnp.js
 
 # testing
-/coverage
+frontend/coverage
 
 # production
-/build
+frontend/build
 
 # misc
 .DS_Store

@@ -7,11 +7,11 @@ from backend.session_handler import create_session, load_session_file, save_sess
 from backend.lang.CastleVisitor import evaluate_expression
 from backend.lang.structures import CastleException
 
-APP = Flask(__name__)
-LOG = create_logger(APP)
+application = Flask(__name__)
+LOG = create_logger(application)
 
 
-@APP.route("/create-session", methods=["POST"])
+@application.route("/create-session", methods=["POST"])
 def create():
     if request.method == "POST":
 
@@ -25,7 +25,7 @@ def create():
         LOG.error("This should be a POST request")
 
 
-@APP.route("/get-history", methods=["POST"])
+@application.route("/get-history", methods=["POST"])
 def get_history():
     if request.method == "POST":
         # Extract Data
@@ -42,7 +42,7 @@ def get_history():
         LOG.error("This should be a POST request")
 
 
-@APP.route("/update-history", methods=["POST"])
+@application.route("/update-history", methods=["POST"])
 def update_history():
     if request.method == "POST":
         # Extract Data
@@ -62,7 +62,7 @@ def update_history():
         LOG.error("This should be a POST request")
 
 
-@APP.route("/run", methods=["POST"])
+@application.route("/run", methods=["POST"])
 def run():
     if request.method == "POST":
         # Extract Data

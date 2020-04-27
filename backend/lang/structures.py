@@ -12,6 +12,7 @@ import sympy
 
 from State import State
 from Dicts import builtin_func_dict, inv_rel_dict
+from LaTeXParser import LaTeXParser as parse
 
 
 class Function(ABC):
@@ -349,9 +350,9 @@ class RealNumber(Number):
         else:
             raise ValueError("Improper instantiation of real number")
 
-        if abs(int(value) - value) < RealNumber.ZERO_CUTOFF:
+        if abs(np.round(value) - value) < RealNumber.ZERO_CUTOFF:
             # cast floats like 4.0 as ints
-            self.value = int(value)
+            self.value = int(np.round(value))
         else:
             self.value = value
 
@@ -626,7 +627,11 @@ class Fraction(Number):
 
     def true_value(self):
         """ Get the float value of this Fraction, not the object like evaluate()"""
-        return self.num / self.den
+        val = (self.num / self.den).true_value()
+        if abs(np.round(val) - val) < RealNumber.ZERO_CUTOFF:
+            # cast floats like 4.0 as ints
+            return int(np.round(val))
+        return val
 
     def simplify(self):
         """reduce to lowest terms"""
@@ -810,7 +815,7 @@ class ComplexNumber(Number):
 
     def true_value(self):
         """ Get the real, not the object like evaluate()"""
-        return np.complex(self.a, self.b)
+        return np.complex(self.a.true_value(), self.b.true_value())
 
     def __eq__(self, other):
         if isinstance(other, ComplexNumber):
@@ -1196,6 +1201,11 @@ class FunctionCall:
         self.passed_args = passed_args
 
     def evaluate(self, state: State):
+        if self.function_name == parse.FUNC_GCD:
+            eval_args = [arg.evaluate(state).true_value() for arg in self.passed_args]
+            if all([isinstance(arg, int) for arg in eval_args]):
+                return listGCD(eval_args)
+            raise ValueError("All arguments to gcd must be integers")
         if self.function_name in builtin_func_dict:
             eval_args = [arg.evaluate(state).true_value() for arg in self.passed_args]
             return RealNumber(float(builtin_func_dict[self.function_name](*eval_args)))

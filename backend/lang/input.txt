@@ -1,10 +1,11 @@
-\sin{\begin{vmatrix} 1 & 2 \\ 3 & 4 \end{vmatrix}}
-2^{\frac{1}{2}}
-a := \frac{\pi}{2}
-\sin{a}
-\sin^{-1}{0.5}
-1 + \cos{a}
-\sqrt{a} + 2
-\sqrt[\lceil a \rceil + 1]{a} + 2
-\sqrt[\lfloor a \rfloor + 1]{a} + 2
-\binom{\frac{6}{2}}{2} + 2
+1+i
+2+(-1)i
+i
+-1i
+(1+i)^2
+i^2
+i^i
+i^e
+e^{i\pi}
+(2-i)^{ \frac{i}{2} + 2 }
+\frac{i}{2}

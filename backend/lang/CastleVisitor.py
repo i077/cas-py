@@ -2,6 +2,7 @@ import math
 import operator as op
 import sys
 
+import numpy as np
 import sympy
 from antlr4 import CommonTokenStream, FileStream, InputStream
 
@@ -229,7 +230,11 @@ class CastleVisitor(LaTeXVisitor):
 
     def visitTex_symb_single(self, ctx: parse.Tex_symb_singleContext):
         """tex_symb_single
-        (LETTER | DIGIT) """
+        (NON_EI_LETTER | E | I | DIGIT) """
+        if ctx.E():
+            return RealNumber(np.e)
+        if ctx.I():
+            return ComplexNumber.create(RealNumber(0), RealNumber(1))
         text = ctx.getText()
         if ctx.DIGIT():
             return RealNumber(int(text))

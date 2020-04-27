@@ -339,6 +339,8 @@ class Number(Function, ABC):
 
 
 class RealNumber(Number):
+    ZERO_CUTOFF = 1e-12
+
     def __init__(self, val):
         if isinstance(val, RealNumber):
             value = val.value
@@ -347,7 +349,7 @@ class RealNumber(Number):
         else:
             raise ValueError("Improper instantiation of real number")
 
-        if int(value) == value:
+        if abs(int(value) - value) < RealNumber.ZERO_CUTOFF:
             # cast floats like 4.0 as ints
             self.value = int(value)
         else:
@@ -356,6 +358,8 @@ class RealNumber(Number):
     def __add__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value + other.value)
+        if isinstance(other, (int, float)):
+            return RealNumber(self.value + other)
         else:
             # addition is commutative and we assume we've implemented other + RealNumber in other's class
             return other + self
@@ -363,6 +367,8 @@ class RealNumber(Number):
     def __sub__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value - other.value)
+        if isinstance(other, (int, float)):
+            return RealNumber(self.value - other)
         else:
             # subtraction is (almost) commutative and we assume we've already implemented other + RealNumber
             return RealNumber(-1) * other + self
@@ -370,6 +376,8 @@ class RealNumber(Number):
     def __mul__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value * other.value)
+        if isinstance(other, (int, float)):
+            return RealNumber(self.value * other)
         else:
             # multiplication is commutative and we assume we've implemented other * RealNumber in other's class
             return other * self
@@ -377,9 +385,14 @@ class RealNumber(Number):
     def __truediv__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value / other.value)
+        if isinstance(other, (int, float)):
+            return RealNumber(self.value / other)
         elif isinstance(other, Fraction):
             # divide real number by fraction: a/(b/c) = (ac)/b
             return Fraction.create(self * other.den, other.num)
+        elif isinstance(other, ComplexNumber):
+            # use ComplexNumber's division procedure
+            return ComplexNumber(self, 0) / other
         else:
             # as of now we can't divide RealNumber by anything else
             raise ValueError(f"can't divide RealNumber {self} by {other}")
@@ -388,9 +401,14 @@ class RealNumber(Number):
         """ Only for internal use to create a fraction from a // b """
         if isinstance(other, RealNumber):
             return Fraction.create(self, other).simplify()
+        if isinstance(other, (int, float)):
+            return Fraction.create(self, RealNumber(other)).simplify()
         if isinstance(other, Fraction):
             # __truediv__ already correctly creates a fraction in this case
             return (self / other).simplify()
+        if isinstance(other, ComplexNumber):
+            # just use the regular division procedure
+            return self / other
         else:
             raise ValueError(
                 f"__floordiv__ only supported for types {type(self)} and {type(other)}"
@@ -399,8 +417,13 @@ class RealNumber(Number):
     def __pow__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value ** other.value)
+        if isinstance(other, (int, float)):
+            return RealNumber(self.value ** other)
         if isinstance(other, Fraction):
             return RealNumber(self ** other.true_value())
+        if isinstance(other, ComplexNumber):
+            # use ComplexNumber's power procedure
+            return ComplexNumber(self, 0) ** other
 
     def evaluate(self, state=None):
         return self
@@ -409,11 +432,18 @@ class RealNumber(Number):
         """ Get the numerical value of this Number, not the object like evaluate()"""
         return self.value
 
+    def simplify(self):
+        """ just need this because fraction.create() can return a RealNumber,
+        and we call fraction.create(...).simplify()"""
+        return self
+
     def __eq__(self, other):
+        RealNumber.ZERO_CUTOFF = 1e-12
         if isinstance(other, RealNumber):
-            return self.value == other.value
+            # equating floats doesn't work well since we don't use arbitrary precision.
+            return abs(self.value - other.value) < RealNumber.ZERO_CUTOFF
         elif isinstance(other, (int, float)):
-            return self.value == other
+            return abs(self.value - other) < RealNumber.ZERO_CUTOFF
         else:
             return other.__eq__(self)
 
@@ -423,12 +453,16 @@ class RealNumber(Number):
     def __lt__(self, other):
         if isinstance(other, RealNumber):
             return self.value < other.value
+        elif isinstance(other, (int, float)):
+            return self.true_value() < other
         else:
             return other.__gt__(self)
 
     def __gt__(self, other):
         if isinstance(other, RealNumber):
             return self.value > other.value
+        elif isinstance(other, (int, float)):
+            return self.true_value() > other
         else:
             return other.__lt__(self)
 
@@ -465,6 +499,9 @@ class Fraction(Number):
         """return a fraction if num and den are both 'rational' and a RealNumber otherwise"""
         assert isinstance(num, Number) and isinstance(den, Number)
 
+        if isinstance(num, ComplexNumber) or isinstance(den, ComplexNumber):
+            return num / den
+
         if isinstance(num, RealNumber) and isinstance(num.value, float):
             # convert any float with less than 10 decimal places into a fraction.
             # Otherwise assume it's irrational and return a RealNumber
@@ -498,7 +535,9 @@ class Fraction(Number):
     def __init__(self, top, bottom):
         """don't initialize with Fraction() - use Fraction.create() factory instead"""
         assert isinstance(top, Number) and isinstance(bottom, Number)
-        if isinstance(top, RealNumber) and isinstance(bottom, RealNumber):
+        if isinstance(top, (RealNumber, ComplexNumber)) and isinstance(
+            bottom, (RealNumber, ComplexNumber)
+        ):
             self.num = top
             self.den = bottom
         else:
@@ -514,35 +553,44 @@ class Fraction(Number):
                 self.den = quotient.den
 
     def __add__(self, other):
-        if isinstance(other, RealNumber):
+        if isinstance(other, (RealNumber, int, float)):
             # a + (b/c) = (ac+b)/c
             return Fraction.create(self.den * other + self.num, self.den).simplify()
-        elif isinstance(other, Fraction):
+        if isinstance(other, Fraction):
             # (a/b) + (c/d) = (ad+bc)/(bd)
             return Fraction.create(
                 self.num * other.den + self.den * other.num, self.den * other.den
             ).simplify()
-        else:
-            # use other's addition method, which we assume is defined for fraction
+        if isinstance(other, ComplexNumber):
+            # ComplexNumber + Fraction is defined in ComplexNumber
             return other + self
+        else:
+            raise ValueError(
+                f"operation {operator.add} not supported between {type(self)} and {type(other)}"
+            )
 
     def __sub__(self, other):
         return RealNumber(-1) * other + self
 
     def __mul__(self, other):
-        if isinstance(other, RealNumber):
+        if isinstance(other, (RealNumber, int, float)):
             # multiply fraction by real number: (a/b)*c = (ac)/b
             return Fraction.create(self.num * other, self.den).simplify()
-        elif isinstance(other, Fraction):
+        if isinstance(other, Fraction):
             # multiply fraction by fraction: (a/b)(c/d) = (ac)/(bd)
             return Fraction.create(
                 self.num * other.num, self.den * other.den
             ).simplify()
-        else:
+        if isinstance(other, ComplexNumber):
+            # ComplexNumber * Fraction is defined in ComplexNumber
             return other * self
+        else:
+            raise ValueError(
+                f"operation {operator.mul} not supported between {type(self)} and {type(other)}"
+            )
 
     def __truediv__(self, other):
-        if isinstance(other, RealNumber):
+        if isinstance(other, (RealNumber, int, float)):
             # divide fraction by real number: (a/b)/c = a/(bc)
             return Fraction.create(self.num, other * self.den).simplify()
         if isinstance(other, Fraction):
@@ -550,6 +598,9 @@ class Fraction(Number):
             return Fraction.create(
                 self.num * other.den, self.den * other.num
             ).simplify()
+        if isinstance(other, ComplexNumber):
+            # use ComplexNumber's division procedure
+            return ComplexNumber(self, 0) / other
         else:
             return Fraction.create(RealNumber(1), other) * self
 
@@ -563,8 +614,12 @@ class Fraction(Number):
             )
 
     def __pow__(self, other):
-        # (a/b)^c = (a^c)/(b^c). We have implemented RealNumber ** Fraction and RealNumber ** RealNumber above
-        return Fraction.create(self.num ** other, self.den ** other)
+        if isinstance(other, ComplexNumber):
+            # use ComplexNumber's power procedure
+            return ComplexNumber(self, 0) ** other
+        else:
+            # (a/b)^c = (a^c)/(b^c). We have implemented RealNumber ** Fraction and RealNumber ** RealNumber above
+            return Fraction.create(self.num ** other, self.den ** other)
 
     def evaluate(self, state=None):
         return self.simplify()
@@ -595,6 +650,8 @@ class Fraction(Number):
             )
         elif isinstance(other, RealNumber):
             return self.num / self.den == other
+        elif isinstance(other, (int, float)):
+            return abs(self.true_value() - other) < RealNumber.ZERO_CUTOFF
         else:
             raise ValueError(
                 f"Can't evaluate __eq__ on objects of type {type(self)} and {type(other)}"
@@ -608,6 +665,8 @@ class Fraction(Number):
             return self.num / self.den < other.num / other.den
         elif isinstance(other, RealNumber):
             return self.num / self.den < other
+        elif isinstance(other, (int, float)):
+            return self.true_value() < other
         else:
             raise ValueError(
                 f"Can't evaluate __lt__ on objects of type {type(self)} and {type(other)}"
@@ -618,6 +677,8 @@ class Fraction(Number):
             return self.num / self.den > other.num / other.den
         elif isinstance(other, RealNumber):
             return self.num / self.den > other
+        elif isinstance(other, (int, float)):
+            return self.true_value() > other
         else:
             raise ValueError(
                 f"Can't evaluate __gt__ on objects of type {type(self)} and {type(other)}"
@@ -692,7 +753,7 @@ class ComplexNumber(Number):
 
     def __truediv__(self, other):
         if isinstance(other, (RealNumber, Fraction)):
-            return self * (1 / other)
+            return self * (RealNumber(1) / other)
         if isinstance(other, ComplexNumber):
             # (a+bi)/(c+di) = ((a+bi)(c-di)) / ((c+di)(c-di)) = ((ac+bd)+(cb-ad)i) / (c^2+d^2)
             return Fraction.create(
@@ -717,31 +778,31 @@ class ComplexNumber(Number):
     def __pow__(self, other):
         if isinstance(other, (RealNumber, Fraction)):
             # use DeMoivre's theorem
-            r = self.a ** 2 + self.b ** 2
+            r = (self.a ** 2 + self.b ** 2) ** (1 / 2)
             if self.a == 0:
                 theta = np.sign(self.b.true_value()) * np.pi / 2
             else:
-                theta = sympy.atan((self.b / self.a).true_value())
+                theta = float(sympy.atan((self.b / self.a).true_value()))
             return ComplexNumber.create(
-                (r ** other) * RealNumber(sympy.cos(theta * other.true_value())),
-                (r ** other) * RealNumber(sympy.sin(theta * other.true_value())),
+                (r ** other) * RealNumber(float(sympy.cos(theta * other.true_value()))),
+                (r ** other) * RealNumber(float(sympy.sin(theta * other.true_value()))),
             )
         if isinstance(other, ComplexNumber):
             # use the closed-form expression for (a+bi)^(c+di) given at
-            # https://mathworld.wolfram.com/ComplexExponentiation.html:
-            r = (self.a ** 2 + self.b ** 2).true_value()
+            # https://mathworld.wolfram.com/ComplexExponentiation.html
+            r = self.a ** 2 + self.b ** 2
             if self.a == 0:
                 theta = np.sign(self.b.true_value()) * np.pi / 2
             # we need to consider b = 0 because RealNumber ** ComplexNumber and Fraction ** ComplexNumber get redirected here
             elif self.b == 0:
                 theta = 0 if self.a > 0 else np.pi
             else:
-                theta = sympy.atan((self.b / self.a).true_value())
+                theta = float(sympy.atan((self.b / self.a).true_value()))
             c, d = other.a, other.b
-            new_r = r ** (c / 2) * np.exp(-d * theta)
-            new_theta = c * theta + d * np.log(r) / 2
+            new_r = r ** (c / 2) * np.exp(-1 * d.true_value() * theta)
+            new_theta = c * theta + d * np.log(r.true_value()) / 2
             return ComplexNumber.create(
-                new_r * sympy.cos(new_theta), new_r * sympy.sin(new_theta)
+                new_r * float(sympy.cos(new_theta)), new_r * float(sympy.sin(new_theta))
             )
 
     def evaluate(self, state=None):
@@ -754,6 +815,8 @@ class ComplexNumber(Number):
     def __eq__(self, other):
         if isinstance(other, ComplexNumber):
             return self.a == other.a and self.b == other.b
+        elif isinstance(other, (Number, int, float)):
+            return self.a == other
         else:
             raise ValueError(
                 f"Can't evaluate __eq__ on objects of type {type(self)} and {type(other)}"
@@ -789,7 +852,20 @@ class ComplexNumber(Number):
         pass
 
     def __repr__(self):
-        return f"{self.a}+{self.b}i"
+        if self.a == 0:
+            if self.b == -1:
+                return "-i"
+            if self.b == 1:
+                return "i"
+            return f"{self.b}i"
+        if self.b == 0:
+            return str(self.a)
+        if self.b == -1:
+            return f"{self.a}-i"
+        if self.b == 1:
+            return f"{self.a}+i"
+        op = "+" if self.b > 0 else ""
+        return f"{self.a}{op}{self.b}i"
 
 
 def numberGCD(a: int, b: int) -> int:

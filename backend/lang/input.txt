@@ -1,3 +1,5 @@
-x := 3
-\gcd(4, \frac{4}{2} -2*e^{i\pi})
-\gcd(4,6.0,\frac{1}{2})
+a := \begin{bmatrix} 3 & 2 & i \\ 0 & 4 & -2 \\ -1 & 6 & -3 \end{bmatrix}
+a^{-1}
+\rref(a)
+\rref(\begin{bmatrix} 2 & 4 \\ 1 & 2 \end{bmatrix})
+\rref(\begin{bmatrix} 1 & 5 & 1 \\ 2 & 11 & 5 \end{bmatrix})

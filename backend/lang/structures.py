@@ -393,7 +393,7 @@ class RealNumber(Number):
             return Fraction.create(self * other.den, other.num)
         elif isinstance(other, ComplexNumber):
             # use ComplexNumber's division procedure
-            return ComplexNumber(self, 0) / other
+            return ComplexNumber(self, RealNumber(0)) / other
         else:
             # as of now we can't divide RealNumber by anything else
             raise ValueError(f"can't divide RealNumber {self} by {other}")
@@ -424,7 +424,7 @@ class RealNumber(Number):
             return RealNumber(self ** other.true_value())
         if isinstance(other, ComplexNumber):
             # use ComplexNumber's power procedure
-            return ComplexNumber(self, 0) ** other
+            return ComplexNumber(self, RealNumber(0)) ** other
 
     def evaluate(self, state=None):
         return self
@@ -601,7 +601,7 @@ class Fraction(Number):
             ).simplify()
         if isinstance(other, ComplexNumber):
             # use ComplexNumber's division procedure
-            return ComplexNumber(self, 0) / other
+            return ComplexNumber(self, RealNumber(0)) / other
         else:
             return Fraction.create(RealNumber(1), other) * self
 
@@ -617,7 +617,7 @@ class Fraction(Number):
     def __pow__(self, other):
         if isinstance(other, ComplexNumber):
             # use ComplexNumber's power procedure
-            return ComplexNumber(self, 0) ** other
+            return ComplexNumber(self, RealNumber(0)) ** other
         else:
             # (a/b)^c = (a^c)/(b^c). We have implemented RealNumber ** Fraction and RealNumber ** RealNumber above
             return Fraction.create(self.num ** other, self.den ** other)
@@ -724,7 +724,7 @@ class ComplexNumber(Number):
     def __init__(self, a, b):
         """don't initialize with ComplexNumber() - use ComplexNumber.create() factory instead"""
         assert isinstance(a, (RealNumber, Fraction)) and isinstance(
-            a, (RealNumber, Fraction)
+            b, (RealNumber, Fraction)
         )
         self.a = a
         self.b = b
@@ -869,7 +869,12 @@ class ComplexNumber(Number):
             return f"{self.a}-i"
         if self.b == 1:
             return f"{self.a}+i"
-        op = "+" if self.b > 0 else ""
+        if self.b > 0:
+            op = "+"
+        elif isinstance(self.b, Fraction):
+            return f"{self.a}-{RealNumber(-1)*self.b}i"
+        else:
+            op = ""
         return f"{self.a}{op}{self.b}i"
 
 
@@ -1041,16 +1046,8 @@ class Matrix(Function):
     def integral(self):
         pass
 
-    def invert(self):
-        """Find inverse of matrix using Gauss-Jordan elimination"""
-        # can't take inverse of non-square matrix
-        if self.mat.shape[0] != self.mat.shape[1]:
-            raise ValueError(
-                f"Can't take inverse of matrix with dimensions {self.mat.shape}"
-            )
-        # can't take inverse if matrix is singular (determinant is 0)
-        if self.determinant() == RealNumber(0):
-            raise ValueError(f"Can't take inverse: matrix is singular")
+    def rref(self):
+        """return this matrix in row-reduced echelon form"""
 
         def swap_rows(r1, r2, mat):
             if r1 != r2:
@@ -1064,9 +1061,8 @@ class Matrix(Function):
             return float("inf")
 
         nrows = self.mat.shape[0]
-        # append identity matrix to the right
-        identity = np.vectorize(lambda v: RealNumber(v))(np.identity(nrows))
-        gmat = np.append(self.mat, identity, axis=1)
+        gmat = self.mat
+
         all_zero_counter = 0
         for row in range(nrows // 2):
             # if all columns are 0, move row to bottom
@@ -1088,6 +1084,9 @@ class Matrix(Function):
             # still work at index row, although there could be a different actual row here now
             # use __floordiv__ to create fractions
             nonzero_index = leftmost_nonzero(gmat, row)
+            if nonzero_index == float("inf"):
+                # can't do any more
+                return Matrix(gmat, self.type)
             gmat[row, :] = gmat[row, :] // gmat[row][nonzero_index]
 
             # 3. clear out other rows' values in column with this row's first nonzero entry
@@ -1096,9 +1095,26 @@ class Matrix(Function):
                     gmat[lrow, :] = (
                         gmat[lrow, :] - gmat[row, :] * gmat[lrow][nonzero_index]
                     )
+        return Matrix(gmat, self.type)
 
-        # right nrows columns were originally identity, now they're the inverse
-        return Matrix(gmat[:, nrows : 2 * nrows], self.type)
+    def invert(self):
+        """Find inverse of matrix using Gauss-Jordan elimination"""
+        # can't take inverse of non-square matrix
+        if self.mat.shape[0] != self.mat.shape[1]:
+            raise ValueError(
+                f"Can't take inverse of matrix with dimensions {self.mat.shape}"
+            )
+        # can't take inverse if matrix is singular (determinant is 0)
+        if self.determinant() == RealNumber(0):
+            raise ValueError(f"Can't take inverse: matrix is singular")
+
+        nrows = self.mat.shape[0]
+        # append identity matrix to the right
+        identity = np.vectorize(lambda v: RealNumber(v))(np.identity(nrows))
+        gmat = Matrix(np.append(self.mat, identity, axis=1), self.type)
+
+        # take rref. right nrows columns were originally identity, now they're the inverse
+        return Matrix(gmat.rref().mat[:, nrows : 2 * nrows], self.type)
 
     def determinant(self):
         """ Calculate determinant using Laplace's formula:
@@ -1206,6 +1222,14 @@ class FunctionCall:
             if all([isinstance(arg, int) for arg in eval_args]):
                 return listGCD(eval_args)
             raise ValueError("All arguments to gcd must be integers")
+        if self.function_name == parse.FUNC_RREF:
+            if len(self.passed_args) != 1:
+                raise ValueError("rref takes 1 argument")
+            mat = self.passed_args[0].evaluate(state)
+            if not isinstance(mat, Matrix):
+                raise ValueError("rref argument must be matrix")
+            return mat.rref()
+
         if self.function_name in builtin_func_dict:
             eval_args = [arg.evaluate(state).true_value() for arg in self.passed_args]
             return RealNumber(float(builtin_func_dict[self.function_name](*eval_args)))

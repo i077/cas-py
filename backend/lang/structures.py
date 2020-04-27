@@ -8,9 +8,11 @@ from typing import List
 
 import numpy as np
 from scipy.special import comb
+import sympy
 
 from backend.lang.State import State
 from backend.lang.Dicts import builtin_func_dict, inv_rel_dict
+from backend.lang.LaTeXParser import LaTeXParser as parse
 
 
 class Function(ABC):
@@ -140,7 +142,7 @@ class Expression(Function):
                 right ** 2
             )
         else:
-            raise ValueError
+            raise CastleException("bad quotient rule")
 
     # TODO: how tf do we do this
     def integral(self):
@@ -338,23 +340,27 @@ class Number(Function, ABC):
 
 
 class RealNumber(Number):
+    ZERO_CUTOFF = 1e-12
+
     def __init__(self, val):
         if isinstance(val, RealNumber):
             value = val.value
         elif isinstance(val, (int, float)):
             value = val
         else:
-            raise ValueError("Improper instantiation of real number")
+            raise CastleException("Improper instantiation of real number")
 
-        if int(value) == value:
+        if abs(np.round(value) - value) < RealNumber.ZERO_CUTOFF:
             # cast floats like 4.0 as ints
-            self.value = int(value)
+            self.value = int(np.round(value))
         else:
             self.value = value
 
     def __add__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value + other.value)
+        if isinstance(other, (int, float)):
+            return RealNumber(self.value + other)
         else:
             # addition is commutative and we assume we've implemented other + RealNumber in other's class
             return other + self
@@ -362,6 +368,8 @@ class RealNumber(Number):
     def __sub__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value - other.value)
+        if isinstance(other, (int, float)):
+            return RealNumber(self.value - other)
         else:
             # subtraction is (almost) commutative and we assume we've already implemented other + RealNumber
             return RealNumber(-1) * other + self
@@ -369,6 +377,8 @@ class RealNumber(Number):
     def __mul__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value * other.value)
+        if isinstance(other, (int, float)):
+            return RealNumber(self.value * other)
         else:
             # multiplication is commutative and we assume we've implemented other * RealNumber in other's class
             return other * self
@@ -378,30 +388,45 @@ class RealNumber(Number):
             if other.value == 0:
                 raise CastleException("Can't divide by zero")
             return RealNumber(self.value / other.value)
+        if isinstance(other, (int, float)):
+            return RealNumber(self.value / other)
         elif isinstance(other, Fraction):
             # divide real number by fraction: a/(b/c) = (ac)/b
             return Fraction.create(self * other.den, other.num)
+        elif isinstance(other, ComplexNumber):
+            # use ComplexNumber's division procedure
+            return ComplexNumber(self, RealNumber(0)) / other
         else:
             # as of now we can't divide RealNumber by anything else
-            raise ValueError(f"can't divide RealNumber {self} by {other}")
+            raise CastleException(f"can't divide RealNumber {self} by {other}")
 
     def __floordiv__(self, other):
         """ Only for internal use to create a fraction from a // b """
         if isinstance(other, RealNumber):
             return Fraction.create(self, other).simplify()
+        if isinstance(other, (int, float)):
+            return Fraction.create(self, RealNumber(other)).simplify()
         if isinstance(other, Fraction):
             # __truediv__ already correctly creates a fraction in this case
             return (self / other).simplify()
+        if isinstance(other, ComplexNumber):
+            # just use the regular division procedure
+            return self / other
         else:
-            raise ValueError(
+            raise CastleException(
                 f"__floordiv__ only supported for types {type(self)} and {type(other)}"
             )
 
     def __pow__(self, other):
         if isinstance(other, RealNumber):
             return RealNumber(self.value ** other.value)
+        if isinstance(other, (int, float)):
+            return RealNumber(self.value ** other)
         if isinstance(other, Fraction):
             return RealNumber(self ** other.true_value())
+        if isinstance(other, ComplexNumber):
+            # use ComplexNumber's power procedure
+            return ComplexNumber(self, RealNumber(0)) ** other
 
     def evaluate(self, state=None):
         return self
@@ -410,11 +435,18 @@ class RealNumber(Number):
         """ Get the numerical value of this Number, not the object like evaluate()"""
         return self.value
 
+    def simplify(self):
+        """ just need this because fraction.create() can return a RealNumber,
+        and we call fraction.create(...).simplify()"""
+        return self
+
     def __eq__(self, other):
+        RealNumber.ZERO_CUTOFF = 1e-12
         if isinstance(other, RealNumber):
-            return self.value == other.value
+            # equating floats doesn't work well since we don't use arbitrary precision.
+            return abs(self.value - other.value) < RealNumber.ZERO_CUTOFF
         elif isinstance(other, (int, float)):
-            return self.value == other
+            return abs(self.value - other) < RealNumber.ZERO_CUTOFF
         else:
             return other.__eq__(self)
 
@@ -424,12 +456,16 @@ class RealNumber(Number):
     def __lt__(self, other):
         if isinstance(other, RealNumber):
             return self.value < other.value
+        elif isinstance(other, (int, float)):
+            return self.true_value() < other
         else:
             return other.__gt__(self)
 
     def __gt__(self, other):
         if isinstance(other, RealNumber):
             return self.value > other.value
+        elif isinstance(other, (int, float)):
+            return self.true_value() > other
         else:
             return other.__lt__(self)
 
@@ -466,6 +502,9 @@ class Fraction(Number):
         """return a fraction if num and den are both 'rational' and a RealNumber otherwise"""
         assert isinstance(num, Number) and isinstance(den, Number)
 
+        if isinstance(num, ComplexNumber) or isinstance(den, ComplexNumber):
+            return num / den
+
         if isinstance(num, RealNumber) and isinstance(num.value, float):
             # convert any float with less than 10 decimal places into a fraction.
             # Otherwise assume it's irrational and return a RealNumber
@@ -499,7 +538,9 @@ class Fraction(Number):
     def __init__(self, top, bottom):
         """don't initialize with Fraction() - use Fraction.create() factory instead"""
         assert isinstance(top, Number) and isinstance(bottom, Number)
-        if isinstance(top, RealNumber) and isinstance(bottom, RealNumber):
+        if isinstance(top, (RealNumber, ComplexNumber)) and isinstance(
+            bottom, (RealNumber, ComplexNumber)
+        ):
             self.num = top
             self.den = bottom
         else:
@@ -515,35 +556,44 @@ class Fraction(Number):
                 self.den = quotient.den
 
     def __add__(self, other):
-        if isinstance(other, RealNumber):
+        if isinstance(other, (RealNumber, int, float)):
             # a + (b/c) = (ac+b)/c
             return Fraction.create(self.den * other + self.num, self.den).simplify()
-        elif isinstance(other, Fraction):
+        if isinstance(other, Fraction):
             # (a/b) + (c/d) = (ad+bc)/(bd)
             return Fraction.create(
                 self.num * other.den + self.den * other.num, self.den * other.den
             ).simplify()
-        else:
-            # use other's addition method, which we assume is defined for fraction
+        if isinstance(other, ComplexNumber):
+            # ComplexNumber + Fraction is defined in ComplexNumber
             return other + self
+        else:
+            raise CastleException(
+                f"operation {operator.add} not supported between {type(self)} and {type(other)}"
+            )
 
     def __sub__(self, other):
         return RealNumber(-1) * other + self
 
     def __mul__(self, other):
-        if isinstance(other, RealNumber):
+        if isinstance(other, (RealNumber, int, float)):
             # multiply fraction by real number: (a/b)*c = (ac)/b
             return Fraction.create(self.num * other, self.den).simplify()
-        elif isinstance(other, Fraction):
+        if isinstance(other, Fraction):
             # multiply fraction by fraction: (a/b)(c/d) = (ac)/(bd)
             return Fraction.create(
                 self.num * other.num, self.den * other.den
             ).simplify()
-        else:
+        if isinstance(other, ComplexNumber):
+            # ComplexNumber * Fraction is defined in ComplexNumber
             return other * self
+        else:
+            raise CastleException(
+                f"operation {operator.mul} not supported between {type(self)} and {type(other)}"
+            )
 
     def __truediv__(self, other):
-        if isinstance(other, RealNumber):
+        if isinstance(other, (RealNumber, int, float)):
             # divide fraction by real number: (a/b)/c = a/(bc)
             return Fraction.create(self.num, other * self.den).simplify()
         if isinstance(other, Fraction):
@@ -551,6 +601,9 @@ class Fraction(Number):
             return Fraction.create(
                 self.num * other.den, self.den * other.num
             ).simplify()
+        if isinstance(other, ComplexNumber):
+            # use ComplexNumber's division procedure
+            return ComplexNumber(self, RealNumber(0)) / other
         else:
             return Fraction.create(RealNumber(1), other) * self
 
@@ -559,20 +612,28 @@ class Fraction(Number):
         if isinstance(other, Number):
             return self / other
         else:
-            raise ValueError(
+            raise CastleException(
                 f"__floordiv__ only supported for types {type(self)} and {type(other)}"
             )
 
     def __pow__(self, other):
-        # (a/b)^c = (a^c)/(b^c). We have implemented RealNumber ** Fraction and RealNumber ** RealNumber above
-        return Fraction.create(self.num ** other, self.den ** other)
+        if isinstance(other, ComplexNumber):
+            # use ComplexNumber's power procedure
+            return ComplexNumber(self, RealNumber(0)) ** other
+        else:
+            # (a/b)^c = (a^c)/(b^c). We have implemented RealNumber ** Fraction and RealNumber ** RealNumber above
+            return Fraction.create(self.num ** other, self.den ** other)
 
     def evaluate(self, state=None):
         return self.simplify()
 
     def true_value(self):
         """ Get the float value of this Fraction, not the object like evaluate()"""
-        return self.num / self.den
+        val = (self.num / self.den).true_value()
+        if abs(np.round(val) - val) < RealNumber.ZERO_CUTOFF:
+            # cast floats like 4.0 as ints
+            return int(np.round(val))
+        return val
 
     def simplify(self):
         """reduce to lowest terms"""
@@ -596,8 +657,10 @@ class Fraction(Number):
             )
         elif isinstance(other, RealNumber):
             return self.num / self.den == other
+        elif isinstance(other, (int, float)):
+            return abs(self.true_value() - other) < RealNumber.ZERO_CUTOFF
         else:
-            raise ValueError(
+            raise CastleException(
                 f"Can't evaluate __eq__ on objects of type {type(self)} and {type(other)}"
             )
 
@@ -609,8 +672,10 @@ class Fraction(Number):
             return self.num / self.den < other.num / other.den
         elif isinstance(other, RealNumber):
             return self.num / self.den < other
+        elif isinstance(other, (int, float)):
+            return self.true_value() < other
         else:
-            raise ValueError(
+            raise CastleException(
                 f"Can't evaluate __lt__ on objects of type {type(self)} and {type(other)}"
             )
 
@@ -619,8 +684,10 @@ class Fraction(Number):
             return self.num / self.den > other.num / other.den
         elif isinstance(other, RealNumber):
             return self.num / self.den > other
+        elif isinstance(other, (int, float)):
+            return self.true_value() > other
         else:
-            raise ValueError(
+            raise CastleException(
                 f"Can't evaluate __gt__ on objects of type {type(self)} and {type(other)}"
             )
 
@@ -638,6 +705,179 @@ class Fraction(Number):
 
     def __repr__(self):
         return f"\\frac{{{self.num}}}{{{self.den}}}"
+
+
+class ComplexNumber(Number):
+    """a + bi"""
+
+    @staticmethod
+    def create(a, b):
+        """use this instead of __init__ to create ComplexNumber instances"""
+        assert isinstance(a, (RealNumber, Fraction)) and isinstance(
+            a, (RealNumber, Fraction)
+        )
+
+        if b == RealNumber(0):
+            # a + 0i = a - no need for a ComplexNumber here
+            return a
+
+        return ComplexNumber(a, b)
+
+    def __init__(self, a, b):
+        """don't initialize with ComplexNumber() - use ComplexNumber.create() factory instead"""
+        assert isinstance(a, (RealNumber, Fraction)) and isinstance(
+            b, (RealNumber, Fraction)
+        )
+        self.a = a
+        self.b = b
+
+    def __add__(self, other):
+        if isinstance(other, (Fraction, RealNumber)):
+            # (a + bi) + c = (a + c) + bi
+            return ComplexNumber.create(self.a + other, self.b)
+        elif isinstance(other, ComplexNumber):
+            # (a + bi) + (c + di) = (a + c) + (b + d)i
+            return ComplexNumber.create(self.a + other.a, self.b + other.b)
+        else:
+            # use other's addition method, which we assume is defined
+            return other + self
+
+    def __sub__(self, other):
+        return RealNumber(-1) * other + self
+
+    def __mul__(self, other):
+        if isinstance(other, (RealNumber, Fraction)):
+            # c(a + bi) = ca + (cb)i
+            return ComplexNumber.create(other * self.a, other * self.b)
+        elif isinstance(other, ComplexNumber):
+            # (a+bi)(c+di) = (ac-bd) + (ad+bc)i
+            return ComplexNumber.create(
+                (self.a * other.a) - (self.b * other.b),
+                (self.a * other.b) + (self.b * other.a),
+            )
+        else:
+            return other * self
+
+    def __truediv__(self, other):
+        if isinstance(other, (RealNumber, Fraction)):
+            return self * (RealNumber(1) / other)
+        if isinstance(other, ComplexNumber):
+            # (a+bi)/(c+di) = ((a+bi)(c-di)) / ((c+di)(c-di)) = ((ac+bd)+(cb-ad)i) / (c^2+d^2)
+            return Fraction.create(
+                ComplexNumber.create(
+                    (self.a * other.a) + (self.b * other.b),
+                    (self.b * other.a) - (self.a * other.b),
+                ),
+                (other.a ** 2) + (other.b ** 2),
+            )
+        else:
+            return Fraction.create(RealNumber(1), other) * self
+
+    def __floordiv__(self, other):
+        """ Only for internal use and only needed because we defined __floordiv__ for RealNumber"""
+        if isinstance(other, Number):
+            return self / other
+        else:
+            raise CastleException(
+                f"__floordiv__ only supported for types {type(self)} and {type(other)}"
+            )
+
+    def __pow__(self, other):
+        if isinstance(other, (RealNumber, Fraction)):
+            # use DeMoivre's theorem
+            r = (self.a ** 2 + self.b ** 2) ** (1 / 2)
+            if self.a == 0:
+                theta = np.sign(self.b.true_value()) * np.pi / 2
+            else:
+                theta = float(sympy.atan((self.b / self.a).true_value()))
+            return ComplexNumber.create(
+                (r ** other) * RealNumber(float(sympy.cos(theta * other.true_value()))),
+                (r ** other) * RealNumber(float(sympy.sin(theta * other.true_value()))),
+            )
+        if isinstance(other, ComplexNumber):
+            # use the closed-form expression for (a+bi)^(c+di) given at
+            # https://mathworld.wolfram.com/ComplexExponentiation.html
+            r = self.a ** 2 + self.b ** 2
+            if self.a == 0:
+                theta = np.sign(self.b.true_value()) * np.pi / 2
+            # we need to consider b = 0 because RealNumber ** ComplexNumber and Fraction ** ComplexNumber get redirected here
+            elif self.b == 0:
+                theta = 0 if self.a > 0 else np.pi
+            else:
+                theta = float(sympy.atan((self.b / self.a).true_value()))
+            c, d = other.a, other.b
+            new_r = r ** (c / 2) * np.exp(-1 * d.true_value() * theta)
+            new_theta = c * theta + d * np.log(r.true_value()) / 2
+            return ComplexNumber.create(
+                new_r * float(sympy.cos(new_theta)), new_r * float(sympy.sin(new_theta))
+            )
+
+    def evaluate(self, state=None):
+        return ComplexNumber.create(self.a.evaluate(), self.b.evaluate())
+
+    def true_value(self):
+        """ Get the real, not the object like evaluate()"""
+        return np.complex(self.a.true_value(), self.b.true_value())
+
+    def __eq__(self, other):
+        if isinstance(other, ComplexNumber):
+            return self.a == other.a and self.b == other.b
+        elif isinstance(other, (Number, int, float)):
+            return self.a == other
+        else:
+            raise CastleException(
+                f"Can't evaluate __eq__ on objects of type {type(self)} and {type(other)}"
+            )
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __lt__(self, other):
+        raise CastleException(
+            f"Can't evaluate __lt__ on objects of type {type(self)} and {type(other)}"
+        )
+
+    def __gt__(self, other):
+        raise CastleException(
+            f"Can't evaluate __gt__ on objects of type {type(self)} and {type(other)}"
+        )
+
+    def __le__(self, other):
+        raise CastleException(
+            f"Can't evaluate __le__ on objects of type {type(self)} and {type(other)}"
+        )
+
+    def __ge__(self, other):
+        raise CastleException(
+            f"Can't evaluate __le__ on objects of type {type(self)} and {type(other)}"
+        )
+
+    def derivative(self):
+        return 0
+
+    def integral(self):
+        pass
+
+    def __repr__(self):
+        if self.a == 0:
+            if self.b == -1:
+                return "-i"
+            if self.b == 1:
+                return "i"
+            return f"{self.b}i"
+        if self.b == 0:
+            return str(self.a)
+        if self.b == -1:
+            return f"{self.a}-i"
+        if self.b == 1:
+            return f"{self.a}+i"
+        if self.b > 0:
+            op = "+"
+        elif isinstance(self.b, Fraction):
+            return f"{self.a}-{RealNumber(-1)*self.b}i"
+        else:
+            op = ""
+        return f"{self.a}{op}{self.b}i"
 
 
 def numberGCD(a: int, b: int) -> int:
@@ -730,10 +970,12 @@ class Matrix(Function):
 
     def __add__(self, other):
         if not isinstance(other, Matrix):
-            raise CastleException(f"Can't add Matrix and {type(other)}")
+            raise CastleException(
+                f"Operation __add__ not supported between Matrix and {type(other)}"
+            )
         if not other.mat.shape == self.mat.shape:
             raise CastleException(
-                f"Can't add Matrices of shapes {self.mat.shape} and {other.mat.shape}"
+                f"Operation __add__ not supported for matrices with shape {self.mat.shape} and {other.mat.shape}"
             )
         # take this matrix's type by default
         return Matrix(self.mat + other.mat, self.type)
@@ -758,7 +1000,7 @@ class Matrix(Function):
                 return RealNumber(np.dot(self.mat, other.mat)[0][0])
             return Matrix(np.matmul(self.mat, other.mat), self.type)
 
-        raise ValueError(
+        raise CastleException(
             f"Operation __mul__ not supported between Matrix and {type(other)}"
         )
 
@@ -767,14 +1009,14 @@ class Matrix(Function):
         if isinstance(other, Number):
             return self * Fraction.create(RealNumber(1), other)
         else:
-            raise ValueError(
+            raise CastleException(
                 f"Operation __div__ not supported between Matrix and {type(other)}"
             )
 
     def __pow__(self, other):
         # can only raise square matrices to powers
         if self.mat.shape[0] != self.mat.shape[1]:
-            raise ValueError(
+            raise CastleException(
                 f"Can't raise matrix with dimension {self.mat.shape} to power (matrix must be square)"
             )
         # can only take integer powers
@@ -804,16 +1046,8 @@ class Matrix(Function):
     def integral(self):
         pass
 
-    def invert(self):
-        """Find inverse of matrix using Gauss-Jordan elimination"""
-        # can't take inverse of non-square matrix
-        if self.mat.shape[0] != self.mat.shape[1]:
-            raise CastleException(
-                f"Can't take inverse of non-square matrix of shape {self.mat.shape}"
-            )
-        # can't take inverse if matrix is singular (determinant is 0)
-        if self.determinant() == RealNumber(0):
-            raise CastleException(f"Can't take inverse: matrix is singular")
+    def rref(self):
+        """return this matrix in row-reduced echelon form"""
 
         def swap_rows(r1, r2, mat):
             if r1 != r2:
@@ -827,9 +1061,8 @@ class Matrix(Function):
             return float("inf")
 
         nrows = self.mat.shape[0]
-        # append identity matrix to the right
-        identity = np.vectorize(lambda v: RealNumber(v))(np.identity(nrows))
-        gmat = np.append(self.mat, identity, axis=1)
+        gmat = self.mat
+
         all_zero_counter = 0
         for row in range(nrows // 2):
             # if all columns are 0, move row to bottom
@@ -851,6 +1084,9 @@ class Matrix(Function):
             # still work at index row, although there could be a different actual row here now
             # use __floordiv__ to create fractions
             nonzero_index = leftmost_nonzero(gmat, row)
+            if nonzero_index == float("inf"):
+                # can't do any more
+                return Matrix(gmat, self.type)
             gmat[row, :] = gmat[row, :] // gmat[row][nonzero_index]
 
             # 3. clear out other rows' values in column with this row's first nonzero entry
@@ -859,9 +1095,26 @@ class Matrix(Function):
                     gmat[lrow, :] = (
                         gmat[lrow, :] - gmat[row, :] * gmat[lrow][nonzero_index]
                     )
+        return Matrix(gmat, self.type)
 
-        # right nrows columns were originally identity, now they're the inverse
-        return Matrix(gmat[:, nrows : 2 * nrows], self.type)
+    def invert(self):
+        """Find inverse of matrix using Gauss-Jordan elimination"""
+        # can't take inverse of non-square matrix
+        if self.mat.shape[0] != self.mat.shape[1]:
+            raise CastleException(
+                f"Can't take inverse of matrix with dimensions {self.mat.shape}"
+            )
+        # can't take inverse if matrix is singular (determinant is 0)
+        if self.determinant() == RealNumber(0):
+            raise CastleException(f"Can't take inverse: matrix is singular")
+
+        nrows = self.mat.shape[0]
+        # append identity matrix to the right
+        identity = np.vectorize(lambda v: RealNumber(v))(np.identity(nrows))
+        gmat = Matrix(np.append(self.mat, identity, axis=1), self.type)
+
+        # take rref. right nrows columns were originally identity, now they're the inverse
+        return Matrix(gmat.rref().mat[:, nrows : 2 * nrows], self.type)
 
     def determinant(self):
         """ Calculate determinant using Laplace's formula:
@@ -966,6 +1219,19 @@ class FunctionCall:
         self.passed_args = passed_args
 
     def evaluate(self, state: State):
+        if self.function_name == parse.FUNC_GCD:
+            eval_args = [arg.evaluate(state).true_value() for arg in self.passed_args]
+            if all([isinstance(arg, int) for arg in eval_args]):
+                return listGCD(eval_args)
+            raise CastleException("All arguments to gcd must be integers")
+        if self.function_name == parse.FUNC_RREF:
+            if len(self.passed_args) != 1:
+                raise CastleException("rref takes 1 argument")
+            mat = self.passed_args[0].evaluate(state)
+            if not isinstance(mat, Matrix):
+                raise CastleException("rref argument must be matrix")
+            return mat.rref()
+
         if self.function_name in builtin_func_dict:
             eval_args = [arg.evaluate(state).true_value() for arg in self.passed_args]
             return RealNumber(float(builtin_func_dict[self.function_name](*eval_args)))

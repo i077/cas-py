@@ -49,8 +49,9 @@ COMMA      : ',';
 
 PI : '\\pi';
 E  : 'e';
+I  : 'i';
 
-NON_E_LETTER  : [a-df-zA-Z];
+NON_EI_LETTER  : [a-df-hj-zA-Z];
 DIGIT   : [0-9];
 
 CMD_CDOT        : '\\cdot';
@@ -72,6 +73,8 @@ FUNC_PDV        : '\\pdv';
 FUNC_SQRT       : '\\sqrt';
 FUNC_CHOOSE     : '\\binom';
 
+FUNC_RREF       : '\\rref';
+FUNC_GCD        : '\\gcd';
 FUNC_LOG        : '\\log';
 FUNC_LN         : '\\ln';
 FUNC_EXP        : '\\exp';
@@ -108,11 +111,11 @@ hist_entry
 number  : MINUS? DIGIT+ (POINT DIGIT*)?;
 nnint   : DIGIT+;
 
-multichar_var : (NON_E_LETTER | E | DIGIT)+;
+multichar_var : (NON_EI_LETTER | E | I | DIGIT)+;
 
 // Variable names
 var_name
-    : NON_E_LETTER                               #var_name_letter
+    : NON_EI_LETTER                               #var_name_letter
     | BACKTICK name=multichar_var BACKTICK #var_name_multichar
     ;
 
@@ -120,7 +123,7 @@ var
     : var_name (UNDERSCORE tex_symb)?;
 
 tex_symb
-    : (NON_E_LETTER | E | DIGIT)   #tex_symb_single
+    : (NON_EI_LETTER | E | I | DIGIT)   #tex_symb_single
     | LCURLY expr RCURLY #tex_symb_multi
     | LCURLY var RCURLY  #tex_symb_recurse
     ;
@@ -128,7 +131,8 @@ tex_symb
 func_builtin
     : name=(FUNC_SIN | FUNC_COS | FUNC_TAN
     | FUNC_SEC | FUNC_CSC | FUNC_COT
-    | FUNC_EXP | FUNC_LN | FUNC_LOG
+    | FUNC_EXP | FUNC_LN | FUNC_GCD
+    | FUNC_RREF | FUNC_LOG
     | FUNC_ASIN | FUNC_ACOS | FUNC_ATAN
     | FUNC_ASEC | FUNC_ACSC | FUNC_ACOT)
     ;
@@ -137,7 +141,7 @@ func_call
     // Custom function call with a number of arguments other than 1
     : var LPAREN (expr (COMMA expr)+)? RPAREN                                                                  #func_custom
     // Function builtin function call
-    | func_builtin (LPAREN (expr ((COMMA expr)+)*)? RPAREN | 
+    | func_builtin (LPAREN (expr ((COMMA expr)+)*)? RPAREN |
                     LCURLY LPAREN (expr ((COMMA expr)+)*)? RPAREN RCURLY |
                     LCURLY (expr ((COMMA expr)+)*)? RCURLY)                                                    #func_call_builtin
     // Sums
@@ -246,7 +250,7 @@ unit
 unit_paren
     : LPAREN expr RPAREN
     ;
-    
+
 //units that can be multiplied together without * or \cdot on both sides:
 //for example x\sqrt{x}
 implicit_mult_unit
@@ -257,8 +261,9 @@ implicit_mult_unit
     | hist_entry                    #unit_hist         // History reference
     | PI                            #unit_pi           // 3.14159...
     | E                             #unit_e            // 2.71828...
+    | I                             #unit_i            // \sqrt{-1}
     ;
-    
+
 //units that can only be explicitly multiplied on the left
 left_implicit_mult_unit
     : number                        #unit_number       // Number literals

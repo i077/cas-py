@@ -2,6 +2,7 @@ import math
 import operator as op
 import sys
 
+import numpy as np
 import sympy
 from antlr4 import CommonTokenStream, FileStream, InputStream
 
@@ -15,6 +16,7 @@ from backend.lang.structures import (
     CastleException,
     Ceiling,
     Choose,
+    ComplexNumber,
     Derivative,
     Determinant,
     Expression,
@@ -152,7 +154,7 @@ class CastleVisitor(LaTeXVisitor):
         """implicit_pow_expr_recurse
         implicit_pow_expr CARET tex_symb """
         return Expression(
-            op.pow, self.visit(ctx.implicit_pow_expr()), self.visit(ctx.tex_symb()),
+            op.pow, self.visit(ctx.implicit_pow_expr()), self.visit(ctx.tex_symb())
         )
 
     def visitLeft_implicit_pow_expr_recurse(
@@ -161,9 +163,7 @@ class CastleVisitor(LaTeXVisitor):
         """left_implicit_pow_expr_recurse
         left_implicit_pow_expr CARET tex_symb """
         return Expression(
-            op.pow,
-            self.visit(ctx.left_implicit_pow_expr()),
-            self.visit(ctx.tex_symb()),
+            op.pow, self.visit(ctx.left_implicit_pow_expr()), self.visit(ctx.tex_symb())
         )
 
     def visitPow_expr_recurse(self, ctx: parse.Pow_expr_recurseContext):
@@ -192,6 +192,10 @@ class CastleVisitor(LaTeXVisitor):
 
     def visitUnit_e(self, ctx: parse.Unit_eContext):
         return RealNumber(math.e)
+
+    def visitUnit_i(self, ctx: parse.Unit_iContext):
+        # i = 0 + 1i
+        return ComplexNumber.create(RealNumber(0), RealNumber(1))
 
     def visitNumber(self, ctx: parse.NumberContext):
         """number
@@ -227,7 +231,11 @@ class CastleVisitor(LaTeXVisitor):
 
     def visitTex_symb_single(self, ctx: parse.Tex_symb_singleContext):
         """tex_symb_single
-        (LETTER | DIGIT) """
+        (NON_EI_LETTER | E | I | DIGIT) """
+        if ctx.E():
+            return RealNumber(np.e)
+        if ctx.I():
+            return ComplexNumber.create(RealNumber(0), RealNumber(1))
         text = ctx.getText()
         if ctx.DIGIT():
             return RealNumber(int(text))
@@ -392,7 +400,7 @@ class CastleVisitor(LaTeXVisitor):
         return Root(self.visit(exprs[0]))
 
     def visitFunc_choose(self, ctx: parse.Func_chooseContext):
-        return Choose(self.visit(ctx.expr(0)), self.visit(ctx.expr(1)),)
+        return Choose(self.visit(ctx.expr(0)), self.visit(ctx.expr(1)))
 
     def visitFunc_builtin(self, ctx: parse.Func_builtinContext):
         return ctx.name.type
@@ -406,9 +414,7 @@ class CastleVisitor(LaTeXVisitor):
         var_val = self.state.get(var.name)
         expr = self.visit(ctx.expr())
         exponent = ctx.tex_symb()
-        if var_val is None:
-            raise Exception(f"Variable {var.name} not found")
-        if isinstance(var_val, UserDefinedFunc):
+        if isinstance(var_val, UserDefinedFunc) or var_val is None:
             # the variable is a function, so call it
             if exponent is not None:
                 return Expression(

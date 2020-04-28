@@ -3,7 +3,7 @@ import operator as op
 import sympy
 import math
 
-from backend.lang.LaTeXParser import LaTeXParser as parse
+from LaTeXParser import LaTeXParser as parse
 
 builtin_func_dict = {
     parse.FUNC_SIN: math.sin,

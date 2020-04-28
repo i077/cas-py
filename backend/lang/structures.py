@@ -410,8 +410,8 @@ class RealNumber(Number):
             # __truediv__ already correctly creates a fraction in this case
             return (self / other).simplify()
         if isinstance(other, ComplexNumber):
-            # just use the regular division procedure
-            return self / other
+            # use ComplexNumber's floordiv
+            return ComplexNumber(self, RealNumber(0)) // other
         else:
             raise ValueError(
                 f"__floordiv__ only supported for types {type(self)} and {type(other)}"
@@ -503,7 +503,7 @@ class Fraction(Number):
         assert isinstance(num, Number) and isinstance(den, Number)
 
         if isinstance(num, ComplexNumber) or isinstance(den, ComplexNumber):
-            return num / den
+            return num // den
 
         if isinstance(num, RealNumber) and isinstance(num.value, float):
             # convert any float with less than 10 decimal places into a fraction.
@@ -603,7 +603,7 @@ class Fraction(Number):
             ).simplify()
         if isinstance(other, ComplexNumber):
             # use ComplexNumber's division procedure
-            return ComplexNumber(self, RealNumber(0)) / other
+            return ComplexNumber(self, RealNumber(0)) // other
         else:
             return Fraction.create(RealNumber(1), other) * self
 
@@ -714,7 +714,7 @@ class ComplexNumber(Number):
     def create(a, b):
         """use this instead of __init__ to create ComplexNumber instances"""
         assert isinstance(a, (RealNumber, Fraction)) and isinstance(
-            a, (RealNumber, Fraction)
+            b, (RealNumber, Fraction)
         )
 
         if b == RealNumber(0):
@@ -759,27 +759,39 @@ class ComplexNumber(Number):
             return other * self
 
     def __truediv__(self, other):
-        if isinstance(other, (RealNumber, Fraction)):
+        if isinstance(other, (RealNumber, int, float)):
             return self * (RealNumber(1) / other)
+        if isinstance(other, Fraction):
+            return self * Fraction.create(RealNumber(1), other)
         if isinstance(other, ComplexNumber):
             # (a+bi)/(c+di) = ((a+bi)(c-di)) / ((c+di)(c-di)) = ((ac+bd)+(cb-ad)i) / (c^2+d^2)
-            return Fraction.create(
-                ComplexNumber.create(
-                    (self.a * other.a) + (self.b * other.b),
-                    (self.b * other.a) - (self.a * other.b),
-                ),
-                (other.a ** 2) + (other.b ** 2),
+            return ComplexNumber.create(
+                ((self.a * other.a) + (self.b * other.b))
+                / (other.a ** 2 + other.b ** 2),
+                ((self.b * other.a) - (self.a * other.b))
+                / (other.a ** 2 + other.b ** 2),
             )
         else:
-            return Fraction.create(RealNumber(1), other) * self
+            raise CastleException(
+                f"{operator.truediv} not supported for types {type(self)} and {type(other)}"
+            )
 
     def __floordiv__(self, other):
         """ Only for internal use and only needed because we defined __floordiv__ for RealNumber"""
-        if isinstance(other, Number):
+        if isinstance(other, (RealNumber, int, float)):
+            return self * (RealNumber(1) // other)
+        if isinstance(other, Fraction):
             return self / other
+        if isinstance(other, ComplexNumber):
+            return ComplexNumber.create(
+                ((self.a * other.a) + (self.b * other.b))
+                // (other.a ** 2 + other.b ** 2),
+                ((self.b * other.a) - (self.a * other.b))
+                // (other.a ** 2 + other.b ** 2),
+            )
         else:
             raise ValueError(
-                f"__floordiv__ only supported for types {type(self)} and {type(other)}"
+                f"{operator.floordiv} not supported for types {type(self)} and {type(other)}"
             )
 
     def __pow__(self, other):
@@ -823,7 +835,7 @@ class ComplexNumber(Number):
         if isinstance(other, ComplexNumber):
             return self.a == other.a and self.b == other.b
         elif isinstance(other, (Number, int, float)):
-            return self.a == other
+            return self.a == other and self.b == RealNumber(0)
         else:
             raise ValueError(
                 f"Can't evaluate __eq__ on objects of type {type(self)} and {type(other)}"
@@ -1400,13 +1412,33 @@ class Root:
 
     def evaluate(self, state: State):
         if self.n is None:
-            return RealNumber(float(math.sqrt(self.expr.evaluate(state).true_value())))
-        n = self.n.evaluate(state).true_value()
+            # default root is 2
+            n = RealNumber(2)
+        else:
+            n = self.n.evaluate(state)
         if n == 0:
             raise CastleException(f"Can't take 0th root of {self.expr}")
-        return RealNumber(
-            float(math.pow(self.expr.evaluate(state).true_value(), 1 / n))
-        )
+
+        def real_root(x: RealNumber):
+            if x < 0:
+                # (-y)^{1/n} = ((-y)^(1/2))^(2/n) = ((-1)^(1/2))^(2/n)y^(1/n) = i^(2/n)y^(1/n)
+                return ComplexNumber(RealNumber(0), RealNumber(1)) ** (
+                    RealNumber(2) / n
+                ) * (x * (-1)) ** (RealNumber(1) / n)
+            else:
+                return x ** (RealNumber(1) / n)
+
+        operand = self.expr.evaluate(state)
+        if isinstance(operand, RealNumber):
+            return real_root(operand)
+        if isinstance(operand, Fraction):
+            return Fraction.create(real_root(operand.num), real_root(operand.den))
+        if isinstance(operand, ComplexNumber):
+            return operand ** (RealNumber(1) / n)
+        else:
+            raise CastleException(
+                f"Can't take root of {operand} of type {type(operand)}"
+            )
 
     def __repr__(self):
         if self.n is None:

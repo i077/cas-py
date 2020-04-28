@@ -6,12 +6,12 @@ import numpy as np
 import sympy
 from antlr4 import CommonTokenStream, FileStream, InputStream
 
-from backend.lang.Dicts import matrix_type_dict, rel_dict
-from backend.lang.LaTeXLexer import LaTeXLexer
-from backend.lang.LaTeXParser import LaTeXParser as parse
-from backend.lang.LaTeXVisitor import LaTeXVisitor
-from backend.lang.State import State
-from backend.lang.structures import (
+from Dicts import matrix_type_dict, rel_dict
+from LaTeXLexer import LaTeXLexer
+from LaTeXParser import LaTeXParser as parse
+from LaTeXVisitor import LaTeXVisitor
+from State import State
+from structures import (
     Cases,
     CastleException,
     Ceiling,

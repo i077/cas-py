@@ -145,6 +145,10 @@ class LaTeXVisitor(ParseTreeVisitor):
     def visitMult_expr_pow(self, ctx: LaTeXParser.Mult_expr_powContext):
         return self.visitChildren(ctx)
 
+    # Visit a parse tree produced by LaTeXParser#ime_left.
+    def visitIme_left(self, ctx: LaTeXParser.Ime_leftContext):
+        return self.visitChildren(ctx)
+
     # Visit a parse tree produced by LaTeXParser#mult_sign.
     def visitMult_sign(self, ctx: LaTeXParser.Mult_signContext):
         return self.visitChildren(ctx)
@@ -183,10 +187,6 @@ class LaTeXVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by LaTeXParser#ime_var_var.
     def visitIme_var_var(self, ctx: LaTeXParser.Ime_var_varContext):
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by LaTeXParser#ime_left.
-    def visitIme_left(self, ctx: LaTeXParser.Ime_leftContext):
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by LaTeXParser#ime_paren_var.

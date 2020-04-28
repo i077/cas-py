@@ -12,7 +12,7 @@ venv/
 *.run.xml
 .idea/
 *.pyc
-lang/.antlr/*
+.antlr/
 
 sessions/*
 

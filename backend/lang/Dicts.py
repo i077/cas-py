@@ -33,6 +33,8 @@ rel_dict = {
 }
 
 inv_rel_dict = {val: key for key, val in rel_dict.items()}
+# make \neq render properly in KaTeX
+inv_rel_dict[op.ne] = "\\cancel{=}"
 
 matrix_type_dict = {
     parse.MATRIX: "matrix",

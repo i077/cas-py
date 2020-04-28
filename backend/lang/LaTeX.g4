@@ -108,7 +108,7 @@ hist_entry
 
 // Compound literals
 
-number  : MINUS? DIGIT+ (POINT DIGIT*)?;
+number  : DIGIT+ (POINT DIGIT*)?;
 nnint   : DIGIT+;
 
 multichar_var : (NON_EI_LETTER | E | I | DIGIT)+;
@@ -187,15 +187,15 @@ add_expr
     ;
 
 mult_expr
-    : mult_expr op=(MULT | CMD_TIMES | CMD_CDOT | DIV | CMD_DIV) mult_expr #mult_expr_recurse
-    | implicit_mult_expr                                                   #mult_implicit
-    | sign=(PLUS | MINUS) mult_expr                                        #mult_sign
-    | pow_expr                                                             #mult_expr_pow
+    : mult_expr op=(MULT | CMD_TIMES | CMD_CDOT | DIV | CMD_DIV) mult_expr          #mult_expr_recurse
+    | implicit_mult_expr                                                            #mult_implicit
+    | left_implicit_pow_expr (implicit_mult_expr | var_pow_expr | paren_pow_expr)?  #ime_left
+    | sign=(PLUS | MINUS) mult_expr                                                 #mult_sign
+    | pow_expr                                                                      #mult_expr_pow
     ;
 
 implicit_mult_expr
     : implicit_mult_expr implicit_mult_expr                   #ime_mult
-    | left_implicit_pow_expr (implicit_mult_expr)?            #ime_left
     | implicit_pow_expr                                       #ime_pow
     | var_parens                                              #ime_var_parens
     //basically everything that isn't 'var unit_paren' because we want that to be only handled by var_parens

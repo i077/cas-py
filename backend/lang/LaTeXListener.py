@@ -277,6 +277,14 @@ class LaTeXListener(ParseTreeListener):
     def exitMult_expr_pow(self, ctx: LaTeXParser.Mult_expr_powContext):
         pass
 
+    # Enter a parse tree produced by LaTeXParser#ime_left.
+    def enterIme_left(self, ctx: LaTeXParser.Ime_leftContext):
+        pass
+
+    # Exit a parse tree produced by LaTeXParser#ime_left.
+    def exitIme_left(self, ctx: LaTeXParser.Ime_leftContext):
+        pass
+
     # Enter a parse tree produced by LaTeXParser#mult_sign.
     def enterMult_sign(self, ctx: LaTeXParser.Mult_signContext):
         pass
@@ -355,14 +363,6 @@ class LaTeXListener(ParseTreeListener):
 
     # Exit a parse tree produced by LaTeXParser#ime_var_var.
     def exitIme_var_var(self, ctx: LaTeXParser.Ime_var_varContext):
-        pass
-
-    # Enter a parse tree produced by LaTeXParser#ime_left.
-    def enterIme_left(self, ctx: LaTeXParser.Ime_leftContext):
-        pass
-
-    # Exit a parse tree produced by LaTeXParser#ime_left.
-    def exitIme_left(self, ctx: LaTeXParser.Ime_leftContext):
         pass
 
     # Enter a parse tree produced by LaTeXParser#ime_paren_var.

@@ -75,6 +75,29 @@ class Expression(Function):
             else len(self.terms) >= 2
         )
 
+    def __add__(self, other):
+        if self.op == operator.add:
+            self.terms.append(other)
+        else:
+            super().__add__(other)
+
+    def __sub__(self, other):
+        if self.op == operator.sub:
+            self.terms.append(other)
+        else:
+            super().__add__(other)
+
+    def __mul__(self, other):
+        if self.op == operator.mul:
+            self.terms.append(other)
+        else:
+            super().__mul__(self, other)
+
+    def __truediv__(self, other):
+        # TODO how should we handle this?
+        if self.op == operator.truediv:
+            pass
+
     def evaluate(self, state: State):
         if (
             self.op == operator.pow
@@ -92,9 +115,7 @@ class Expression(Function):
             # transpose
             return self.terms[0].evaluate(state).transpose()
         if self.op != operator.floordiv:
-            return reduce(
-                self.op, [term.evaluate(state) for term in self.terms]
-            ).evaluate(state)
+            return reduce(self.op, (term.evaluate(state) for term in self.terms))
         else:
             # floordiv indicates that this division was entered using \frac. If each side is a number make a fraction
             left_eval = self.terms[0].evaluate(state)

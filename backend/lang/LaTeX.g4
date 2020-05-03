@@ -48,10 +48,10 @@ UNDERSCORE : '_';
 COMMA      : ',';
 
 PI : '\\pi';
-E  : 'e';
-I  : 'i';
+E  : '\\e';
+I  : '\\i' | '\\imath';
 
-NON_EI_LETTER  : [a-df-hj-zA-Z];
+LETTER  : [a-zA-Z];
 DIGIT   : [0-9];
 
 CMD_CDOT        : '\\cdot';
@@ -113,11 +113,11 @@ hist_entry
 number  : DIGIT+ (POINT DIGIT*)?;
 nnint   : DIGIT+;
 
-multichar_var : (NON_EI_LETTER | E | I | DIGIT)+;
+multichar_var : (LETTER | DIGIT)+;
 
 // Variable names
 var_name
-    : NON_EI_LETTER                               #var_name_letter
+    : LETTER                               #var_name_letter
     | BACKTICK name=multichar_var BACKTICK #var_name_multichar
     ;
 
@@ -125,7 +125,7 @@ var
     : var_name (UNDERSCORE tex_symb)?;
 
 tex_symb
-    : (NON_EI_LETTER | E | I | DIGIT)   #tex_symb_single
+    : (LETTER | DIGIT)   #tex_symb_single
     | LCURLY expr RCURLY #tex_symb_multi
     | LCURLY var RCURLY  #tex_symb_recurse
     ;

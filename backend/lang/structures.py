@@ -46,13 +46,17 @@ class Function(ABC):
     def __ne__(self, other):
         pass
 
-    @abstractmethod
     def derivative(self):
         pass
 
-    @abstractmethod
     def integral(self):
         pass
+
+    def can_combine(self, other):
+        if isinstance(other, Expression):
+            return other.can_combine(self)
+        else:
+            return self == other
 
 
 class Expression(Function):
@@ -91,7 +95,7 @@ class Expression(Function):
         if self.op == operator.mul:
             self.terms.append(other)
         else:
-            super().__mul__(self, other)
+            super().__mul__(other)
 
     def __truediv__(self, other):
         # TODO how should we handle this?
@@ -198,7 +202,7 @@ class Variable(Function):
             return state[new_name].evaluate(state)
 
         self.name = new_name
-        return self.name
+        return self
 
     def __eq__(self, f) -> bool:
         return isinstance(f, Variable) and f.name == self.name
@@ -972,16 +976,12 @@ class Cases(Function):
         raise CastleException("Improper Cases: No case satisfied!")
 
     def __eq__(self, other):
-        pass
+        if not isinstance(other, Cases):
+            return False
+        return self.cases_list == other.cases_list
 
     def __ne__(self, other):
-        pass
-
-    def derivative(self):
-        pass
-
-    def integral(self):
-        pass
+        return not self.__eq__(other)
 
     def __repr__(self):
         rep = "\\begin{cases}\n"
@@ -1193,7 +1193,7 @@ class Matrix(Function):
         return f"\\begin{{{self.type}}}{mat_string}\\end{{{self.type}}}"
 
 
-class Determinant:
+class Determinant(Function):
     """ The determinant of a matrix.
     Determinants are indicated by a matrix created with the vmatrix environment"""
 
@@ -1203,11 +1203,19 @@ class Determinant:
     def evaluate(self, state: State):
         return self.matrix.evaluate(state).determinant()
 
+    def __eq__(self, other):
+        if not isinstance(other, Determinant):
+            return False
+        return self.matrix == other.matrix
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         return str(self.matrix)
 
 
-class Relation:
+class Relation(Function):
     def __init__(self, rel_chain):
         self.rel_chain = rel_chain
 
@@ -1225,6 +1233,14 @@ class Relation:
                 )
         return True
 
+    def __eq__(self, other):
+        if not isinstance(other, Relation):
+            return False
+        return self.rel_chain == other.rel_chain
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         output = ""
         for ex in self.rel_chain:
@@ -1232,7 +1248,7 @@ class Relation:
         return output
 
 
-class UserDefinedFunc:
+class UserDefinedFunc(Function):
     def __init__(self, args: list, func_body: Expression):
         self.args = args
         self.func_body = func_body
@@ -1240,45 +1256,72 @@ class UserDefinedFunc:
     def evaluate(self, state: State):
         return None
 
+    def __eq__(self, other):
+        if not isinstance(other, Function):
+            return False
+        return self.func_body == other.func_body
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         return str(tuple(self.args)) + "\\to" + str(self.func_body)
 
 
-class FunctionCall:
+class FunctionCall(Function):
     def __init__(self, function_name, passed_args: list):
         self.function_name = function_name
         self.passed_args = passed_args
 
     def evaluate(self, state: State):
+        eval_args = [arg.evaluate(state).true_value() for arg in self.passed_args]
         if self.function_name == parse.FUNC_GCD:
-            eval_args = [arg.evaluate(state).true_value() for arg in self.passed_args]
             if all([isinstance(arg, int) for arg in eval_args]):
                 return listGCD(eval_args)
-            raise ValueError("All arguments to gcd must be integers")
+            raise CastleException("All arguments to gcd must be integers")
         if self.function_name == parse.FUNC_RREF:
-            if len(self.passed_args) != 1:
-                raise ValueError("rref takes 1 argument")
-            mat = self.passed_args[0].evaluate(state)
+            if len(eval_args) != 1:
+                raise CastleException("rref takes 1 argument")
+            mat = eval_args[0]
             if not isinstance(mat, Matrix):
-                raise ValueError("rref argument must be matrix")
+                raise CastleException("rref argument must be matrix")
             return mat.rref()
-
+        if self.function_name == parse.FUNC_EXPAND:
+            if len(eval_args) != 1:
+                raise CastleException("expand takes 1 argument")
+            expr = eval_args[0]
+            if not isinstance(expr, Expression):
+                raise CastleException(
+                    "expand argument must be an Expression with +,-,*,/, or ^"
+                )
+            return expr.expand()
         if self.function_name in builtin_func_dict:
-            eval_args = [arg.evaluate(state).true_value() for arg in self.passed_args]
             return RealNumber(float(builtin_func_dict[self.function_name](*eval_args)))
         else:
             function = state[self.function_name]
-            if self.passed_args:
+            if eval_args:
                 state.push_layer()
-                for arg, value in zip(function.args, self.passed_args):
-                    # evaluate args here to avoid bugs where passed variable has same name as function arg
-                    value = Number.number_init(value.evaluate(state))
+                for arg, value in zip(function.args, eval_args):
                     state[arg.name] = value
                 result = function.func_body.evaluate(state)
                 state.pop_layer()
             else:
                 result = function.func_body.evaluate(state)
             return result
+
+    def __eq__(self, other):
+        if not isinstance(other, FunctionCall):
+            return False
+        return (
+            self.function_name == other.function_name
+            and self.passed_args == other.passed_args
+        )
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __repr__(self):
+        return f"{builtin_func_dict.get(self.function_name, self.function_name)}({tuple(self.passed_args)})"
 
 
 class SumFunc:

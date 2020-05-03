@@ -1,5 +1,6 @@
 import math
 import operator
+from itertools import product, permutations
 from abc import ABC, abstractmethod
 from collections import Counter
 from functools import reduce
@@ -73,11 +74,12 @@ class Expression(Function):
         )
 
     def evaluate(self, state: State):
+        pass
         if self.op != operator.floordiv:
             return reduce(self.op, [term.evaluate(state) for term in self.terms])
         else:
             # floordiv indicates that this is a rational expression that should be stored as a fraction
-            if 
+            if
 
     def __eq__(self, other):
         return (
@@ -242,7 +244,6 @@ class Monomial(Function):
 class Polynomial(Expression):
     def __init__(self, *terms):
         super().__init__(op=operator.add, *terms)
-        assert all(isinstance(term, Monomial) for term in self.terms)
 
 
 class Number(Function, ABC):
@@ -251,7 +252,6 @@ class Number(Function, ABC):
         if isinstance(value, (RealNumber, float, int)):
             return RealNumber(value)
         return None
-
 
     @abstractmethod
     def __add__(self, other):
@@ -303,7 +303,7 @@ class RealNumber(Number):
         if isinstance(other, RealNumber):
             return RealNumber(self.value + other.value)
         elif isinstance(other, Fraction):
-            #addition is commutative and we already implemented Fraction + RealNumber in Fraction
+            # addition is commutative and we already implemented Fraction + RealNumber in Fraction
             return other + self
         else:
             return other.__add__(self)
@@ -312,7 +312,7 @@ class RealNumber(Number):
         if isinstance(other, RealNumber):
             return RealNumber(self.value - other.value)
         elif isinstance(other, Fraction):
-            #subtraction is (almost) commutative and we already implemented Fraction + RealNumber in Fraction
+            # subtraction is (almost) commutative and we already implemented Fraction + RealNumber in Fraction
             return RealNumber(-1) * other + self
         else:
             return other.__sub__(self)
@@ -321,7 +321,7 @@ class RealNumber(Number):
         if isinstance(other, RealNumber):
             return RealNumber(self.value * other.value)
         elif isinstance(other, Fraction):
-            #multiplication is commutative and we already implemented Fraction * RealNumber in Fraction
+            # multiplication is commutative and we already implemented Fraction * RealNumber in Fraction
             return other * self
         else:
             return other.__mul__(self)
@@ -330,7 +330,7 @@ class RealNumber(Number):
         if isinstance(other, RealNumber):
             return RealNumber(self.value / other.value)
         elif isinstance(other, Fraction):
-            #divide real number by fraction: a/(b/c) = (ac)/b
+            # divide real number by fraction: a/(b/c) = (ac)/b
             return Fraction.create(self.value * other.den, other.num)
         else:
             return other.__truediv__(self)
@@ -365,18 +365,21 @@ class RealNumber(Number):
             return str(int(self.value))
         return str(self.value)
 
+
 def Fraction(Number):
     """This class represents a numerical fraction at evaluation time, not a rational function, which would be stored
     as Expression with op.truediv/floordiv. For example, this class would hold \\frac{1}{2} but 
     \\frac{x}{2} is an Expression"""
+
     @staticmethod
-    def create(num, den)
+    def create(num, den):
         """return a fraction if num and den are both integers and a RealNumber otherwise"""
         assert num is Number and den is Number
-        if (isinstance(num, RealNumber) and isinstance(num.value, float)) or
-           (isinstance(den, RealNumber) and isinstance(den.value, float)):
-                #don't make fractions from floats - just divide them
-                return RealNumber(num / den)
+        if (isinstance(num, RealNumber) and isinstance(num.value, float)) or (
+            isinstance(den, RealNumber) and isinstance(den.value, float)
+        ):
+            # don't make fractions from floats - just divide them
+            return RealNumber(num / den)
         else:
             return Fraction(num, den)
 
@@ -391,8 +394,8 @@ def Fraction(Number):
             quotient = top / bottom
             self.num = quotient.top
             self.den = quotient.den
-        else:
-            raise ValueError("Improper instantiation of fraction")
+        # else:
+        #     raise ValueError("Improper instantiation of fraction")
 
     def __add__(self, other):
         if isinstance(other, RealNumber):
@@ -408,20 +411,20 @@ def Fraction(Number):
 
     def __mul__(self, other):
         if isinstance(other, RealNumber):
-            #multiply fraction by real number: (a/b)*c = (ac)/b
+            # multiply fraction by real number: (a/b)*c = (ac)/b
             return Fraction.create(self.num * other, self.den)
         elif isinstance(other, Fraction):
-            #multiply fraction by fraction: (a/b)(c/d) = (ac)/(bd)
+            # multiply fraction by fraction: (a/b)(c/d) = (ac)/(bd)
             return Fraction.create(self.num * other.num, self.den * other.den)
         else:
             return other.__mul__(self)
 
     def __truediv__(self, other):
         if isinstance(other, RealNumber):
-            #divide fraction by real number: (a/b)/c = a/(bc)
+            # divide fraction by real number: (a/b)/c = a/(bc)
             return Fraction.create(self.num, other * self.den)
         if isinstance(other, Fraction):
-            #divide fraction by fraction: (a/b)/(c/d) = (ad)/(bc)
+            # divide fraction by fraction: (a/b)/(c/d) = (ad)/(bc)
             return Fraction.create(self.num * other.den, self.den * other.num)
         else:
             return other.__truediv__(self)
@@ -480,6 +483,7 @@ def listGCD(values, gcd=numberGCD):
     result = values.pop()
     while values:
         result = gcd(result, values.pop())
+        # raise ValueError("Improper instantiation of fraction")
     return result
 
 
@@ -584,7 +588,7 @@ class Relation:
         return True
 
     def __repr__(self):
-        output = ''
+        output = ""
         for ex in self.rel_chain:
             output += str(inv_rel_dict.get(ex, ex))
         return output
@@ -602,7 +606,7 @@ class UserDefinedFunc:
         return str(tuple(self.args)) + "\\to" + str(self.func_body)
 
 
-class FunctionCall():
+class FunctionCall:
     def __init__(self, function_name, passed_args: list):
         self.function_name = function_name
         self.passed_args = passed_args
@@ -648,7 +652,7 @@ class SumFunc:
         max_bound = max(upper_bound, lower_bound)
         min_bound = min(upper_bound, lower_bound)
         sum_val = 0
-        for i in range(min_bound, max_bound+1):
+        for i in range(min_bound, max_bound + 1):
             state[self.var.name] = RealNumber(i)
             sum_val += float(self.sum_expr.evaluate(state))
         state.pop_layer()
@@ -680,7 +684,7 @@ class ProdFunc:
         max_bound = max(upper_bound, lower_bound)
         min_bound = min(upper_bound, lower_bound)
         prod_val = 1
-        for i in range(min_bound, max_bound+1):
+        for i in range(min_bound, max_bound + 1):
             state[self.var.name] = RealNumber(i)
             prod_val *= float(self.prod_expr.evaluate(state))
         state.pop_layer()
@@ -741,7 +745,7 @@ class Ceiling:
         return f"\\lceil {self.expr} \\rceil"
 
 
-class Derivative():
+class Derivative:
     def __init__(self, cmd: str, order: RealNumber, expr, var):
         self.cmd = cmd
         self.order = order
@@ -756,35 +760,258 @@ class Derivative():
         if self.order:
             return f"{self.cmd}[{self.order}]{{{self.expr}}}{{{self.var}}}"
         else:
-            return f'{self.cmd}{{{self.expr}}}{{{self.var}}}'
+            return f"{self.cmd}{{{self.expr}}}{{{self.var}}}"
 
-class Root():
+
+class Root:
     def __init__(self, expr, n=None):
         self.expr = expr
         self.n = n
-    
+
     def evaluate(self, state: State):
         if self.n is None:
             return math.sqrt(self.expr.evaluate(state))
         n = self.n.evaluate()
         if n == 0:
             raise ValueError(f"Can't take 0th root of {self.expr}")
-        return math.pow(self.expr.evaluate(state), 1/n)
+        return math.pow(self.expr.evaluate(state), 1 / n)
 
     def __repr__(self):
         if self.n is None:
-            return f'\\sqrt{{{self.expr}}}'
-        return f'\\sqrt[{self.n}]{{{self.expr}}}'
+            return f"\\sqrt{{{self.expr}}}"
+        return f"\\sqrt[{self.n}]{{{self.expr}}}"
 
-class Choose():
+
+class Choose:
     def __init__(self, n, k):
         self.n = n
         self.k = k
-    
+
     def evaluate(self, state: State):
         n = self.n.evaluate(state)
         k = self.k.evaluate(state)
         return comb(n, k)
 
     def __repr__(self):
-        return f'\\binom{{{self.n}}}{{{self.k}}}'
+        return f"\\binom{{{self.n}}}{{{self.k}}}"
+
+
+# get all the degrees of the current polynomial
+def get_degrees(poly):
+    degrees = []
+    for mon in poly:
+        if isinstance(mon, Monomial):
+            degrees.append(mon.power)
+        else:
+            degrees.append(0)
+    return degrees
+
+
+# find the index of a monomial with a given power
+def power_poly_index(poly, power):
+    for x in range(len(poly)):
+        if isinstance(poly[x], Monomial) and power == poly[x].power:
+            return x
+    return -1
+
+
+# find the highest power of a polynomial
+def get_highest_pow(poly):
+    if isinstance(poly, RealNumber):
+        return 0
+    for mon in poly:
+        if isinstance(mon, RealNumber):
+            return 0
+        elif mon.coeff != 0:
+            return mon.power
+    return 0
+
+
+# find the largest power with a nonzero coefficient in a polynomial
+def get_highest_coeff(poly):
+    for mon in poly:
+        if mon.coeff != 0:
+            return mon.coeff
+
+
+# add intermediate monomials that are missing from a polynomial
+def add_missing_degrees(poly, numerator_high_pow):
+    num_degrees = get_degrees(poly)
+    pot_missing = list(np.arange(0, numerator_high_pow + 1)[::-1])
+    upd_poly = []
+
+    poly = [
+        poly[power_poly_index(poly, x)]
+        if x in num_degrees and x != 0
+        else Monomial(0, poly[0].var, x)
+        if x not in num_degrees and x != 0
+        else poly[power_poly_index(poly, x)]
+        if x in num_degrees
+        else RealNumber(0)
+        for x in pot_missing
+    ]
+
+    if isinstance(poly[-1], Monomial) and poly[-1].power == 0:
+        poly[-1] = RealNumber(poly[-1].coeff)
+    return poly
+
+
+# remove monomials that have a zero coefficient until you have a monomial with a nonzero
+# coefficient (in order of descending powers)
+def remove_leading_zeros(poly):
+    for x in range(len(poly)):
+        if isinstance(poly[x], RealNumber):
+            return poly[x]
+        if poly[x].coeff != 0:
+            return poly[x:]
+
+
+# polynomial division with a numerator and denominator
+def poly_div(num_poly, den_poly):
+    high_num_poly_deg = num_poly[0].power
+    quotient = [0] * high_num_poly_deg
+
+    # add the missing degrees for the numerator polynomial and denominator polynomial
+    num_poly = add_missing_degrees(num_poly, high_num_poly_deg)
+    den_poly = add_missing_degrees(den_poly, high_num_poly_deg)
+
+    remainder = num_poly
+    i = 0
+
+    remain_high_deg = get_highest_pow(remainder)
+    deg_den = get_highest_pow(den_poly)
+
+    # while the power of the remainder is higher than that of the denominator,
+    # divide the numerator by the denominator
+    while remain_high_deg >= deg_den:
+        quotient[i], remainder = poly_divide_one_iter(remainder, den_poly)
+        remain_high_deg = get_highest_pow(remainder)
+        i += 1
+    quotient = list(filter((0).__ne__, quotient))
+    return (quotient, remainder)
+
+
+def poly_divide_one_iter(num_poly, den_poly):
+    deg_num = get_highest_pow(num_poly)
+    deg_den = get_highest_pow(den_poly)
+    quotient = Monomial(
+        get_highest_coeff(num_poly) / get_highest_coeff(den_poly),
+        num_poly[0].var,
+        deg_num - deg_den,
+    )
+    mult = [
+        quotient * mon
+        if isinstance(mon, Monomial)
+        else Monomial(
+            (RealNumber(quotient.coeff) * mon).value, quotient.var, quotient.power
+        )
+        for mon in den_poly
+    ]
+    mult = remove_leading_zeros(mult)
+
+    eq_length_mult = add_missing_degrees(mult, deg_num)
+    eq_length_rem = add_missing_degrees(num_poly, deg_num)
+
+    subtract_from_rem = [
+        eq_length_rem[x] - eq_length_mult[x]
+        if type(eq_length_rem[x]) is type(eq_length_mult[x])
+        else RealNumber(eq_length_rem[x]) - eq_length_mult[x]
+        if isinstance(eq_length_mult[x], RealNumber)
+        else eq_length_rem[x] - RealNumber(eq_length_mult[x])
+        for x in range(len(eq_length_mult))
+    ]
+
+    remainder = subtract_from_rem
+    remain_high_deg = get_highest_pow(remainder)
+    remainder = remove_leading_zeros(remainder)
+
+    if deg_num == deg_den:
+        quotient = RealNumber(quotient.coeff)
+    return quotient, remainder
+
+
+def polynomialGCD(a, b):
+    while b != 0:
+        quotient, remainder = poly_divide_one_iter(a, b)
+        a = b
+        b = remainder
+    if a == 0 or isinstance(a, RealNumber):
+        return a
+    leading_coeff = a[0].coeff
+    for index in range(len(a)):
+        if isinstance(a[index], Monomial):
+            a[index].coeff /= leading_coeff
+        else:
+            a[index] /= RealNumber(leading_coeff)
+    return a
+
+
+def eval_poly(poly, value):
+    sum = 0
+    for mon in poly:
+        if isinstance(mon, Monomial):
+            sum += mon.coeff * value ** mon.power
+        elif isinstance(mon, RealNumber):
+            sum += mon.value
+        else:
+            sum += mon
+    return sum
+
+
+def kronecker(poly):
+    # if isinstance(poly, RealNumber):
+    variable = poly[0].var
+    f_pow = get_highest_pow(poly)
+    g_pow = f_pow // 2
+    h_pow = f_pow - g_pow
+
+    last_mon = poly[len(poly) - 1]
+
+    if isinstance(last_mon, Monomial):
+        q, r = poly_div(poly, [last_mon])
+        return list(kronecker(q), last_mon)
+
+    f = [eval_poly(poly, 0), eval_poly(poly, 1), eval_poly(poly, 2)]
+
+    d = []
+
+    for num in f:
+        abs_num = abs(num)
+        divisor_of_num = []
+        for i in range(1, int(abs_num) + 1):
+            if abs_num % i == 0:
+                divisor_of_num.append(i)
+                divisor_of_num.append(-i)
+        d.append(divisor_of_num)
+
+    a = list(product(*d))
+
+    b = a[: len(a) // 2]
+
+    for poss_coeff in b:
+        all_perm = list(permutations(poss_coeff))
+        for perm in set(all_perm):
+
+            poss_poly = []
+            coeff = len(perm) - 1
+            power = len(perm) - 1
+            while power > 0:
+                poss_poly.append(Monomial(perm[coeff - power], variable, power))
+                power -= 1
+            poss_poly.append(RealNumber(perm[coeff]))
+            q, r = poly_div(poly, poss_poly)
+            if isinstance(r, RealNumber) and r.value == 0:
+                return list((kronecker(q), poss_poly))
+    return poly
+
+
+start = State()
+x = Variable(start, "x")
+first_num = Monomial(1, x, 5)
+second_num = Monomial(1, x, 4)
+# third_num = Monomial(-2, x, 3)
+fourth_num = Monomial(1, x, 2)
+fifth_num = Monomial(1, x, 1)
+# sixth_num = RealNumber(2)
+x = kronecker([first_num, second_num, fourth_num, fifth_num])
+print(x)

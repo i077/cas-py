@@ -12,7 +12,7 @@ else:
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3P")
+        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3Q")
         buf.write("\u024b\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7")
         buf.write("\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4\f\t\f\4\r\t\r\4\16")
         buf.write("\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22\4\23\t\23")
@@ -68,9 +68,9 @@ def serializedATN():
         buf.write("'\u0233\13'\3'\3'\3'\3'\3(\7(\u023a\n(\f(\16(\u023d")
         buf.write('\13(\3(\3(\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\2\b\36 "')
         buf.write('(*,*\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 "$&(*,.\60')
-        buf.write("\62\64\668:<>@BDFHJLNP\2\r\3\2#&\3\28I\3\2-.\4\2JJLL\4")
-        buf.write("\2KKMM\3\2\64\65\3\2\24\31\3\2\r\16\4\2\17\20')\3\2N")
-        buf.write("O\3\2\34\37\2\u0278\2V\3\2\2\2\4Y\3\2\2\2\6g\3\2\2\2\b")
+        buf.write("\62\64\668:<>@BDFHJLNP\2\r\3\2#&\3\28J\3\2-.\4\2KKMM\4")
+        buf.write("\2LLNN\3\2\64\65\3\2\24\31\3\2\r\16\4\2\17\20')\3\2O")
+        buf.write("P\3\2\34\37\2\u0278\2V\3\2\2\2\4Y\3\2\2\2\6g\3\2\2\2\b")
         buf.write("l\3\2\2\2\nu\3\2\2\2\fw\3\2\2\2\16\u0085\3\2\2\2\20\u0087")
         buf.write("\3\2\2\2\22\u0137\3\2\2\2\24\u0139\3\2\2\2\26\u013f\3")
         buf.write("\2\2\2\30\u0144\3\2\2\2\32\u014a\3\2\2\2\34\u014c\3\2")
@@ -81,7 +81,7 @@ def serializedATN():
         buf.write("\3\2\2\2:\u01dd\3\2\2\2<\u01ea\3\2\2\2>\u01f6\3\2\2\2")
         buf.write("@\u01f8\3\2\2\2B\u0200\3\2\2\2D\u0207\3\2\2\2F\u0210\3")
         buf.write("\2\2\2H\u0215\3\2\2\2J\u0224\3\2\2\2L\u0231\3\2\2\2N\u023b")
-        buf.write("\3\2\2\2P\u0240\3\2\2\2RS\7P\2\2SW\5\6\4\2TU\7P\2\2UW")
+        buf.write("\3\2\2\2P\u0240\3\2\2\2RS\7Q\2\2SW\5\6\4\2TU\7Q\2\2UW")
         buf.write("\7\3\2\2VR\3\2\2\2VT\3\2\2\2W\3\3\2\2\2XZ\7&\2\2YX\3\2")
         buf.write("\2\2Z[\3\2\2\2[Y\3\2\2\2[\\\3\2\2\2\\d\3\2\2\2]a\7\23")
         buf.write("\2\2^`\7&\2\2_^\3\2\2\2`c\3\2\2\2a_\3\2\2\2ab\3\2\2\2")
@@ -364,6 +364,7 @@ class LaTeXParser(Parser):
         "'\\binom'",
         "'\\rref'",
         "'\\expand'",
+        "'\\factor'",
         "'\\gcd'",
         "'\\log'",
         "'\\ln'",
@@ -446,6 +447,7 @@ class LaTeXParser(Parser):
         "FUNC_CHOOSE",
         "FUNC_RREF",
         "FUNC_EXPAND",
+        "FUNC_FACTOR",
         "FUNC_GCD",
         "FUNC_LOG",
         "FUNC_LN",
@@ -611,29 +613,30 @@ class LaTeXParser(Parser):
     FUNC_CHOOSE = 53
     FUNC_RREF = 54
     FUNC_EXPAND = 55
-    FUNC_GCD = 56
-    FUNC_LOG = 57
-    FUNC_LN = 58
-    FUNC_EXP = 59
-    FUNC_SIN = 60
-    FUNC_COS = 61
-    FUNC_TAN = 62
-    FUNC_SEC = 63
-    FUNC_CSC = 64
-    FUNC_COT = 65
-    FUNC_ASIN = 66
-    FUNC_ACOS = 67
-    FUNC_ATAN = 68
-    FUNC_ASEC = 69
-    FUNC_ACSC = 70
-    FUNC_ACOT = 71
-    CMD_LFLOOR = 72
-    CMD_RFLOOR = 73
-    CMD_LCEIL = 74
-    CMD_RCEIL = 75
-    INFINITY = 76
-    NEG_INFINITY = 77
-    DOLLAR = 78
+    FUNC_FACTOR = 56
+    FUNC_GCD = 57
+    FUNC_LOG = 58
+    FUNC_LN = 59
+    FUNC_EXP = 60
+    FUNC_SIN = 61
+    FUNC_COS = 62
+    FUNC_TAN = 63
+    FUNC_SEC = 64
+    FUNC_CSC = 65
+    FUNC_COT = 66
+    FUNC_ASIN = 67
+    FUNC_ACOS = 68
+    FUNC_ATAN = 69
+    FUNC_ASEC = 70
+    FUNC_ACSC = 71
+    FUNC_ACOT = 72
+    CMD_LFLOOR = 73
+    CMD_RFLOOR = 74
+    CMD_LCEIL = 75
+    CMD_RCEIL = 76
+    INFINITY = 77
+    NEG_INFINITY = 78
+    DOLLAR = 79
 
     def __init__(self, input: TokenStream, output: TextIO = sys.stdout):
         super().__init__(input, output)
@@ -1361,6 +1364,9 @@ class LaTeXParser(Parser):
         def FUNC_EXPAND(self):
             return self.getToken(LaTeXParser.FUNC_EXPAND, 0)
 
+        def FUNC_FACTOR(self):
+            return self.getToken(LaTeXParser.FUNC_FACTOR, 0)
+
         def FUNC_ASIN(self):
             return self.getToken(LaTeXParser.FUNC_ASIN, 0)
 
@@ -1414,6 +1420,7 @@ class LaTeXParser(Parser):
                         & (
                             (1 << (LaTeXParser.FUNC_RREF - 54))
                             | (1 << (LaTeXParser.FUNC_EXPAND - 54))
+                            | (1 << (LaTeXParser.FUNC_FACTOR - 54))
                             | (1 << (LaTeXParser.FUNC_GCD - 54))
                             | (1 << (LaTeXParser.FUNC_LOG - 54))
                             | (1 << (LaTeXParser.FUNC_LN - 54))
@@ -1979,6 +1986,7 @@ class LaTeXParser(Parser):
                             | (1 << LaTeXParser.FUNC_CHOOSE)
                             | (1 << LaTeXParser.FUNC_RREF)
                             | (1 << LaTeXParser.FUNC_EXPAND)
+                            | (1 << LaTeXParser.FUNC_FACTOR)
                             | (1 << LaTeXParser.FUNC_GCD)
                             | (1 << LaTeXParser.FUNC_LOG)
                             | (1 << LaTeXParser.FUNC_LN)
@@ -1986,7 +1994,6 @@ class LaTeXParser(Parser):
                             | (1 << LaTeXParser.FUNC_SIN)
                             | (1 << LaTeXParser.FUNC_COS)
                             | (1 << LaTeXParser.FUNC_TAN)
-                            | (1 << LaTeXParser.FUNC_SEC)
                         )
                     )
                     != 0
@@ -1995,7 +2002,8 @@ class LaTeXParser(Parser):
                     and (
                         (1 << (_la - 64))
                         & (
-                            (1 << (LaTeXParser.FUNC_CSC - 64))
+                            (1 << (LaTeXParser.FUNC_SEC - 64))
+                            | (1 << (LaTeXParser.FUNC_CSC - 64))
                             | (1 << (LaTeXParser.FUNC_COT - 64))
                             | (1 << (LaTeXParser.FUNC_ASIN - 64))
                             | (1 << (LaTeXParser.FUNC_ACOS - 64))
@@ -2034,6 +2042,7 @@ class LaTeXParser(Parser):
             elif token in [
                 LaTeXParser.FUNC_RREF,
                 LaTeXParser.FUNC_EXPAND,
+                LaTeXParser.FUNC_FACTOR,
                 LaTeXParser.FUNC_GCD,
                 LaTeXParser.FUNC_LOG,
                 LaTeXParser.FUNC_LN,
@@ -2090,6 +2099,7 @@ class LaTeXParser(Parser):
                                 | (1 << LaTeXParser.FUNC_CHOOSE)
                                 | (1 << LaTeXParser.FUNC_RREF)
                                 | (1 << LaTeXParser.FUNC_EXPAND)
+                                | (1 << LaTeXParser.FUNC_FACTOR)
                                 | (1 << LaTeXParser.FUNC_GCD)
                                 | (1 << LaTeXParser.FUNC_LOG)
                                 | (1 << LaTeXParser.FUNC_LN)
@@ -2097,7 +2107,6 @@ class LaTeXParser(Parser):
                                 | (1 << LaTeXParser.FUNC_SIN)
                                 | (1 << LaTeXParser.FUNC_COS)
                                 | (1 << LaTeXParser.FUNC_TAN)
-                                | (1 << LaTeXParser.FUNC_SEC)
                             )
                         )
                         != 0
@@ -2106,7 +2115,8 @@ class LaTeXParser(Parser):
                         and (
                             (1 << (_la - 64))
                             & (
-                                (1 << (LaTeXParser.FUNC_CSC - 64))
+                                (1 << (LaTeXParser.FUNC_SEC - 64))
+                                | (1 << (LaTeXParser.FUNC_CSC - 64))
                                 | (1 << (LaTeXParser.FUNC_COT - 64))
                                 | (1 << (LaTeXParser.FUNC_ASIN - 64))
                                 | (1 << (LaTeXParser.FUNC_ACOS - 64))
@@ -2189,6 +2199,7 @@ class LaTeXParser(Parser):
                                 | (1 << LaTeXParser.FUNC_CHOOSE)
                                 | (1 << LaTeXParser.FUNC_RREF)
                                 | (1 << LaTeXParser.FUNC_EXPAND)
+                                | (1 << LaTeXParser.FUNC_FACTOR)
                                 | (1 << LaTeXParser.FUNC_GCD)
                                 | (1 << LaTeXParser.FUNC_LOG)
                                 | (1 << LaTeXParser.FUNC_LN)
@@ -2196,7 +2207,6 @@ class LaTeXParser(Parser):
                                 | (1 << LaTeXParser.FUNC_SIN)
                                 | (1 << LaTeXParser.FUNC_COS)
                                 | (1 << LaTeXParser.FUNC_TAN)
-                                | (1 << LaTeXParser.FUNC_SEC)
                             )
                         )
                         != 0
@@ -2205,7 +2215,8 @@ class LaTeXParser(Parser):
                         and (
                             (1 << (_la - 64))
                             & (
-                                (1 << (LaTeXParser.FUNC_CSC - 64))
+                                (1 << (LaTeXParser.FUNC_SEC - 64))
+                                | (1 << (LaTeXParser.FUNC_CSC - 64))
                                 | (1 << (LaTeXParser.FUNC_COT - 64))
                                 | (1 << (LaTeXParser.FUNC_ASIN - 64))
                                 | (1 << (LaTeXParser.FUNC_ACOS - 64))
@@ -2288,6 +2299,7 @@ class LaTeXParser(Parser):
                                 | (1 << LaTeXParser.FUNC_CHOOSE)
                                 | (1 << LaTeXParser.FUNC_RREF)
                                 | (1 << LaTeXParser.FUNC_EXPAND)
+                                | (1 << LaTeXParser.FUNC_FACTOR)
                                 | (1 << LaTeXParser.FUNC_GCD)
                                 | (1 << LaTeXParser.FUNC_LOG)
                                 | (1 << LaTeXParser.FUNC_LN)
@@ -2295,7 +2307,6 @@ class LaTeXParser(Parser):
                                 | (1 << LaTeXParser.FUNC_SIN)
                                 | (1 << LaTeXParser.FUNC_COS)
                                 | (1 << LaTeXParser.FUNC_TAN)
-                                | (1 << LaTeXParser.FUNC_SEC)
                             )
                         )
                         != 0
@@ -2304,7 +2315,8 @@ class LaTeXParser(Parser):
                         and (
                             (1 << (_la - 64))
                             & (
-                                (1 << (LaTeXParser.FUNC_CSC - 64))
+                                (1 << (LaTeXParser.FUNC_SEC - 64))
+                                | (1 << (LaTeXParser.FUNC_CSC - 64))
                                 | (1 << (LaTeXParser.FUNC_COT - 64))
                                 | (1 << (LaTeXParser.FUNC_ASIN - 64))
                                 | (1 << (LaTeXParser.FUNC_ACOS - 64))
@@ -2416,6 +2428,7 @@ class LaTeXParser(Parser):
                     LaTeXParser.FUNC_CHOOSE,
                     LaTeXParser.FUNC_RREF,
                     LaTeXParser.FUNC_EXPAND,
+                    LaTeXParser.FUNC_FACTOR,
                     LaTeXParser.FUNC_GCD,
                     LaTeXParser.FUNC_LOG,
                     LaTeXParser.FUNC_LN,
@@ -2515,6 +2528,7 @@ class LaTeXParser(Parser):
                     LaTeXParser.FUNC_CHOOSE,
                     LaTeXParser.FUNC_RREF,
                     LaTeXParser.FUNC_EXPAND,
+                    LaTeXParser.FUNC_FACTOR,
                     LaTeXParser.FUNC_GCD,
                     LaTeXParser.FUNC_LOG,
                     LaTeXParser.FUNC_LN,

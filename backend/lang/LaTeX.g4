@@ -75,6 +75,7 @@ FUNC_CHOOSE     : '\\binom';
 
 FUNC_RREF       : '\\rref';
 FUNC_EXPAND     : '\\expand';
+FUNC_FACTOR     : '\\factor';
 FUNC_GCD        : '\\gcd';
 FUNC_LOG        : '\\log';
 FUNC_LN         : '\\ln';
@@ -133,7 +134,7 @@ func_builtin
     : name=(FUNC_SIN | FUNC_COS | FUNC_TAN
     | FUNC_SEC | FUNC_CSC | FUNC_COT
     | FUNC_EXP | FUNC_LN | FUNC_GCD
-    | FUNC_RREF | FUNC_LOG | FUNC_EXPAND
+    | FUNC_RREF | FUNC_LOG | FUNC_EXPAND | FUNC_FACTOR
     | FUNC_ASIN | FUNC_ACOS | FUNC_ATAN
     | FUNC_ASEC | FUNC_ACSC | FUNC_ACOT)
     ;

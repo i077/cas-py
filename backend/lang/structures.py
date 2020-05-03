@@ -1336,6 +1336,13 @@ class FunctionCall(Function):
                     "expand argument must be an Expression with +,-,*,/, or ^"
                 )
             return expr.expand()
+        if self.function_name == parse.FUNC_FACTOR:
+            if len(eval_args) != 1:
+                raise CastleException("factor takes 1 argument")
+            expr = eval_args[0]
+            if not isinstance(expr, Expression):
+                raise CastleException("factor argument must be a polynomial^")
+            return expr.factor()
         if self.function_name in builtin_func_dict:
             if any(isinstance(eval_args), Variable):
                 # unbound variable

@@ -1,19 +1,2 @@
-\frac{1+i}{1+i}
-(1+i)/(1+i)
-4/(3i)
-\frac{4}{3i}
-a := \begin{bmatrix} i-1 & 2 & i \\ 2+i & -1 & 2 \end{bmatrix}
-\rref(a)
-a := \begin{bmatrix} i-1 & 2 & i \\ 2+i & -1 & 2 \\ \frac{1+i}{2} & \frac{2-i}{i} & \frac{2}{i-1} \end{bmatrix}
-\rref(a)
-a^{-1}
-aa^{-1}
-\sqrt{-1}
-\sqrt[4]{16}
-\sqrt{-4}
-\sqrt{i+1}
-\sqrt[3]{-1}
-\sqrt[3]{\frac{-4}{5}}
-\sqrt[3]{\frac{-4}{i}}
-\sqrt[3.5]{\frac{-4}{i}}
-\sqrt{\frac{9}{4}}
+x := 2
+\sqrt{x} = \sqrt{x*1}

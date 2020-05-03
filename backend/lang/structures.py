@@ -58,6 +58,9 @@ class Function(ABC):
         else:
             return self == other
 
+    def __hash__(self):
+        return hash(str(self))
+
 
 class Expression(Function):
     op_str = {
@@ -133,11 +136,14 @@ class Expression(Function):
                 )
 
     def __eq__(self, other):
-        return (
-            isinstance(other, Expression)
-            and other.op == self.op
-            and Counter(other.terms) == Counter(self.terms)
-        )
+        if self.op in {operator.add, operator.mul}:
+            return (
+                isinstance(other, Expression)
+                and other.op == self.op
+                and Counter(other.terms) == Counter(self.terms)
+            )
+        else:
+            return self.terms == other.terms
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -177,6 +183,9 @@ class Expression(Function):
         if self.op == operator.floordiv:
             return f"\\frac{{{self.terms[0]}}}{{{self.terms[1]}}}"
         return Expression.op_str[self.op].join([str(term) for term in self.terms])
+
+    def __hash__(self):
+        return hash(str(self))
 
 
 class Variable(Function):
@@ -218,6 +227,9 @@ class Variable(Function):
 
     def __repr__(self) -> str:
         return self.name
+
+    def __hash__(self):
+        return hash(str(self))
 
 
 class Monomial(Function):
@@ -292,6 +304,9 @@ class Monomial(Function):
             return f"{self.coeff if self.coeff != 1 else ''}{self.var}"
         else:
             return f"{self.coeff}{self.var}^{{{self.power}}}"
+
+    def __hash__(self):
+        return hash(str(self))
 
 
 class Polynomial(Expression):
@@ -516,6 +531,9 @@ class RealNumber(Number):
             return str(int(self.value))
         return str(self.value)
 
+    def __hash__(self):
+        return hash(str(self))
+
 
 class Fraction(Number):
     """This class represents a numerical fraction at evaluation time, not a rational function, which would be stored
@@ -731,6 +749,9 @@ class Fraction(Number):
     def __repr__(self):
         return f"\\frac{{{self.num}}}{{{self.den}}}"
 
+    def __hash__(self):
+        return hash(str(self))
+
 
 class ComplexNumber(Number):
     """a + bi"""
@@ -916,6 +937,9 @@ class ComplexNumber(Number):
             op = ""
         return f"{self.a}{op}{self.b}i"
 
+    def __hash__(self):
+        return hash(str(self))
+
 
 def numberGCD(a: int, b: int) -> int:
     if b == 0:
@@ -989,6 +1013,9 @@ class Cases(Function):
             rep += str(row[0]) + "&" + str(row[1]) + "\\\\"
         rep += "\n\\end{cases}"
         return rep
+
+    def __hash__(self):
+        return hash(str(self))
 
 
 class Matrix(Function):
@@ -1192,6 +1219,9 @@ class Matrix(Function):
 
         return f"\\begin{{{self.type}}}{mat_string}\\end{{{self.type}}}"
 
+    def __hash__(self):
+        return hash(str(self))
+
 
 class Determinant(Function):
     """ The determinant of a matrix.
@@ -1214,6 +1244,9 @@ class Determinant(Function):
     def __repr__(self):
         return str(self.matrix)
 
+    def __hash__(self):
+        return hash(str(self))
+
 
 class Relation(Function):
     def __init__(self, rel_chain):
@@ -1224,13 +1257,8 @@ class Relation(Function):
             rel = self.rel_chain[i]
             left = self.rel_chain[i - 1].evaluate(state)
             right = self.rel_chain[i + 1].evaluate(state)
-            if isinstance(right, Number) and isinstance(left, Number):
-                if not rel(left, right):
-                    return False
-            else:
-                raise CastleException(
-                    f"Cannot compute relation {rel} on {left} and {right}"
-                )
+            if not rel(left, right):
+                return False
         return True
 
     def __eq__(self, other):
@@ -1246,6 +1274,9 @@ class Relation(Function):
         for ex in self.rel_chain:
             output += str(inv_rel_dict.get(ex, ex))
         return output
+
+    def __hash__(self):
+        return hash(str(self))
 
 
 class UserDefinedFunc(Function):
@@ -1267,6 +1298,9 @@ class UserDefinedFunc(Function):
     def __repr__(self):
         return str(tuple(self.args)) + "\\to" + str(self.func_body)
 
+    def __hash__(self):
+        return hash(str(self))
+
 
 class FunctionCall(Function):
     def __init__(self, function_name, passed_args: list):
@@ -1274,15 +1308,22 @@ class FunctionCall(Function):
         self.passed_args = passed_args
 
     def evaluate(self, state: State):
-        eval_args = [arg.evaluate(state).true_value() for arg in self.passed_args]
+        eval_args = [arg.evaluate(state) for arg in self.passed_args]
         if self.function_name == parse.FUNC_GCD:
-            if all([isinstance(arg, int) for arg in eval_args]):
+            if not all([isinstance(arg, Number) for arg in eval_args]):
+                # this has unbound variables in it, so just return self to get string repr
+                return self
+            val_args = [arg.true_value() for arg in eval_args]
+            if all([isinstance(arg, int) for arg in val_args]):
                 return listGCD(eval_args)
             raise CastleException("All arguments to gcd must be integers")
         if self.function_name == parse.FUNC_RREF:
             if len(eval_args) != 1:
                 raise CastleException("rref takes 1 argument")
             mat = eval_args[0]
+            if isinstance(mat, Variable):
+                # unbound variable
+                return self
             if not isinstance(mat, Matrix):
                 raise CastleException("rref argument must be matrix")
             return mat.rref()
@@ -1296,10 +1337,17 @@ class FunctionCall(Function):
                 )
             return expr.expand()
         if self.function_name in builtin_func_dict:
+            if any(isinstance(eval_args), Variable):
+                # unbound variable
+                return self
+            val_args = [arg.true_value() for arg in eval_args]
             return RealNumber(float(builtin_func_dict[self.function_name](*eval_args)))
         else:
             function = state[self.function_name]
-            if eval_args:
+            if any(isinstance(eval_args), Variable):
+                # unbound variable
+                return self
+            elif eval_args:
                 state.push_layer()
                 for arg, value in zip(function.args, eval_args):
                     state[arg.name] = value
@@ -1322,6 +1370,9 @@ class FunctionCall(Function):
 
     def __repr__(self):
         return f"{builtin_func_dict.get(self.function_name, self.function_name)}({tuple(self.passed_args)})"
+
+    def __hash__(self):
+        return hash(str(self))
 
 
 class SumFunc:
@@ -1358,11 +1409,27 @@ class SumFunc:
         state.pop_layer()
         return sum_val
 
+    def __eq__(self, other):
+        if not isinstance(other, SumFunc):
+            return False
+        return (
+            self.var == other.var
+            and self.sum_expr == other.sum_expr
+            and self.upper_bound_expr == other.upper_bound_expr
+            and self.lower_bound_expr == other.lower_bound_expr
+        )
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         return f"\\sum_{{{self.var.name} = {self.lower_bound_expr}}}^{{{self.upper_bound_expr}}}{{{self.sum_expr}}}"
 
+    def __hash__(self):
+        return hash(str(self))
 
-class ProdFunc:
+
+class ProdFunc(Function):
     def __init__(self, var: Variable, lower_bound_expr, upper_bound_expr, prod_expr):
         self.var = var
         self.prod_expr = prod_expr
@@ -1396,11 +1463,27 @@ class ProdFunc:
         state.pop_layer()
         return prod_val
 
+    def __eq__(self, other):
+        if not isinstance(other, ProdFunc):
+            return False
+        return (
+            self.var == other.var
+            and self.prod_expr == other.prod_expr
+            and self.upper_bound_expr == other.upper_bound_expr
+            and self.lower_bound_expr == other.lower_bound_expr
+        )
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         return f"\\prod_{{{self.var.name} = {self.lower_bound_expr}}}^{{{self.upper_bound_expr}}}{{{self.prod_expr}}}"
 
+    def __hash__(self):
+        return hash(str(self))
 
-class Limit:
+
+class Limit(Function):
     def __init__(self, var: Variable, lim_to, expr):
         self.var = var
         self.lim_to = lim_to
@@ -1410,11 +1493,26 @@ class Limit:
         # TODO
         pass
 
+    def __eq__(self, other):
+        if not isinstance(other, Limit):
+            return False
+        return (
+            self.var == other.var
+            and self.lim_to == other.lim_to
+            and self.expr == other.expr
+        )
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         return f"\\lim_{{{self.var} \\to {self.lim_to}}}{{{self.expr}}}"
 
+    def __hash__(self):
+        return hash(str(self))
 
-class Integral:
+
+class Integral(Function):
     def __init__(self, lower, upper, expr, var):
         self.lower = lower
         self.upper = upper
@@ -1425,33 +1523,83 @@ class Integral:
         # TODO
         pass
 
+    def __eq__(self, other):
+        if not isinstance(other, Integral):
+            return False
+        return (
+            self.lower == other.lower
+            and self.upper == other.upper
+            and self.expr == other.expr
+            and self.var == other.var
+        )
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         return f"\\int_{{{self.lower}}}^{{{self.upper}}}{{{self.expr}\\dd {self.var}}}"
 
+    def __hash__(self):
+        return hash(str(self))
 
-class Floor:
+
+class Floor(Function):
     def __init__(self, expr):
         self.expr = expr
 
     def evaluate(self, state: State):
-        return RealNumber(float(math.floor(self.expr.evaluate(state).true_value())))
+        eval_expr = self.expr.evaluate(state)
+        if isinstance(eval_expr, (Matrix, Relation)):
+            raise CastleException(
+                "Cannot evaluate Floor on {self.expr} of type {type(self.expr)}"
+            )
+        if not isinstance(eval_expr, Number):
+            # most likely contains an unbound variable
+            return self
+        return RealNumber(float(math.floor(eval_expr.true_value())))
+
+    def __eq__(self, other):
+        return isinstance(other, Floor) and self.expr == other.expr
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def __repr__(self):
         return f"\\lfloor {self.expr} \\rfloor"
 
+    def __hash__(self):
+        return hash(str(self))
 
-class Ceiling:
+
+class Ceiling(Function):
     def __init__(self, expr):
         self.expr = expr
 
     def evaluate(self, state: State):
-        return RealNumber(float(math.ceil(self.expr.evaluate(state).true_value())))
+        eval_expr = self.expr.evaluate(state)
+        if isinstance(eval_expr, (Matrix, Relation)):
+            raise CastleException(
+                "Cannot evaluate Ceiling on {self.expr} of type {type(self.expr)}"
+            )
+        if not isinstance(eval_expr, Number):
+            # most likely contains an unbound variable
+            return self
+        return RealNumber(float(math.ceil(eval_expr.true_value())))
+
+    def __eq__(self, other):
+        return isinstance(other, Ceiling) and self.expr == other.expr
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def __repr__(self):
         return f"\\lceil {self.expr} \\rceil"
 
+    def __hash__(self):
+        return hash(str(self))
 
-class Derivative:
+
+class Derivative(Function):
     def __init__(self, cmd: str, order: RealNumber, expr, var):
         self.cmd = cmd
         self.order = order
@@ -1462,14 +1610,30 @@ class Derivative:
         # TODO
         pass
 
+    def __eq__(self, other):
+        if not isinstance(other, Derivative):
+            return False
+        return (
+            self.cmd == other.cmd
+            and self.order == other.order
+            and self.expr == other.expr
+            and self.var == other.var
+        )
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         if self.order:
             return f"{self.cmd}[{self.order}]{{{self.expr}}}{{{self.var}}}"
         else:
             return f"{self.cmd}{{{self.expr}}}{{{self.var}}}"
 
+    def __hash__(self):
+        return hash(str(self))
 
-class Root:
+
+class Root(Function):
     def __init__(self, expr, n=None):
         self.expr = expr
         self.n = n
@@ -1480,6 +1644,11 @@ class Root:
             n = RealNumber(2)
         else:
             n = self.n.evaluate(state)
+        if isinstance(n, (Matrix, Relation)):
+            raise CastleException(f"can't take {n}th root of {self.expr}")
+        if not isinstance(n, Number):
+            # likely contains unbound variables
+            return self
         if n == 0:
             raise CastleException(f"Can't take 0th root of {self.expr}")
 
@@ -1493,6 +1662,11 @@ class Root:
                 return x ** (RealNumber(1) / n)
 
         operand = self.expr.evaluate(state)
+        if isinstance(operand, (Matrix, Relation)):
+            raise CastleException(f"can't take root of {self.expr}")
+        if not isinstance(operand, Number):
+            # likely contains unbound variables
+            return self
         if isinstance(operand, RealNumber):
             return real_root(operand)
         if isinstance(operand, Fraction):
@@ -1504,13 +1678,27 @@ class Root:
                 f"Can't take root of {operand} of type {type(operand)}"
             )
 
+    def derivative(self):
+        return Expression(operator.pow, self.expr, RealNumber(1) / self.n).derivative()
+
+    def __eq__(self, other):
+        if not isinstance(other, Root):
+            return False
+        return self.n == other.n and self.expr == other.expr
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         if self.n is None:
             return f"\\sqrt{{{self.expr}}}"
         return f"\\sqrt[{self.n}]{{{self.expr}}}"
 
+    def __hash__(self):
+        return hash(str(self))
 
-class Choose:
+
+class Choose(Function):
     def __init__(self, n, k):
         self.n = n
         self.k = k
@@ -1518,14 +1706,33 @@ class Choose:
     def evaluate(self, state: State):
         n = self.n.evaluate(state).true_value()
         k = self.k.evaluate(state).true_value()
+        if isinstance(n, (Matrix, Relation)) or isinstance(k, (Matrix, Relation)):
+            raise CastleException(
+                f"bad types for function binom: {type(self.n)} and {type(self.k)}"
+            )
+        if not isinstance(n, Number) or not isinstance(k, Number):
+            # likely contains unbound variables
+            return self
+        n, k = n.true_value(), k.true_value()
         if int(n) != n or int(k) != k:
             raise CastleException(
                 f"Inputs {self.n} and {self.k} to binom must be integers"
             )
         return RealNumber(int(comb(int(n), int(k))))
 
+    def __eq__(self, other):
+        if not isinstance(other, Choose):
+            return False
+        return self.n == other.n and self.k == other.k
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         return f"\\binom{{{self.n}}}{{{self.k}}}"
+
+    def __hash__(self):
+        return hash(str(self))
 
 
 class CastleException(Exception):

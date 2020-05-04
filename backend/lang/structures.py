@@ -79,7 +79,8 @@ class Expression(Function):
             return reduce(self.op, [term.evaluate(state) for term in self.terms])
         else:
             # floordiv indicates that this is a rational expression that should be stored as a fraction
-            if
+            # if
+            pass
 
     def __eq__(self, other):
         return (
@@ -123,7 +124,17 @@ class Expression(Function):
         pass
 
     def __repr__(self):
+        if self.op == operator.mul:
+            return "".join([f"({term})" for term in self.terms]) 
         return Expression.op_str[self.op].join([str(term) for term in self.terms])
+
+    def factor(self):
+        assert all(isinstance(x, (Monomial, Number)) for x in self.terms)
+        factors = [
+            Expression(operator.add, *factor) for factor in kronecker(self.terms)
+        ]
+        self.op = operator.mul
+        self.terms = factors
 
 
 class Variable(Function):
@@ -891,6 +902,7 @@ def poly_div(num_poly, den_poly):
     return (quotient, remainder)
 
 
+# run one iteration of polynomial division
 def poly_divide_one_iter(num_poly, den_poly):
     deg_num = get_highest_pow(num_poly)
     deg_den = get_highest_pow(den_poly)
@@ -930,6 +942,8 @@ def poly_divide_one_iter(num_poly, den_poly):
     return quotient, remainder
 
 
+# find the greatest common divisor between a and b
+# highest degree of a must be higher than that of b
 def polynomialGCD(a, b):
     while b != 0:
         quotient, remainder = poly_divide_one_iter(a, b)
@@ -946,6 +960,7 @@ def polynomialGCD(a, b):
     return a
 
 
+# plug in number for variable in the polynomial and evaluate
 def eval_poly(poly, value):
     sum = 0
     for mon in poly:
@@ -958,8 +973,8 @@ def eval_poly(poly, value):
     return sum
 
 
+# factor a polynomial
 def kronecker(poly):
-    # if isinstance(poly, RealNumber):
     variable = poly[0].var
     f_pow = get_highest_pow(poly)
     g_pow = f_pow // 2
@@ -968,8 +983,9 @@ def kronecker(poly):
     last_mon = poly[len(poly) - 1]
 
     if isinstance(last_mon, Monomial):
-        q, r = poly_div(poly, [last_mon])
-        return list(kronecker(q), last_mon)
+        divisor = [Monomial(1, last_mon.var, last_mon.power)]
+        q, r = poly_div(poly, divisor)
+        return list(kronecker(q), divisor)
 
     f = [eval_poly(poly, 0), eval_poly(poly, 1), eval_poly(poly, 2)]
 
@@ -1008,10 +1024,12 @@ def kronecker(poly):
 start = State()
 x = Variable(start, "x")
 first_num = Monomial(1, x, 5)
-second_num = Monomial(1, x, 4)
-# third_num = Monomial(-2, x, 3)
-fourth_num = Monomial(1, x, 2)
-fifth_num = Monomial(1, x, 1)
-# sixth_num = RealNumber(2)
-x = kronecker([first_num, second_num, fourth_num, fifth_num])
-print(x)
+second_num = Monomial(-1, x, 4)
+third_num = Monomial(8, x, 3)
+fourth_num = Monomial(-2, x, 2)
+fifth_num = Monomial(14, x, 1)
+sixth_num = RealNumber(5)
+poly = [first_num, second_num, third_num, fourth_num, fifth_num, sixth_num]
+ex = Expression(operator.add, *poly)
+ex.factor()
+print(ex)

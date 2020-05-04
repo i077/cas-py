@@ -1,18 +1,18 @@
+import decimal
 import math
 import operator
-import decimal
 from abc import ABC, abstractmethod
 from collections import Counter
 from functools import reduce
 from typing import List
 
 import numpy as np
-from scipy.special import comb
 import sympy
+from scipy.special import comb
 
-from State import State
 from Dicts import builtin_func_dict, inv_rel_dict
 from LaTeXParser import LaTeXParser as parse
+from State import State
 
 
 class Function(ABC):
@@ -75,16 +75,43 @@ class Expression(Function):
     def __init__(self, op: callable, *terms):
         # how should we handle expressions taken to powers?
         self.op = op
-        self.terms = list(terms)
+        self.terms = self.combine_like_terms(terms)
         assert (
             len(self.terms) == 2
             if self.op in [operator.truediv, operator.floordiv, operator.pow]
             else len(self.terms) >= 2
         )
 
+    def has_coefficient(self):
+        return (
+            len(self.terms) == 2
+            and any(lambda x: isinstance(x, (Number, int, float)), self.terms)
+            and any(lambda x: not isinstance(x, (Number, int, float)), self.terms)
+        )
+
+    def can_combine(self, other):
+        if not (self.has_coefficient() and other.has_coefficient()):
+            return False
+        term = next(x for x in self.terms if not isinstance(x, (Number, int, float)))
+        other_term = next(
+            x for x in other.terms if not isinstance(x, (Number, int, float))
+        )
+        if term.can_combine(other_term):
+            pass
+
+    def combine_like_terms(self, terms, *types):
+        for term in terms:
+            for other in terms:
+                if term != other:
+                    pass
+        return terms
+
+    def expand(self):
+        pass
+
     def __add__(self, other):
         if self.op == operator.add:
-            self.terms.append(other)
+            self.terms += other.terms
         else:
             super().__add__(other)
 
@@ -177,6 +204,7 @@ class Expression(Function):
 
     # TODO: how tf do we do this
     def integral(self):
+
         pass
 
     def __repr__(self):
@@ -238,8 +266,15 @@ class Monomial(Function):
         self.var = var
         self.power = power
 
+    def can_combine(self, other):
+        return (self.var == other.var and self.power == other.power) or (
+            self.power == 0 and isinstance(other, (Number, int, float))
+        )
+
     def __add__(self, other):
-        if (
+        if self.power == 0:
+            return self.coeff + other
+        elif (
             isinstance(other, Monomial)
             and other.var == self.var
             and other.power == self.power
@@ -249,7 +284,9 @@ class Monomial(Function):
             return super().__add__(other)
 
     def __sub__(self, other):
-        if (
+        if self.power == 0:
+            return self.coeff - other
+        elif (
             isinstance(other, Monomial)
             and other.var == self.var
             and other.power == self.power
@@ -259,7 +296,9 @@ class Monomial(Function):
             return super().__sub__(other)
 
     def __mul__(self, other):
-        if isinstance(other, Monomial) and other.var == self.var:
+        if self.power == 0:
+            return self.coeff * other
+        elif isinstance(other, Monomial) and other.var == self.var:
             return Monomial(
                 self.coeff * other.coeff, self.var, other.power + self.power
             )
@@ -267,22 +306,39 @@ class Monomial(Function):
             return super().__mul__(other)
 
     def __truediv__(self, other):
-        if isinstance(other, Monomial) and other.var == self.var:
-            return (
-                Monomial(self.coeff, self.var, self.power - other.power) / other.coeff
+        if self.power == 0:
+            return self.coeff / other
+        elif isinstance(other, Monomial) and other.var == self.var:
+            return Monomial(
+                self.coeff / other.coeff, self.var, self.power - other.power
             )
         else:
             return super().__truediv__(other)
 
+    def __floordiv__(self, other):
+        if self.power == 0:
+            return self.coeff // other
+        elif isinstance(other, Monomial) and other.var == self.var:
+            return Monomial(
+                self.coeff // other.coeff, self.var, self.power - other.power
+            )
+        else:
+            return super().__floordiv__(other)
+
     def evaluate(self, state: State):
-        return self.coeff * (state[self.var.name] ** self.power)
+        return (
+            self.coeff
+            if self.power == 0
+            else self.coeff * (state[self.var.name] ** self.power)
+        )
 
     def __eq__(self, other):
         return (
-            self.coeff == other.coeff
+            isinstance(other, Monomial)
+            and self.coeff == other.coeff
             and self.var == other.var
             and self.power == other.power
-        )
+        ) or (isinstance(other, Number) and self.power == 0 and self.coeff == other)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -307,12 +363,6 @@ class Monomial(Function):
 
     def __hash__(self):
         return hash(str(self))
-
-
-class Polynomial(Expression):
-    def __init__(self, *terms):
-        super().__init__(op=operator.add, *terms)
-        assert all(isinstance(term, Monomial) for term in self.terms)
 
 
 class Number(Function, ABC):
@@ -1429,6 +1479,22 @@ class SumFunc:
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def derivative(self):
+        return SumFunc(
+            self.var,
+            self.lower_bound_expr,
+            self.upper_bound_expr,
+            self.sum_expr.derivative(),
+        )
+
+    def integral(self):
+        return SumFunc(
+            self.var,
+            self.lower_bound_expr,
+            self.upper_bound_expr,
+            self.sum_expr.integral(),
+        )
+
     def __repr__(self):
         return f"\\sum_{{{self.var.name} = {self.lower_bound_expr}}}^{{{self.upper_bound_expr}}}{{{self.sum_expr}}}"
 
@@ -1527,8 +1593,7 @@ class Integral(Function):
         self.var = var
 
     def evaluate(self, state: State):
-        # TODO
-        pass
+        return self.expr.integral().evaluate(state)
 
     def __eq__(self, other):
         if not isinstance(other, Integral):
@@ -1614,8 +1679,12 @@ class Derivative(Function):
         self.var = var
 
     def evaluate(self, state: State):
-        # TODO
-        pass
+        expr = self.expr
+        order = self.order
+        while order > 0:
+            expr = expr.derivative()
+            order -= 1
+        return self.expr.evaluate(state)
 
     def __eq__(self, other):
         if not isinstance(other, Derivative):

@@ -131,7 +131,7 @@ class Expression(Function):
     def factor(self):
         assert all(isinstance(x, (Monomial, Number)) for x in self.terms)
         factors = [
-            Expression(operator.add, *factor) for factor in kronecker(self.terms)
+            Expression(operator.add, *factor) for factor in kronecker(self.terms, 0)
         ]
         self.op = operator.mul
         self.terms = factors
@@ -974,7 +974,9 @@ def eval_poly(poly, value):
 
 
 # factor a polynomial
-def kronecker(poly):
+def kronecker(poly, depth):
+    if isinstance(poly[0], RealNumber):
+        return [poly[0], 0]
     variable = poly[0].var
     f_pow = get_highest_pow(poly)
     g_pow = f_pow // 2
@@ -987,7 +989,7 @@ def kronecker(poly):
             Monomial(mon.coeff, mon.var, mon.power - last_mon.power) for mon in poly
         ]
         upd_poly[len(upd_poly) - 1] = RealNumber(last_mon.coeff)
-        k = kronecker(upd_poly)
+        k = kronecker(upd_poly, depth + 1)
         return [k, [Monomial(1, last_mon.var, last_mon.power), RealNumber(0)]]
 
     f = [eval_poly(poly, 0), eval_poly(poly, 1), eval_poly(poly, 2)]
@@ -1020,8 +1022,12 @@ def kronecker(poly):
             poss_poly.append(RealNumber(perm[coeff]))
             q, r = poly_div(poly, poss_poly)
             if isinstance(r, RealNumber) and r.value == 0:
-                return list((kronecker(q), poss_poly))
-    return poly
+                return list((kronecker(q, depth + 1), poss_poly))
+    if depth == 0:
+        return [poly]
+    else:
+        depth += 1
+        return poly
 
 
 start = State()
@@ -1036,3 +1042,26 @@ poly = [first_num, second_num, third_num, fourth_num, fifth_num, sixth_num]
 ex = Expression(operator.add, *poly)
 ex.factor()
 print(ex)
+
+# start = State()
+# x = Variable(start, "x")
+# first_num = Monomial(1, x, 5)
+# # second_num = Monomial(-1, x, 4)
+# third_num = Monomial(2, x, 3)
+# fourth_num = Monomial(1, x, 2)
+# fifth_num = Monomial(-3, x, 1)
+# sixth_num = RealNumber(-1)
+# poly = [first_num, third_num, fourth_num, fifth_num, sixth_num]
+# ex = Expression(operator.add, *poly)
+# ex.factor()
+# print(ex)
+
+# start = State()
+# x = Variable(start, "x")
+# fourth_num = Monomial(1, x, 2)
+# fifth_num = Monomial(4, x, 1)
+# sixth_num = RealNumber(3)
+# poly = [fourth_num, fifth_num, sixth_num]
+# ex = Expression(operator.add, *poly)
+# ex.factor()
+# print(ex)

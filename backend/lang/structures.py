@@ -10,9 +10,9 @@ import numpy as np
 import sympy
 from scipy.special import comb
 
-from Dicts import builtin_func_dict, inv_rel_dict
-from LaTeXParser import LaTeXParser as parse
-from State import State
+from backend.lang.Dicts import builtin_func_dict, inv_rel_dict
+from backend.lang.LaTeXParser import LaTeXParser as parse
+from backend.lang.State import State
 
 
 class Function(ABC):
@@ -305,12 +305,38 @@ class Expression(Function):
     def __init__(self, op: callable, *terms):
         # how should we handle expressions taken to powers?
         self.op = op
-        self.terms = self.combine_like_terms(terms)
+        # self.terms = self.combine_like_terms(terms)
+        self.terms = list(terms)
         assert (
             len(self.terms) == 2
             if self.op in [operator.truediv, operator.floordiv, operator.pow]
             else len(self.terms) >= 2
         )
+
+    def is_monomial_like(self):
+        if self.has_coefficient() and len(self.terms) == 2:
+            pow_expr = next(
+                isinstance(term, Expression) and term.op == operator.pow
+                for term in self.terms
+            )
+            return len(pow_expr.terms) == 2 and all(
+                isinstance(term, Number, Variable) for term in pow_expr.terms
+            )
+        return False
+
+    def to_monomial(self):
+        if self.is_monomial_like():
+            coeff = next(isinstance(term, Number) for term in self.terms)
+            var_pow = next(
+                isinstance(term, Expression) and term.op == operator.pow
+                for term in self.terms
+            )
+            var = next(isinstance(term, Variable) for term in var_pow.terms)
+            power = next(isinstance(term, Number) for term in var_pow.terms)
+            return Monomial(coeff, var, power)
+
+    def is_polynomial(self):
+        return all(isinstance(term, (Monomial, Number)) for term in self.terms)
 
     def has_coefficient(self):
         return (
@@ -322,45 +348,64 @@ class Expression(Function):
     def can_combine(self, other):
         if not (self.has_coefficient() and other.has_coefficient()):
             return False
-        term = next(x for x in self.terms if not isinstance(x, (Number, int, float)))
-        other_term = next(
-            x for x in other.terms if not isinstance(x, (Number, int, float))
-        )
-        if term.can_combine(other_term):
-            pass
 
-    def combine_like_terms(self, terms, *types):
-        for term in terms:
-            for other in terms:
-                if term != other:
-                    pass
-        return terms
+    def combine_like_terms(self, terms):
+        if self.op == operator.add or self.op == operator.sub:
+            combined = reduce(lambda x, y: self.op(x, y) if x.can_combine(y) else x, terms)
+        return combined
 
     def expand(self):
-        pass
+        if self.op == operator.mul:
+            for a in self.terms:
+                for b in self.terms:
+                    if (
+                        a != b
+                        and isinstance(a, Expression)
+                        and isinstance(b, Expression)
+                    ):
+                        for a_term in a:
+                            for b_term in b:
+                                pass
+                                # what the fuck
+        else:
+            return self
 
     def __add__(self, other):
-        if self.op == operator.add:
-            self.terms += other.terms
+        if isinstance(other, Expression) and other.op == self.op:
+            return Expression(self.op, self.terms + other.terms)
+        elif self.op == operator.add:
+            return Expression(self.op, self.terms + [other])
         else:
-            super().__add__(other)
+            return super().__add__(other)
 
     def __sub__(self, other):
-        if self.op == operator.sub:
-            self.terms.append(other)
+        if isinstance(other, Expression) and other.op == self.op:
+            return Expression(self.op, self.terms + other.terms)
+        elif self.op == operator.sub:
+            return Expression(self.op, self.terms + [other])
         else:
-            super().__add__(other)
+            return super().__sub__(other)
 
     def __mul__(self, other):
-        if self.op == operator.mul:
-            self.terms.append(other)
+        if isinstance(other, Expression) and other.op == self.op:
+            return Expression(self.op, self.terms + other.terms)
+        elif self.op == operator.sub:
+            return Expression(self.op, self.terms + [other])
         else:
-            super().__mul__(other)
+            return super().__mul__(other)
 
     def __truediv__(self, other):
-        # TODO how should we handle this?
-        if self.op == operator.truediv:
+        return super().__truediv__(other)
+
+    def __floordiv__(self, other):
+        if (
+            isinstance(other, Expression)
+            and other.is_polynomial()
+            and self.is_polynomial()
+        ):
+            # return Expression(operation.add, )
             pass
+        return super().__floordiv__(other)
 
     def evaluate(self, state: State):
         if (
@@ -442,16 +487,25 @@ class Expression(Function):
         if self.op == operator.floordiv:
             return f"\\frac{{{self.terms[0]}}}{{{self.terms[1]}}}"
         if self.op == operator.mul:
-            return "".join([f"({term})" for term in self.terms])
+            return "".join(
+                [
+                    f"({term})"
+                    if isinstance(term, Expression) and term.op != operator.mul
+                    else f"{term}"
+                    for term in self.terms
+                ]
+            )
         return Expression.op_str[self.op].join([str(term) for term in self.terms])
 
     def factor(self):
-        assert all(isinstance(x, (Monomial, Number)) for x in self.terms)
+        if not self.is_polynomial():
+            raise CastleException("Provided argument was not a polynomial")
+
+        terms = [term.to_monomial() if term.is_monomial_like() else term for term in self.terms]
         factors = [
-            Expression(operator.add, *factor) for factor in kronecker(self.terms, 0)
+            Expression(operator.add, *factor) for factor in kronecker(terms, 0)
         ]
-        self.op = operator.mul
-        self.terms = factors
+        return Expression(operator.mul, *factors)
 
     def __hash__(self):
         return hash(str(self))
@@ -1631,7 +1685,12 @@ class FunctionCall(Function):
             if len(eval_args) != 1:
                 raise CastleException("factor takes 1 argument")
             expr = eval_args[0]
-            if not isinstance(expr, Expression):
+            print(expr)
+            print(expr.terms)
+            print(list(map(type, expr.terms)))
+            print(expr.is_polynomial())
+            print(type(expr))
+            if not (isinstance(expr, Expression) and expr.is_polynomial()):
                 raise CastleException("factor argument must be a polynomial^")
             return expr.factor()
         if self.function_name in builtin_func_dict:
@@ -1642,7 +1701,7 @@ class FunctionCall(Function):
             return RealNumber(float(builtin_func_dict[self.function_name](*eval_args)))
         else:
             function = state[self.function_name]
-            if any(isinstance(eval_args), Variable):
+            if any(isinstance(eval_args, Variable)):
                 # unbound variable
                 return self
             elif eval_args:

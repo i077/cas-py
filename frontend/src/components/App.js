@@ -124,8 +124,8 @@ class App extends React.Component {
         </Row>
         <Row className="App-main-row">
           <Col className="App-col">
-            <History history={this.state.history} handleHistory={this.handleHistoryClick} />
             <InputArea submitHandler={this.handleSubmit} resetHandler={this.handleReset} history={this.state.history} selectedText={this.state.selectedText} />
+            <History history={this.state.history} handleHistory={this.handleHistoryClick} />
           </Col>
         </Row>
       </Container>

@@ -61,6 +61,232 @@ class Function(ABC):
     def __hash__(self):
         return hash(str(self))
 
+####### POLYNOMIAL FACTORING UTILITY FUNCTIONS #######################
+# get all the degrees of the current polynomial
+def get_degrees(poly):
+    degrees = []
+    for mon in poly:
+        if isinstance(mon, Monomial):
+            degrees.append(mon.power)
+        else:
+            degrees.append(0)
+    return degrees
+
+
+# find the index of a monomial with a given power
+def power_poly_index(poly, power):
+    for x in range(len(poly)):
+        if isinstance(poly[x], Monomial) and power == poly[x].power:
+            return x
+    return -1
+
+
+# find the highest power of a polynomial
+def get_highest_pow(poly):
+    if isinstance(poly, RealNumber):
+        return 0
+    for mon in poly:
+        if isinstance(mon, RealNumber):
+            return 0
+        elif mon.coeff != 0:
+            return mon.power
+    return 0
+
+
+# find the largest power with a nonzero coefficient in a polynomial
+def get_highest_coeff(poly):
+    for mon in poly:
+        if mon.coeff != 0:
+            return mon.coeff
+
+
+# add intermediate monomials that are missing from a polynomial
+def add_missing_degrees(poly, numerator_high_pow):
+    num_degrees = get_degrees(poly)
+    pot_missing = list(np.arange(0, numerator_high_pow + 1)[::-1])
+    upd_poly = []
+
+    poly = [
+        poly[power_poly_index(poly, x)]
+        if x in num_degrees and x != 0
+        else Monomial(0, poly[0].var, x)
+        if x not in num_degrees and x != 0
+        else poly[power_poly_index(poly, x)]
+        if x in num_degrees
+        else RealNumber(0)
+        for x in pot_missing
+    ]
+
+    if isinstance(poly[-1], Monomial) and poly[-1].power == 0:
+        poly[-1] = RealNumber(poly[-1].coeff)
+    return poly
+
+
+# remove monomials that have a zero coefficient until you have a monomial with a nonzero
+# coefficient (in order of descending powers)
+def remove_leading_zeros(poly):
+    for x in range(len(poly)):
+        if isinstance(poly[x], RealNumber):
+            return poly[x]
+        if poly[x].coeff != 0:
+            return poly[x:]
+
+
+# polynomial division with a numerator and denominator
+def poly_div(num_poly, den_poly):
+    high_num_poly_deg = num_poly[0].power
+    quotient = [0] * len(num_poly)
+
+    # add the missing degrees for the numerator polynomial and denominator polynomial
+    num_poly = add_missing_degrees(num_poly, high_num_poly_deg)
+    den_poly = add_missing_degrees(den_poly, high_num_poly_deg)
+
+    remainder = num_poly
+    i = 0
+
+    remain_high_deg = get_highest_pow(remainder)
+    deg_den = get_highest_pow(den_poly)
+
+    # while the power of the remainder is higher than that of the denominator,
+    # divide the numerator by the denominator
+    while remain_high_deg >= deg_den:
+        quotient[i], remainder = poly_divide_one_iter(remainder, den_poly)
+        remain_high_deg = get_highest_pow(remainder)
+        i += 1
+    quotient = list(filter((0).__ne__, quotient))
+    return (quotient, remainder)
+
+
+# run one iteration of polynomial division
+def poly_divide_one_iter(num_poly, den_poly):
+    deg_num = get_highest_pow(num_poly)
+    deg_den = get_highest_pow(den_poly)
+    quotient = Monomial(
+        get_highest_coeff(num_poly) / get_highest_coeff(den_poly),
+        num_poly[0].var,
+        deg_num - deg_den,
+    )
+    mult = [
+        quotient * mon
+        if isinstance(mon, Monomial)
+        else Monomial(
+            (RealNumber(quotient.coeff) * mon).value, quotient.var, quotient.power
+        )
+        for mon in den_poly
+    ]
+    mult = remove_leading_zeros(mult)
+
+    eq_length_mult = add_missing_degrees(mult, deg_num)
+    eq_length_rem = add_missing_degrees(num_poly, deg_num)
+
+    subtract_from_rem = [
+        eq_length_rem[x] - eq_length_mult[x]
+        if type(eq_length_rem[x]) is type(eq_length_mult[x])
+        else RealNumber(eq_length_rem[x]) - eq_length_mult[x]
+        if isinstance(eq_length_mult[x], RealNumber)
+        else eq_length_rem[x] - RealNumber(eq_length_mult[x])
+        for x in range(len(eq_length_mult))
+    ]
+
+    remainder = subtract_from_rem
+    remain_high_deg = get_highest_pow(remainder)
+    remainder = remove_leading_zeros(remainder)
+
+    if deg_num == deg_den:
+        quotient = RealNumber(quotient.coeff)
+    return quotient, remainder
+
+
+# find the greatest common divisor between a and b
+# highest degree of a must be higher than that of b
+def polynomialGCD(a, b):
+    while b != 0:
+        quotient, remainder = poly_divide_one_iter(a, b)
+        a = b
+        b = remainder
+    if a == 0 or isinstance(a, RealNumber):
+        return a
+    leading_coeff = a[0].coeff
+    for index in range(len(a)):
+        if isinstance(a[index], Monomial):
+            a[index].coeff /= leading_coeff
+        else:
+            a[index] /= RealNumber(leading_coeff)
+    return a
+
+
+# plug in number for variable in the polynomial and evaluate
+def eval_poly(poly, value):
+    sum = 0
+    for mon in poly:
+        if isinstance(mon, Monomial):
+            sum += mon.coeff * value ** mon.power
+        elif isinstance(mon, RealNumber):
+            sum += mon.value
+        else:
+            sum += mon
+    return sum
+
+
+# factor a polynomial
+def kronecker(poly, depth):
+    if isinstance(poly[0], RealNumber):
+        return [poly[0], 0]
+    variable = poly[0].var
+    f_pow = get_highest_pow(poly)
+    if f_pow == 1:
+        return poly
+    g_pow = f_pow // 2
+
+    last_mon = poly[len(poly) - 1]
+
+    if isinstance(last_mon, Monomial):
+        upd_poly = [
+            Monomial(mon.coeff, mon.var, mon.power - last_mon.power) for mon in poly
+        ]
+        upd_poly[len(upd_poly) - 1] = RealNumber(last_mon.coeff)
+        k = kronecker(upd_poly, depth + 1)
+        return [k, [Monomial(1, last_mon.var, last_mon.power), RealNumber(0)]]
+
+    f = []
+    d = []
+
+    for index in range(g_pow + 1):
+        f.append(eval_poly(poly, index))
+
+    for num in f:
+        abs_num = abs(num)
+        divisor_of_num = []
+        for i in range(1, int(abs_num) + 1):
+            if abs_num % i == 0:
+                divisor_of_num.append(i)
+                divisor_of_num.append(-i)
+        d.append(divisor_of_num)
+
+    a = list(product(*d))
+
+    a = a[: len(a) // 2]
+
+    for poss_coeff in a:
+        all_perm = list(permutations(poss_coeff))
+        for perm in set(all_perm):
+
+            poss_poly = []
+            coeff = len(perm) - 1
+            power = len(perm) - 1
+            while power > 0:
+                poss_poly.append(Monomial(perm[coeff - power], variable, power))
+                power -= 1
+            poss_poly.append(RealNumber(perm[coeff]))
+            q, r = poly_div(poly, poss_poly)
+            if isinstance(r, RealNumber) and r.value == 0:
+                return list((kronecker(q, depth + 1), poss_poly))
+    if depth == 0:
+        return [poly]
+    else:
+        depth += 1
+        return poly
+##### POLYNOMIAL FACTORING UTILITIES #######
 
 class Expression(Function):
     op_str = {

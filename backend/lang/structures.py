@@ -125,7 +125,7 @@ class Expression(Function):
 
     def __repr__(self):
         if self.op == operator.mul:
-            return "".join([f"({term})" for term in self.terms]) 
+            return "".join([f"({term})" for term in self.terms])
         return Expression.op_str[self.op].join([str(term) for term in self.terms])
 
     def factor(self):
@@ -880,7 +880,7 @@ def remove_leading_zeros(poly):
 # polynomial division with a numerator and denominator
 def poly_div(num_poly, den_poly):
     high_num_poly_deg = num_poly[0].power
-    quotient = [0] * high_num_poly_deg
+    quotient = [0] * len(num_poly)
 
     # add the missing degrees for the numerator polynomial and denominator polynomial
     num_poly = add_missing_degrees(num_poly, high_num_poly_deg)
@@ -983,9 +983,12 @@ def kronecker(poly):
     last_mon = poly[len(poly) - 1]
 
     if isinstance(last_mon, Monomial):
-        divisor = [Monomial(1, last_mon.var, last_mon.power)]
-        q, r = poly_div(poly, divisor)
-        return list(kronecker(q), divisor)
+        upd_poly = [
+            Monomial(mon.coeff, mon.var, mon.power - last_mon.power) for mon in poly
+        ]
+        upd_poly[len(upd_poly) - 1] = RealNumber(last_mon.coeff)
+        k = kronecker(upd_poly)
+        return [k, [Monomial(1, last_mon.var, last_mon.power), RealNumber(0)]]
 
     f = [eval_poly(poly, 0), eval_poly(poly, 1), eval_poly(poly, 2)]
 

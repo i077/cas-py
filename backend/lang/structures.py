@@ -979,8 +979,9 @@ def kronecker(poly, depth):
         return [poly[0], 0]
     variable = poly[0].var
     f_pow = get_highest_pow(poly)
+    if f_pow == 1:
+        return poly
     g_pow = f_pow // 2
-    h_pow = f_pow - g_pow
 
     last_mon = poly[len(poly) - 1]
 
@@ -992,9 +993,11 @@ def kronecker(poly, depth):
         k = kronecker(upd_poly, depth + 1)
         return [k, [Monomial(1, last_mon.var, last_mon.power), RealNumber(0)]]
 
-    f = [eval_poly(poly, 0), eval_poly(poly, 1), eval_poly(poly, 2)]
-
+    f = []
     d = []
+
+    for index in range(g_pow + 1):
+        f.append(eval_poly(poly, index))
 
     for num in f:
         abs_num = abs(num)
@@ -1007,9 +1010,9 @@ def kronecker(poly, depth):
 
     a = list(product(*d))
 
-    b = a[: len(a) // 2]
+    a = a[: len(a) // 2]
 
-    for poss_coeff in b:
+    for poss_coeff in a:
         all_perm = list(permutations(poss_coeff))
         for perm in set(all_perm):
 

@@ -61,6 +61,7 @@ class Function(ABC):
     def __hash__(self):
         return hash(str(self))
 
+
 ####### POLYNOMIAL FACTORING UTILITY FUNCTIONS #######################
 # get all the degrees of the current polynomial
 def get_degrees(poly):
@@ -286,7 +287,10 @@ def kronecker(poly, depth):
     else:
         depth += 1
         return poly
+
+
 ##### POLYNOMIAL FACTORING UTILITIES #######
+
 
 class Expression(Function):
     op_str = {
@@ -430,13 +434,24 @@ class Expression(Function):
 
     # TODO: how tf do we do this
     def integral(self):
-
-        pass
+        if self.op == operator.add or self.op == operator.sub:
+            return Expression(self.op, *[term.integral() for term in self.terms])
+        raise CastleException("Integration is not for this operation")
 
     def __repr__(self):
         if self.op == operator.floordiv:
             return f"\\frac{{{self.terms[0]}}}{{{self.terms[1]}}}"
+        if self.op == operator.mul:
+            return "".join([f"({term})" for term in self.terms])
         return Expression.op_str[self.op].join([str(term) for term in self.terms])
+
+    def factor(self):
+        assert all(isinstance(x, (Monomial, Number)) for x in self.terms)
+        factors = [
+            Expression(operator.add, *factor) for factor in kronecker(self.terms, 0)
+        ]
+        self.op = operator.mul
+        self.terms = factors
 
     def __hash__(self):
         return hash(str(self))
@@ -1921,6 +1936,13 @@ class Derivative(Function):
             and self.expr == other.expr
             and self.var == other.var
         )
+    def integral(self):
+        if self.order == 1:
+            return self.expr
+        else:
+            return Derivative(self.cmd, self.order - 1, self.expr, self.var)
+    def derivative(self):
+        return Derivative(self.cmd, self.order + 1, self.expr, self.var)
 
     def __ne__(self, other):
         return not self.__eq__(other)

@@ -1834,7 +1834,29 @@ class Integral(Function):
         self.var = var
 
     def evaluate(self, state: State):
-        return self.expr.integral().evaluate(state)
+        lower_bound = self.lower.evaluate(state)
+        upper_bound = self.upper.evaluate(state)
+
+        # light error checking for stuff we didn't do
+        if not isinstance(lower_bound, RealNumber):
+            raise CastleException("Sum lower bound must evaluate to a real value")
+        if upper_bound.value == float("inf"):
+            raise CastleException("Improper integrals are not defined")
+        if not isinstance(upper_bound, RealNumber):
+            raise CastleException("Sum upper bound must evaluate to a real value")
+
+        # add temporary local variable environment
+        state.push_layer()
+
+        # evaluate the upper and lower bounds by setting the state manually
+        state[self.var.name] = RealNumber(upper_bound)
+        A = self.expr.integral().evaluate(state)
+
+        state[self.var.name] = RealNumber(lower_bound)
+        B = self.expr.integral().evaluate(state)
+        state.pop_layer()
+
+        return A - B
 
     def __eq__(self, other):
         if not isinstance(other, Integral):
@@ -1936,11 +1958,13 @@ class Derivative(Function):
             and self.expr == other.expr
             and self.var == other.var
         )
+
     def integral(self):
         if self.order == 1:
             return self.expr
         else:
             return Derivative(self.cmd, self.order - 1, self.expr, self.var)
+
     def derivative(self):
         return Derivative(self.cmd, self.order + 1, self.expr, self.var)
 

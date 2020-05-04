@@ -316,8 +316,9 @@ class Expression(Function):
     def is_monomial_like(self):
         if self.has_coefficient() and len(self.terms) == 2:
             pow_expr = next(
-                isinstance(term, Expression) and term.op == operator.pow
+                term
                 for term in self.terms
+                if isinstance(term, Expression) and term.op == operator.pow
             )
             return len(pow_expr.terms) == 2 and all(
                 isinstance(term, Number, Variable) for term in pow_expr.terms
@@ -326,23 +327,27 @@ class Expression(Function):
 
     def to_monomial(self):
         if self.is_monomial_like():
-            coeff = next(isinstance(term, Number) for term in self.terms)
+            coeff = next(term for term in self.terms if isinstance(term, Number))
             var_pow = next(
-                isinstance(term, Expression) and term.op == operator.pow
+                term
                 for term in self.terms
+                if isinstance(term, Expression) and term.op == operator.pow
             )
-            var = next(isinstance(term, Variable) for term in var_pow.terms)
-            power = next(isinstance(term, Number) for term in var_pow.terms)
+            var = next(term for term in var_pow.terms if isinstance(term, Variable))
+            power = next(term for term in var_pow.terms if isinstance(term, Number))
             return Monomial(coeff, var, power)
 
     def is_polynomial(self):
-        return all(isinstance(term, (Monomial, Number)) for term in self.terms)
+        return all(
+            isinstance(term, (Monomial, Number)) or term.is_monomial_like()
+            for term in self.terms
+        )
 
     def has_coefficient(self):
         return (
             len(self.terms) == 2
-            and any(lambda x: isinstance(x, (Number, int, float)), self.terms)
-            and any(lambda x: not isinstance(x, (Number, int, float)), self.terms)
+            and any(isinstance(term, (Number, int, float)) for term in self.terms)
+            and any(not isinstance(term, (Number, int, float)) for term in self.terms)
         )
 
     def can_combine(self, other):
@@ -351,7 +356,9 @@ class Expression(Function):
 
     def combine_like_terms(self, terms):
         if self.op == operator.add or self.op == operator.sub:
-            combined = reduce(lambda x, y: self.op(x, y) if x.can_combine(y) else x, terms)
+            combined = reduce(
+                lambda x, y: self.op(x, y) if x.can_combine(y) else x, terms
+            )
         return combined
 
     def expand(self):
@@ -498,13 +505,16 @@ class Expression(Function):
         return Expression.op_str[self.op].join([str(term) for term in self.terms])
 
     def factor(self):
-        if not self.is_polynomial():
-            raise CastleException("Provided argument was not a polynomial")
-
-        terms = [term.to_monomial() if term.is_monomial_like() else term for term in self.terms]
-        factors = [
-            Expression(operator.add, *factor) for factor in kronecker(terms, 0)
+        # if not self.is_polynomial():
+        #     raise CastleException("Provided argument was not a polynomial")
+        terms = [
+            term.to_monomial() if term.is_monomial_like() else term
+            for term in self.terms
         ]
+        print("factoring")
+        print(terms)
+        print([type(term) for term in self.terms])
+        factors = [Expression(operator.add, *factor) for factor in kronecker(terms, 0)]
         return Expression(operator.mul, *factors)
 
     def __hash__(self):
@@ -1685,12 +1695,12 @@ class FunctionCall(Function):
             if len(eval_args) != 1:
                 raise CastleException("factor takes 1 argument")
             expr = eval_args[0]
-            print(expr)
-            print(expr.terms)
-            print(list(map(type, expr.terms)))
-            print(expr.is_polynomial())
-            print(type(expr))
-            if not (isinstance(expr, Expression) and expr.is_polynomial()):
+            # print(expr)
+            # print(expr.terms)
+            # print(list(map(type, expr.terms)))
+            # print(expr.is_polynomial())
+            # print(type(expr))
+            if not isinstance(expr, Expression):
                 raise CastleException("factor argument must be a polynomial^")
             return expr.factor()
         if self.function_name in builtin_func_dict:

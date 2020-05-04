@@ -245,10 +245,6 @@ class CastleVisitor(LaTeXVisitor):
     def visitTex_symb_single(self, ctx: parse.Tex_symb_singleContext):
         """tex_symb_single
         (NON_EI_LETTER | E | I | DIGIT) """
-        if ctx.E():
-            return RealNumber(np.e)
-        if ctx.I():
-            return ComplexNumber.create(RealNumber(0), RealNumber(1))
         text = ctx.getText()
         if ctx.DIGIT():
             return RealNumber(int(text))
@@ -377,12 +373,11 @@ class CastleVisitor(LaTeXVisitor):
         )
 
     def visitFunc_int(self, ctx: parse.Func_intContext):
-        return Integral(
-            self.visit(ctx.tex_symb(0)),
-            self.visit(ctx.tex_symb(1)),
-            self.visit(ctx.expr()),
-            self.visit(ctx.var()),
-        )
+        if ctx.tex_symb():
+            upper, lower = self.visit(ctx.tex_symb(0)), self.visit(ctx.tex_symb(1))
+        else:
+            upper, lower = None, None
+        return Integral(upper, lower, self.visit(ctx.expr()), self.visit(ctx.var()))
 
     def visitFunc_floorceil(self, ctx: parse.Func_floorceilContext):
         left, right = ctx.lop.type, ctx.rop.type
